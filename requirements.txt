@@ -1,0 +1,4 @@
+markdown-it-py
+linkify-it-py
+mdit-py-plugins
+python-frontmatter
