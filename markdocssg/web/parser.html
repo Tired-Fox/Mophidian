@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+         
+        <link rel="stylesheet" href="style.min.css">
+        
+
+        
+    <!-- Highlight.js -->
+<link rel="stylesheet"
+href="//unpkg.com/@highlightjs/cdn-assets@11.6.0/styles/nord.min.css">
+<script src="//unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"></script>
+    
+    <script>
+        window.onload = () => {
+            
+                
+                // Highlight know languages otherwise plaintext
+const toHighlight = document.querySelectorAll('code');
+if (toHighlight) {
+    for (const hl in toHighlight) {
+        if (toHighlight[hl].className?.includes('language-')) {
+            hljs.highlightElement(toHighlight[hl]);
+        } else {
+            toHighlight[hl].className += 'language-plaintext hljs'
+        }
+    }
+}
+                
+                
+            
+        }
+    </script>
+
+
+        <title>Document</title>
+    </head>
+    <body>
+        <div class="header">
+    <h5>Zachary Boehm</h5>
+    
+    <nav>
+        <ul>
+            
+                <li class="nav-Sample">
+                    <a href="/playground/web/sample.html">
+                        Sample
+                    </a>
+                </li>
+            
+                <li class="nav-Todo">
+                    <a href="/playground/web/Todo.html">
+                        Todo
+                    </a>
+                </li>
+            
+        </ul>
+    </nav>
+    
+</div>
+        
+    <article>
+        <h2 id="created-in-python">Created in Python <a class="header-anchor" href="#created-in-python">#</a></h2>
+<ol>
+<li>Uses Highlight.js for code block highlighting
+<ul>
+<li><a href="https://unpkg.com/browse/@highlightjs/cdn-assets@11.6.0/styles/">HighlightJS Styles</a></li>
+</ul>
+</li>
+<li>Uses markdown-it-py to convert markdown to html
+<ul>
+<li><a href="https://markdown-it-py.readthedocs.io/en/latest/using.html">markdown-it-py</a></li>
+<li><a href="https://github.com/executablebooks/mdit-py-plugins/tree/master/mdit_py_plugins">plugins</a></li>
+<li><code>pip install markdown-it-py[linkify,plugins]</code></li>
+</ul>
+</li>
+<li>Uses python-frontmatter to parse markdown frontmatter
+<ul>
+<li><a href="https://pypi.org/project/python-frontmatter/">python-frontmatter</a></li>
+</ul>
+</li>
+<li>Uses toml to support python prior to 3.11
+<ul>
+<li><a href="https://pypi.org/project/toml/">toml</a></li>
+</ul>
+</li>
+<li>Uses Jinja2 for templating the html pages
+<ul>
+<li><a href="https://jinja.palletsprojects.com/en/3.1.x/templates/#base-template">Jinja2</a></li>
+</ul>
+</li>
+</ol>
+
+    </article>
+
+        
+        <div class="flex-grow flex-shrink"></div>
+        <footer>
+    
+    &copy; 2022 Zachary Boehm. All Rights Reserved
+    
+</footer>
+        
+    </body>
+</html>

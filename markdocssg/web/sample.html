@@ -1,38 +1,87 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
     <head>
+        
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
-        <title>Sample markdown document</title>
         
-        <link rel="stylesheet" href="style.css">
+         
+        <link rel="stylesheet" href="style.min.css">
         
-        <!-- Highlight.js -->
-        <link rel="stylesheet"
-      href="//unpkg.com/@highlightjs/cdn-assets@11.6.0/styles/nord.min.css">
-        <script src="//unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"></script>
-        <script>
-                    window.onload = () => {
-            const toHighlight = document.querySelectorAll('pre code');
-            if (toHighlight) {
-                for (const hl in toHighlight) {
-                    if (toHighlight[hl].className.includes('language-')) {
-                        hljs.highlightElement(toHighlight[hl]);
-                    } else {
-                        toHighlight[hl].className += 'language-plaintext hljs'
-                    }
-                }
-            }
-        }
 
-        </script>
+        
+    <!-- Highlight.js -->
+<link rel="stylesheet"
+href="//unpkg.com/@highlightjs/cdn-assets@11.6.0/styles/nord.min.css">
+<script src="//unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"></script>
+    <!-- Katex -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.css" integrity="sha384-IKOookmJ6jaAbJnGdgrLG5MDmzxJmjkIm6XCFqxnhzuMbfkEhGQalwVq2sYnGyZM" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.js" integrity="sha384-kSBEBJfG5+zZAKID5uvi6avDXnnOGLnbknFv6VMnVBrknlFw67TwFsY9PaD33zBI" crossorigin="anonymous"></script>
+    <script>
+        window.onload = () => {
+            
+                
+                // Highlight know languages otherwise plaintext
+const toHighlight = document.querySelectorAll('code');
+if (toHighlight) {
+    for (const hl in toHighlight) {
+        if (toHighlight[hl].className?.includes('language-')) {
+            hljs.highlightElement(toHighlight[hl]);
+        } else {
+            toHighlight[hl].className += 'language-plaintext hljs'
+        }
+    }
+}
+                
+                
+                // Convert eq and eqn elements to formatted katex
+const toConvert = document.querySelectorAll('eq, eqn');
+if (toConvert) {
+    for (const math in toConvert) {
+        if (toConvert[math].localName === "eqn") {
+            toConvert[math].parentElement.classList.add('math-block');
+        }
+        if (toConvert[math].innerText) {
+            let mathConverted = katex.render(toConvert[math].innerText, toConvert[math]);
+        }
+    }
+}
+                
+            
+        }
+    </script>
+
+
+        <title>Sample markdown document</title>
     </head>
-    
     <body>
-        <article>
-            <h1>An h1 header</h1>
+        <div class="header">
+    <h5>Zachary Boehm</h5>
+    
+    <nav>
+        <ul>
+            
+                <li class="nav-Todo">
+                    <a href="/playground/web/Todo.html">
+                        Todo
+                    </a>
+                </li>
+            
+                <li class="nav-Parser">
+                    <a href="/playground/web/parser.html">
+                        Parser
+                    </a>
+                </li>
+            
+        </ul>
+    </nav>
+    
+</div>
+        
+    <article>
+        <h1>An h1 header</h1>
 <h1>h1</h1>
 <h2 id="h2">h2 <a class="header-anchor" href="#h2">#</a></h2>
 <h3 id="h3">h3 <a class="header-anchor" href="#h3">#</a></h3>
@@ -180,19 +229,33 @@ term/definition pair to spread things out more.)</p>
 <p>Here’s a “line block”:</p>
 <p>and images can be specified like so:</p>
 <p><img src="example-image.jpg" alt="example image" title="An exemplary image" /></p>
-<p>Inline math equations go in like so: $\alpha = \frac{1}{2}$. Display
+<p>Inline math equations go in like so: <eq>\alpha = \frac{1}{2}</eq>. Display
 math should get its own line and be put in in double-dollarsigns:</p>
-<p>$$I = \int \rho R^{2} dV$$</p>
+<section>
+<eqn>I = \int \rho R^{2} dV</eqn>
+</section>
 <p>And note that you can backslash-escape any punctuation characters
 which you wish to be displayed literally, ex.: `foo`, *bar*, etc.</p>
+<p><kbd><kbd>CTRL</kbd>+<kbd>ALT</kbd>+<kbd>Delete</kbd></kbd></p>
 <hr class="footnotes-sep" />
 <section class="footnotes">
 <ol class="footnotes-list">
-<li id="fn1" class="footnote-item"><p>Footnote text goes here. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+<li id="fn1" class="footnote-item"><p>Footnote text goes here. <a href="#fnref1" class="footnote-backref"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="1rem" height="1rem">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+    </svg></a></p>
 </li>
 </ol>
 </section>
 
-        </article>
+    </article>
+
+        
+        <div class="flex-grow flex-shrink"></div>
+        <footer>
+    
+    &copy; 2022 Zachary Boehm. All Rights Reserved
+    
+</footer>
+        
     </body>
 </html>

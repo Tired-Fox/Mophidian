@@ -55,6 +55,9 @@ $headers: (
 
 html {
   scroll-behavior: smooth;
+  
+  margin: 0;
+  padding: 0;
 }
 
 article {
@@ -69,6 +72,13 @@ article {
 
 pre code {
     font-family: var(--font-mono);
+    letter-spacing: 1px;
+    font-size: inherit;
+}
+
+code {
+    @include text-small;
+    border-radius: .25rem;
 }
 
 blockquote {
@@ -118,6 +128,7 @@ h6, p, li, dt, dd, td, th {
 
 h2, h3, h4 {
     cursor: pointer;
+    width: fit-content;
 
     a {
         color: transparent;
@@ -212,4 +223,69 @@ kbd {
             box-shadow: 0 1px 0 0.5px #a1a1aa;
         }
     }
+}
+
+footer {
+    display: flex;
+    justify-content: space-evenly;
+    margin-block: 1rem;
+}
+
+.header {
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-inline: 2rem;
+    padding-block: 1rem;
+    background-color: rgba(241, 245, 249, .5);
+    backdrop-filter: blur(10px);
+    
+    border-bottom: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: white;
+
+    margin: 0;
+    width: 100%;
+    z-index: 10;
+
+    h5 {
+        margin: 0;
+    }
+
+    ul {
+        margin: 0;
+        display: flex;
+        gap: 1rem;
+        list-style-type: none;
+    }
+
+    a {
+        margin: 0;
+        text-decoration: none;
+        color: rgb(15 23 42);
+
+        &:hover {
+            text-decoration: underline;
+            color: rgb(100 116 139);
+        }
+    }
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    
+    margin: 0;
+    padding: 0;
+}
+
+.flex-grow {
+    flex-grow: 1;
+}
+
+.flex-shrink {
+    flex-shrink: 1;
 }

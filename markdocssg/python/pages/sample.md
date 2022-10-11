@@ -1,5 +1,8 @@
 ---
 title: Sample markdown document
+include_highlight: true
+include_math: true
+header_nav: [['Todo', '/playground/web/Todo.html'], ["Parser", "/playground/web/parser.html"]]
 ---
 
 An h1 header
