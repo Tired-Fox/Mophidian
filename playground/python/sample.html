@@ -1,0 +1,220 @@
+<!doctype html>
+    <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            
+            <title>Sample markdown document</title>
+            
+            <link rel="stylesheet" href="style.css">
+            
+            <!-- Highlight.js -->
+            <link rel="stylesheet"
+        href="//unpkg.com/@highlightjs/cdn-assets@11.6.0/styles/nord.min.css">
+            <script src="//unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"></script>            
+            
+            <!-- Katex -->
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.css" integrity="sha384-IKOookmJ6jaAbJnGdgrLG5MDmzxJmjkIm6XCFqxnhzuMbfkEhGQalwVq2sYnGyZM" crossorigin="anonymous">
+            <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.js" integrity="sha384-kSBEBJfG5+zZAKID5uvi6avDXnnOGLnbknFv6VMnVBrknlFw67TwFsY9PaD33zBI" crossorigin="anonymous"></script>
+            
+            <!-- Onload -->
+            <script>
+                    window.onload = () => {
+    // Highlight know languages otherwise plaintext
+    const toHighlight = document.querySelectorAll('pre code');
+    if (toHighlight) {
+        for (const hl in toHighlight) {
+            if (toHighlight[hl].className?.includes('language-')) {
+                hljs.highlightElement(toHighlight[hl]);
+            } else {
+                toHighlight[hl].className += 'language-plaintext hljs'
+            }
+        }
+    }
+
+    // Convert eq and eqn elements to formatted katex
+    const toConvert = document.querySelectorAll('eq, eqn');
+    if (toConvert) {
+        for (const math in toConvert) {
+            if (toConvert[math].localName === "eqn") {
+                toConvert[math].parentElement.classList.add('math-block');
+            }
+            if (toConvert[math].innerText) {
+                let mathConverted = katex.render(toConvert[math].innerText, toConvert[math]);
+            }
+        }
+    }
+}
+            </script>
+        </head>
+        
+        <body>
+            <article>
+                <h1>An h1 header</h1>
+<h1>h1</h1>
+<h2 id="h2">h2 <a class="header-anchor" href="#h2">#</a></h2>
+<h3 id="h3">h3 <a class="header-anchor" href="#h3">#</a></h3>
+<h4 id="h4">h4 <a class="header-anchor" href="#h4">#</a></h4>
+<h5>h5</h5>
+<h6>h6</h6>
+<p>‘single quotes’ ©</p>
+<p>Paragraphs are separated by a blank line.</p>
+<p>2nd paragraph. <em>Italic</em>, <strong>bold</strong>, and <code>monospace</code>. Itemized lists
+look like:</p>
+<ul>
+<li>this one</li>
+<li>that one</li>
+<li>the other one</li>
+</ul>
+<p>Note that — not considering the asterisk — the actual text
+content starts at 4-columns in.</p>
+<blockquote>
+<p>Block quotes are
+written like so.</p>
+<p>They can span multiple paragraphs,
+if you like.</p>
+<blockquote>
+<p>nested blockquote</p>
+<blockquote>
+<p>nested nested blockquote</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Use 3 dashes for an em-dash. Use 2 dashes for ranges (ex., “it’s all
+in chapters 12–14”). Three dots … will be converted to an ellipsis.
+Unicode is supported. ☺</p>
+<h2 id="an-h2-header">An h2 header <a class="header-anchor" href="#an-h2-header">#</a></h2>
+<p>Here’s a numbered list:</p>
+<ol>
+<li>first item</li>
+<li>second item</li>
+<li>third item</li>
+</ol>
+<p>Note again how the actual text starts at 4 columns in (4 characters
+from the left side). Here’s a code sample:</p>
+<pre><code># Let me re-iterate ...
+for i in 1 .. 10 { do-something(i) }
+</code></pre>
+<p>As you probably guessed, indented 4 spaces. By the way, instead of
+indenting the block, you can use delimited blocks, if you like:</p>
+<pre><code>define foobar() {
+    print &quot;Welcome to flavor country!&quot;;
+}
+</code></pre>
+<p>(which makes copying &amp; pasting easier). You can optionally mark the
+delimited block for Pandoc to syntax highlight it:</p>
+<pre><code class="language-python">import time
+# Quick, count to ten!
+for i in range(10):
+    # (but not *too* quick)
+    time.sleep(0.5)
+    print i
+</code></pre>
+<pre><code class="language-rust">fn hw() -&gt; bool {
+    println!(&quot;Hello World&quot;);
+}
+</code></pre>
+<h3 id="an-h3-header">An h3 header <a class="header-anchor" href="#an-h3-header">#</a></h3>
+<p>Now a nested list:</p>
+<ol>
+<li>
+<p>First, get these ingredients:</p>
+<ul>
+<li>carrots</li>
+<li>celery</li>
+<li>lentils</li>
+</ul>
+</li>
+<li>
+<p>Boil some water.</p>
+</li>
+<li>
+<p>Dump everything in the pot and follow
+this algorithm:</p>
+<pre><code>find wooden spoon
+uncover pot
+stir
+cover pot
+balance wooden spoon precariously on pot handle
+wait 10 minutes
+goto first step (or shut off burner when done)
+</code></pre>
+<p>Do not bump wooden spoon or it will fall.</p>
+</li>
+</ol>
+<p>Notice again how text always lines up on 4-space indents (including
+that last line which continues item 3 above).</p>
+<p>Here’s a link to <a href="http://foo.bar">a website</a> , to a <a href="local-doc.html">local
+doc</a>, and to a <a href="#an-h2-header">section heading in the current
+doc</a>. Here’s a footnote<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>.</p>
+<p>Tables can look like this:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">size</th>
+<th style="text-align:center">material</th>
+<th style="text-align:left">color</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">9</td>
+<td style="text-align:center">leather</td>
+<td style="text-align:left">brown</td>
+</tr>
+<tr>
+<td style="text-align:left">10</td>
+<td style="text-align:center">hemp canvas</td>
+<td style="text-align:left">natural</td>
+</tr>
+<tr>
+<td style="text-align:left">11</td>
+<td style="text-align:center">glass</td>
+<td style="text-align:left">transparent</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Here’s a definition list:</p>
+<dl>
+<dt>apples</dt>
+<dd>Good for making applesauce.</dd>
+<dt>oranges</dt>
+<dd>Citrus!</dd>
+<dt>tomatoes</dt>
+<dd>There’s no “e” in tomatoe.</dd>
+<dt>Term 1</dt>
+<dd>Definition 1 long form</dd>
+</dl>
+<pre><code>second paragraph
+</code></pre>
+<dl>
+<dt>Term 2 with <em>inline markup</em></dt>
+<dd>Definition 2a compact style</dd>
+<dd>Definition 2b</dd>
+</dl>
+<p>Again, text is indented 4 spaces. (Put a blank line between each
+term/definition pair to spread things out more.)</p>
+<p>Here’s a “line block”:</p>
+<p>and images can be specified like so:</p>
+<p><img src="example-image.jpg" alt="example image" title="An exemplary image" /></p>
+<p>Inline math equations go in like so: <eq>\alpha = \frac{1}{2}</eq>. Display
+math should get its own line and be put in in double-dollarsigns:</p>
+<section>
+<eqn>I = \int \rho R^{2} dV</eqn>
+</section>
+<p>And note that you can backslash-escape any punctuation characters
+which you wish to be displayed literally, ex.: `foo`, *bar*, etc.</p>
+<p><kbd><kbd>CTRL</kbd>+<kbd>ALT</kbd>+<kbd>Delete</kbd></kbd></p>
+<hr class="footnotes-sep" />
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>Footnote text goes here. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+
+            </article>
+        </body>
+    </html>

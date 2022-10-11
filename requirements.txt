@@ -1,4 +1,2 @@
-markdown-it-py
-linkify-it-py
-mdit-py-plugins
+markdown-it-py[linkify,plugins]
 python-frontmatter

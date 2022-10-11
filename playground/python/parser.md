@@ -1,6 +1,8 @@
 Inspired from remark and rehype:
 Will support options and plugins similar to both remark and rehype.
 
+[HighlightJS Styles](https://unpkg.com/browse/@highlightjs/cdn-assets@11.6.0/styles/)
+
 ## Basic Markdown
 
 https://www.markdownguide.org/basic-syntax/

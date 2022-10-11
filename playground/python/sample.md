@@ -5,6 +5,14 @@ title: Sample markdown document
 An h1 header
 ============
 
+# h1
+## h2
+### h3
+#### h4
+##### h5
+
+###### h6
+
 'single quotes' (c)
 
 Paragraphs are separated by a blank line.
@@ -104,38 +112,19 @@ Now a nested list:
 Notice again how text always lines up on 4-space indents (including
 that last line which continues item 3 above).
 
-Here's a link to [a website](http://foo.bar){style="color: yellow;"} , to a [local
+Here's a link to [a website](http://foo.bar) , to a [local
 doc](local-doc.html), and to a [section heading in the current
-doc](#an-h2-header). Here's a footnote [^1].
+doc](#an-h2-header). Here's a footnote[^1].
 
 [^1]: Footnote text goes here.
 
 Tables can look like this:
 
-size  material      color
-----  ------------  ------------
-9     leather       brown
-10    hemp canvas   natural
-11    glass         transparent
-
-Table: Shoes, their sizes, and what they're made of
-
-(The above is the caption for the table.) Pandoc also supports
-multi-line tables:
-
---------  -----------------------
-keyword   text
---------  -----------------------
-red       Sunsets, apples, and
-          other red or reddish
-          things.
-
-green     Leaves, grass, frogs
-          and other things it's
-          not easy being.
---------  -----------------------
-
-A horizontal rule follows.
+| size | material    | color       |
+|:-----|:-----------:|:------------|
+| 9    | leather     | brown       |
+| 10   | hemp canvas | natural     |
+| 11   | glass       | transparent |
 
 ***
 
@@ -143,10 +132,21 @@ Here's a definition list:
 
 apples
   : Good for making applesauce.
+
 oranges
   : Citrus!
+
 tomatoes
   : There's no "e" in tomatoe.
+
+Term 1
+    : Definition 1 long form
+  
+    second paragraph
+
+Term 2 with *inline markup*
+    ~ Definition 2a compact style
+    ~ Definition 2b
 
 Again, text is indented 4 spaces. (Put a blank line between each
 term/definition pair to spread things out more.)
@@ -155,7 +155,7 @@ Here's a "line block":
 
 and images can be specified like so:
 
-![example image](example-image.jpg "An exemplary image"){style="background-color: yellow"}
+![example image](example-image.jpg "An exemplary image")
 
 Inline math equations go in like so: $\alpha = \frac{1}{2}$. Display
 math should get its own line and be put in in double-dollarsigns:
@@ -164,3 +164,5 @@ $$I = \int \rho R^{2} dV$$
 
 And note that you can backslash-escape any punctuation characters
 which you wish to be displayed literally, ex.: \`foo\`, \*bar\*, etc.
+
+<kbd><kbd>CTRL</kbd>+<kbd>ALT</kbd>+<kbd>Delete</kbd></kbd>
