@@ -1,0 +1,13 @@
+* {
+  box-sizing: border-box;
+}
+
+p {
+  font-size: 1.125rem;
+  line-height: 1.25;
+}
+
+.footnote-backref > .fn-backlink {
+  width: 0.5rem;
+  height: auto;
+}
