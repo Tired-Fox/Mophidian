@@ -1,0 +1,43 @@
+{
+  "markdown": {
+    "append": true,
+    "extensions": [
+      "abbr",
+      "admonition",
+      "attr_list",
+      "def_list",
+      "footnotes",
+      "md_in_html",
+      "tables",
+      "wikilinks",
+      "pymdownx.betterem",
+      "pymdownx.caret",
+      "pymdownx.details",
+      "pymdownx.mark",
+      "pymdownx.smartsymbols",
+      "pymdownx.superfences",
+      "pymdownx.tabbed",
+      "pymdownx.tasklist",
+      "pymdownx.tilde"
+    ],
+    "extension_configs": {
+      "abbr": {},
+      "admonition": {},
+      "attr_list": {},
+      "def_list": {},
+      "footnotes": {},
+      "md_in_html": {},
+      "tables": {},
+      "wikilinks": {},
+      "pymdownx.betterem": {},
+      "pymdownx.caret": {},
+      "pymdownx.details": {},
+      "pymdownx.mark": {},
+      "pymdownx.smartsymbols": {},
+      "pymdownx.superfences": {},
+      "pymdownx.tabbed": {},
+      "pymdownx.tasklist": {},
+      "pymdownx.tilde": {}
+    }
+  }
+}

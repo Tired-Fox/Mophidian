@@ -1,3 +1,4 @@
+
 from pprint import pprint
 from markdown_it import MarkdownIt
 import frontmatter
@@ -14,6 +15,7 @@ from mdit_py_plugins.deflist import deflist_plugin
 from mdit_py_plugins.tasklists import tasklists_plugin
 
 from components.SVG import flask
+from constants import features
 
 def san(text: str, tabs: int = 0) -> str:
     lines = text.strip().replace('\t', '    ').split('\n')
@@ -63,46 +65,6 @@ for file in files:
     # Parse the frontmatter from the content
     metadata, content = frontmatter.parse(content)
     
-    code_theme = "nord"
-    
-    highlightTags = (
-f'''<!-- Highlight.js -->
-<link rel="stylesheet"
-href="//unpkg.com/@highlightjs/cdn-assets@11.6.0/styles/{code_theme}.min.css">
-<script src="//unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"></script>''')
-    
-    mathTags = (
-'''<!-- Katex -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.css" integrity="sha384-IKOookmJ6jaAbJnGdgrLG5MDmzxJmjkIm6XCFqxnhzuMbfkEhGQalwVq2sYnGyZM" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.2/dist/katex.js" integrity="sha384-kSBEBJfG5+zZAKID5uvi6avDXnnOGLnbknFv6VMnVBrknlFw67TwFsY9PaD33zBI" crossorigin="anonymous"></script>''')
-    
-    onloadMath = (
-        '''// Convert eq and eqn elements to formatted katex
-const toConvert = document.querySelectorAll('eq, eqn');
-if (toConvert) {
-    for (const math in toConvert) {
-        if (toConvert[math].localName === "eqn") {
-            toConvert[math].parentElement.classList.add('math-block');
-        }
-        if (toConvert[math].innerText) {
-            let mathConverted = katex.render(toConvert[math].innerText, toConvert[math]);
-        }
-    }
-}''')
-    
-    onloadHighlight = (
-        '''// Highlight know languages otherwise plaintext
-const toHighlight = document.querySelectorAll('code');
-if (toHighlight) {
-    for (const hl in toHighlight) {
-        if (toHighlight[hl].className?.includes('language-')) {
-            hljs.highlightElement(toHighlight[hl]);
-        } else {
-            toHighlight[hl].className += 'language-plaintext hljs'
-        }
-    }
-}''')
-    
     copyrightYear = '2022'
 
     if not path.exists('../web'):
@@ -114,7 +76,7 @@ if (toHighlight) {
     except:
         template = environment.get_template("base/markup.jinja")
     
-    print(metadata)
+    # print(metadata)
     
     footnote_anchor = '''<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="1rem" height="1rem">
     <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
@@ -123,28 +85,19 @@ if (toHighlight) {
     sub = "↩︎"
 
     # Render content and inject frontmatter
-    with open(f'../web/{file}.html', '+w', encoding='utf-8') as output_file:
+    with open(f'site/{file}.html', '+w', encoding='utf-8') as output_file:
         options = {
-            "mathTags": mathTags,
-            "highlightTags": highlightTags,
-            "onloadMath": onloadMath,
-            "onloadHighlight": onloadHighlight,
             "content": md.render(content),
             "copyrightYear": copyrightYear,
             "copyrightOwner": "Zachary Boehm",
             "header_logo": "<h5>Zachary Boehm</h5>",
         }
         options.update(metadata)
+        options.update(features)
         if 'global' in config and 'variables' in config['global']:
             options.update({"global": config['global']['variables']})
         
         raw = template.render(options)
-        raw = raw.replace(sub, footnote_anchor)
+        # raw = raw.replace(sub, footnote_anchor)
         output_file.write(raw)
     
-def testing(klass: str):
-    return (f'''
-        <div class="{klass}">
-            <p>Hello World!</p>
-        </div>
-    ''')

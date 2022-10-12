@@ -1,0 +1,41 @@
+[build-system]
+
+[project]
+name = "pymark"
+description = "Static websites with python"
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name="Zachary Boehm", email = "zboehm104@gmail.com"}
+]
+classifiers = [
+
+]
+dynamic = ["Version"]
+requires-python = ">=3.7"
+dependencies = []
+
+[project.optional-dependencies]
+# <section> = []
+
+[project.urls]
+
+[project.scripts]
+pymark = "pymark.__main__:cli"
+
+# [project.entry-points.""]
+
+[tool.black]
+line-length = 100
+target-version = ["py37"]
+skip-string-normalization = true
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+ignore_missing_imports = true
+warn_unreachable = true
+no_implicit_optional = true
+show_error_codes = true

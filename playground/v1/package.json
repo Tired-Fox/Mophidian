@@ -1,0 +1,17 @@
+{
+  "name": "SSG",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Zachary Boehm",
+  "license": "MIT",
+  "private": null,
+  "scripts": {
+    "sass": "sass -c --unicode style.scss:site/style.min.css",
+    "sass:mini": "sass -c --unicode style.scss:site/style.min.css --style=compressed",
+    "sass:watch": "sass -w -c --unicode style.scss:site/style.min.css"
+  },
+  "dependencies": {
+    "live-server": "^1.2.2",
+    "sass": "^1.55.0"
+  }
+}
