@@ -17,8 +17,9 @@ def serve_command(open: bool):
 @cli.command(name="build")
 @click.option("-o", "--open", flag_value=True, help=open_help, default=False)
 def serve_command(open: bool):
-    from compiler.setup import init_static
-    init_static()
+    from compiler.setup import init_static, find_pages
+    # init_static()
+    find_pages()
     
 if __name__ == "__main__":
     cli()

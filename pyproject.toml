@@ -1,7 +1,7 @@
 [build-system]
 
 [project]
-name = "m-ophidian"
+name = "mophidian"
 description = "Static websites with python"
 readme = "README.md"
 license = "MIT"
