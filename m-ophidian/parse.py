@@ -14,6 +14,7 @@ html = md.reset().convert(content)
 with open('sample.html', '+w', encoding="utf-8") as html_file:
     html_file.write(f'''\
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">

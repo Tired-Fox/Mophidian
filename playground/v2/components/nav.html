@@ -1,0 +1,9 @@
+<ul class="flex gap-2">
+    {% for link in env.nav.links  %}
+    <li>
+        <a href="{{ link.href }}" class="no-underline">
+            {{ link.name }}
+        </a>
+    </li>
+    {% endfor %}
+</ul>
