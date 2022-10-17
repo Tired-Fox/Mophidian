@@ -1,10 +1,9 @@
 import os
 import shutil
 from pathlib import Path
+from jinja2 import Environment, FileSystemLoader, Template
 
 from .pages import Page, Pages
-
-from pprint import pprint  #! DEBUG ONLY
 
 
 def init_static():
@@ -19,16 +18,47 @@ def init_static():
 # {index,readme}.{html.md}
 #   - [dir]
 #       - {index,readme}.{html,md}
-def find_pages():
-    print("Finding pages...")
+def find_pages() -> Pages:
+    """Get all files in the `pages/` directory
 
+    Returns:
+        Pages: A collection of all the pages that were found.
+    """
+    pages = Pages()
     if os.path.isdir('pages'):
-        pages = Pages()
-        page_list = []
         for path in Path('pages').glob(f"./**/*.*"):
             if path.suffix in [".md", ".html"]:
                 pages.append(Page(path.parent.as_posix(), path.name, path.suffix))
+    return pages
 
-        print(pages)
-        # del pages['about/license/MIT']
-        print(pages[1:3])
+
+def get_components() -> dict[str, Template]:
+    """Get all jinja templates from `componenets/`.
+
+    Returns:
+        dict[str, Template]: Dictionary of all components (user defined)
+    """
+    components = {}
+    if os.path.isdir('components'):
+        for path in Path('components').glob(f"./**/*.html"):
+            environment = Environment(loader=FileSystemLoader("./"))
+            components.update(
+                {path.name.replace(path.suffix, ""): environment.get_template(path.as_posix())}
+            )
+    return components
+
+
+def get_layouts() -> dict[str, Template]:
+    """Get all jinja layouts from `layouts/`
+
+    Returns:
+        dict[str, Template]: Dictionary of all layouts (user defined)
+    """
+    layouts = {}
+    if os.path.isdir('layouts'):
+        for path in Path('layouts').glob(f"./**/*.html"):
+            environment = Environment(loader=FileSystemLoader("./"))
+            layouts.update(
+                {path.name.replace(path.suffix, ""): environment.get_template(path.as_posix())}
+            )
+    return layouts

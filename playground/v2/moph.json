@@ -1,0 +1,18 @@
+{
+  "site": {
+    "version": 0.1
+  },
+  "build": {
+    "version": {
+      "format": "v{}"
+    },
+    "default_template": "post.html"
+  },
+  "markdown": {
+    "extensions": [33],
+    "extension_configs": {
+      "pymdownx.tilde": 23,
+      "somerandom.plugin": {}
+    }
+  }
+}
