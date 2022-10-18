@@ -143,10 +143,11 @@ Framework provided information:
   - **site**: This is the site information like name, url, uri, description, etc. (`{{ site.name }}`)
   - **env** : This is the global variables the user wants to make available to every templates. (`{{ env.socials.github }}`)
   - **meta**: The meta data that is retrieved from frontmatter in a markdown file. (`{{ meta.tags }}`)
-  - **content**: Gives access to the information for each page defined in `content/` directory. (`{{ content['file_name without extension'].description }}`)
+  - **pages**: Gives access to the information for each page defined in the `content/` and `pages/` directories. (`{{ pages['recipes/chocolage_cake'].description }}`)
+  - **content**: The rendered html from a markdown file
 
 - ***Computed during site generation***
-  - **hooks**: *(Maybe not possible with jinja2)* Idea is a work in progress. Some sort of way of including methods or functions then allowing the user to specify that they want to retrieve that data. (`{{ hook.get_weather() }}`)
+  - **hooks**: *(Big work in progress and a stretch goal)* Idea is a work in progress. Some sort of way of including methods or functions then allowing the user to specify that they want to retrieve that data. (`{{ hook.get_weather() }}`)
   - **components**: This is the list of all components specified in the components folder. (`{% include components.dropdown %}`)
   - **templates**: Gives access to all user and internally defined templates. (`{% include templates.nav %}`) or (`{% extend templates.base_template %}`)
   
@@ -162,3 +163,38 @@ Framework provides built in `[slug]` and `[...slug]` features which are "catch a
 - `pages/articles/[slug].html` would map to any file in the `content/articles/` directory (`content/articles/*.md`)
 - `pages/articles/[...slug].html` would map to any file and directory of `content/articles` (`content/articles/**/*.md`)
 ___
+
+### Systems
+
+The user will get a suite of tools at their disposal. To start with you will get the ability to write in either markdown, html, or Jinja2 html files. On top of this you can store static assets that are to be pulled into the final site, but not compiled in a folder calls `static/`. This is where images, CSS, Javascript, and other static files should go.
+
+When running the live reload server you will get access to incremental file building, and yes, that does include dynamic routes. Whenever you add a new dynamic route, or add another content file, the server will automatically try building related files with related templates.
+
+There are no hidden magical systems at play here. The framework starts by fetching all the templated files. These are components and layouts. Then it will transfer the static assets 1 for 1 to the `site/` folder. After this, it detects, parses, and compiles valid markdown and html files which are then placed in the corresponding directory. See the previous section for how the framework handles this. Finally, if the framework comes across any dynamic routes `[slug]` or `[...slug]` it will automatically look for corresponding markdown files in the `content/` directory and compile them with the template specified in the `[slug]` or `[...slug]` file.
+
+Below I will list and describe different tools and processes that can be used.
+---
+
+### Workflow
+
+Begin by creating a new project. Right now you need to manually create all the files.
+The file structure will look like the text below.
+
+```plaintext
+project
+├ components/
+│ └ */**/.html
+├ content/
+│ └ */**/*.html
+├ layouts/
+│ └ */**/*.html
+├ pages/
+│ ├ */**/*.md
+│ └ */**/*.html
+└ static/
+  └ */**/*.*
+```
+
+When you build or serve the project you will get a `site/` folder added. This is all the files compiled together. These are also the files you can host on a server.
+
+Eventually, when there is an automated way of creating a new project, you will also get example files in the main folders. There will be example layouts, components, content, dynamic routes, pages, and static assets.
