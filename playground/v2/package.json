@@ -1,0 +1,20 @@
+{
+  "name": "mophidian",
+  "version": "1.0.0",
+  "description": "A pythonic SSG",
+  "main": "index.js",
+  "repository": "https://github.com/Tired-Fox/Mophidian",
+  "author": "Zachary Boehm",
+  "license": "MIT",
+  "private": null,
+  "scripts": {
+    "css": "sass scss/moph_styles.scss:static/moph_styles.css",
+    "css:watch": "sass --watch scss/moph_styles.scss:static/moph_styles.css",
+    "css:compress": "sass --style=compressed scss/moph_styles.scss:static/moph_styles.min.css",
+    "css:watch:compress": "sass --watch --style=compressed scss/moph_styles.scss:static/moph_styles.min.css"
+  },
+  "dependencies": {
+    "sass": "^1.55.0",
+    "scss": "^0.2.4"
+  }
+}

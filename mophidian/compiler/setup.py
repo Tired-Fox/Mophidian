@@ -32,6 +32,18 @@ def find_pages() -> Pages:
     return pages
 
 
+def find_content() -> Pages:
+    """Get all files in the `pages/` directory
+
+    Returns:
+        Pages: A collection of all the pages that were found."""
+    content = Pages()
+    if os.path.isdir('content'):
+        for path in Path('content').glob(f"./**/*.md"):
+            content.append(Page(path.parent.as_posix(), path.name, path.suffix))
+    return content
+
+
 def get_components() -> dict[str, Template]:
     """Get all jinja templates from `componenets/`.
 
@@ -55,10 +67,18 @@ def get_layouts() -> dict[str, Template]:
         dict[str, Template]: Dictionary of all layouts (user defined)
     """
     layouts = {}
+    environment = Environment(loader=FileSystemLoader("./"))
     if os.path.isdir('layouts'):
         for path in Path('layouts').glob(f"./**/*.html"):
-            environment = Environment(loader=FileSystemLoader("./"))
             layouts.update(
                 {path.name.replace(path.suffix, ""): environment.get_template(path.as_posix())}
             )
+
+    import pathlib
+
+    built_in = pathlib.Path(__file__).parent.resolve().as_posix()
+    environment = Environment(loader=FileSystemLoader(built_in))
+
+    # Add default layout(s)
+    layouts.update({"moph_base": environment.get_template("moph_base.html")})
     return layouts

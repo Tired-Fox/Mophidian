@@ -20,9 +20,10 @@ def serve_command(open: bool):
 @cli.command(name="build")
 @click.option("-o", "--open", flag_value=True, help=open_help, default=False)
 def build_command(open: bool):
-    from compiler.build import full
+    from compiler.build import Build
 
-    full()
+    build = Build()
+    build.full()
 
 
 if __name__ == "__main__":

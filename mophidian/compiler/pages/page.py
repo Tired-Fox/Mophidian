@@ -1,8 +1,12 @@
 from __future__ import annotations
+from functools import cached_property
+from pathlib import Path
+from jinja2 import Environment, FileSystemLoader
 
 from typing import Any, Optional
-from .util import normpath, create_uri
+from .util import normpath, create_uri, splitall
 from os import path
+from os import getcwd
 
 
 page_var_type = Optional[str | int | dict[str, Any]]
@@ -43,6 +47,8 @@ class Page:
             name_ (str): The name of the file/page
             ext_ (str): The extension for the file
         """
+        prefix = normpath(parent_).split("/")[0]
+        self.prefix = prefix if prefix != '.' else ""
         self.parent = normpath('/'.join(normpath(parent_).split("/")[1:]))
         self.name = name_.replace(ext_, '')
         self.file_name = name_
@@ -50,31 +56,57 @@ class Page:
         self.next = None
         self.previous = None
         self.is_blank = is_blank_
+        self.meta = {}
+        self.content = ""
 
         if path.isfile(self.full_path):
             with open(self.full_path, "r", encoding="utf-8") as file_content:
+                environment = Environment(loader=FileSystemLoader("./"))
                 if self.ext == ".md":
                     import frontmatter
 
                     self.meta, self.content = frontmatter.parse(file_content.read())
+                    try:
+                        self.template = environment.get_template(self.full_path)
+                    except:
+                        self.template = None
                 else:
-                    self.meta = None
                     self.content = file_content.read()
+                    self.template = environment.get_template(self.full_path)
         else:
-            self.meta, self.content = {}, ""
+            self.meta, self.content, self.template = {}, "", None
 
-    @property
+    @cached_property
     def full_path(self) -> str:
         """Returns the relative path with filename and extension."""
-        return path.normpath(path.join("pages", self.parent, self.file_name))
+        return normpath(path.join(self.prefix, self.parent, self.file_name))
 
-    @property
+    @cached_property
     def uri(self) -> str:
         """The uri that is associated with this page."""
         if self.name.lower() in ["index", "readme"]:
             return f'{self.parent}'
         else:
             return f'{create_uri(self.parent, self.name)}'
+
+    @classmethod
+    def build_uri(cls, path: Path) -> str:
+        """The uri that is associated with this page."""
+        name = path.name.replace(path.suffix, "")
+        parent = normpath('/'.join(normpath(path.parent.as_posix()).split("/")[1:]))
+        if name.lower() in ["index", "readme"]:
+            return f'{parent}'
+        else:
+            return f'{create_uri(parent, name)}'
+
+    @cached_property
+    def breadcrumb(self) -> list[str]:
+        """The individual parts of the path for the uri.
+
+        Returns:
+            list[str]: List of directories leading to the final uri
+        """
+        return splitall(self.uri)
 
     def has_priority(self, page_: Page) -> bool:
         """Return true if current page has priority over the passed in page.

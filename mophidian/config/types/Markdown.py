@@ -60,7 +60,7 @@ class Markdown(BaseType):
                 self.errors["general"].append(
                     '  "append": was of type <'
                     + color(type(defaults).__name__, prefix=[Color.RED])
-                    + "> but was expected to be of type <"
+                    + "> but was expecting <"
                     + color("bool", prefix=[Color.YELLOW])
                     + ">"
                 )
@@ -79,7 +79,7 @@ class Markdown(BaseType):
                             color(f'    {extensions[i]}', prefix=[Color.RED])
                             + ":  was of type <"
                             + color(type(extension).__name__, prefix=[Color.RED])
-                            + "> but was expected to be of type <"
+                            + "> but was expecting <"
                             + color("str", prefix=[Color.YELLOW])
                             + ">"
                         )
@@ -87,7 +87,7 @@ class Markdown(BaseType):
                 self.errors["e_error"] = (
                     "was of type <"
                     + color(type(extensions).__name__, prefix=[Color.RED])
-                    + "> but was expected to be of type <"
+                    + "> but was expecting <"
                     + color("list", prefix=[Color.YELLOW])
                     + ">"
                 )
@@ -111,7 +111,7 @@ class Markdown(BaseType):
                                     prefix=[Color.RED],
                                     suffix=[Color.RESET],
                                 )
-                                + "> but was expected to be of type <"
+                                + "> but was expecting <"
                                 + color("dict", prefix=[Color.YELLOW])
                                 + ">"
                             )
@@ -127,7 +127,7 @@ class Markdown(BaseType):
                 self.errors["ec_error"] = (
                     "was of type <"
                     + color(type(kwargs["extension_configs"]).__name__, prefix=[Color.RED])
-                    + "> but was expected to be of type <"
+                    + "> but was expecting <"
                     + color("dict", prefix=[Color.YELLOW])
                     + ">"
                 )
@@ -191,6 +191,3 @@ class Markdown(BaseType):
             prefix=[Style.BOLD],
             suffix=[Style.NOBOLD, Color.RESET],
         )
-
-    def key() -> str:
-        return "markdown"

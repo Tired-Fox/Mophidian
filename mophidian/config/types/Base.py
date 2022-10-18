@@ -1,4 +1,8 @@
+from abc import abstractclassmethod, abstractmethod
+
+
 class BaseType:
+    @abstractmethod
     def has_errors(self) -> bool:
         """Determines if there were errors while parsing the markdown parameters
 
@@ -6,9 +10,11 @@ class BaseType:
             bool: True if there are any erros. False if there are none.
         """
         pass
-    
+
+    @abstractmethod
     def format_errors(self) -> str:
         pass
 
-    def key() -> str:
-        return "Base"
+    @classmethod
+    def key(cls) -> str:
+        return cls.__name__.lower()
