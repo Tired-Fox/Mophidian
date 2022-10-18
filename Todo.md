@@ -1,0 +1,22 @@
+# Todo
+
+- [ ] Rewrite next and previous links to be of pages of the same hierarchical level
+- [ ] Pythonic css/sass component similar to tailwind. Or somehow get tailwind working
+- Config
+  - [ ] 
+- Refactoring
+  - [ ] Page discovery
+  - [ ] Parsing and storing page data
+  - [ ] Generating pages
+  - Live Server
+    - [ ] Static Watcher
+    - [ ] Pages/Content Watcher
+    - [ ] Customize parameters
+      - port
+      - entry
+      - auto open browser
+  - Config
+    - [ ] Parsing variables
+    - [ ] Validating variables
+- [ ] Add custom logging
+- [ ] Add custom errors 

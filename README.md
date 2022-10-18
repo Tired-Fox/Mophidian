@@ -1,7 +1,16 @@
-# MarkDocSSG
+---
+title: 'M-Ophidian'
+description: 'A python based static site generator (SSG). Inspired from mkDocs, next.js, vue.js, nuxt.js, mynt, astro, and just about every other SSG.'
+img: 'https://wallpaperaccess.com/full/344618.jpg'
+tags: [Python, SSG, Jinja2, Live-Server, Website, M-Ophidian]
+---
+
+# Mophidian - A python based SSG
 Use markdown to create websites
 
 ## Ideas:
+
+**Inspiration**
   - [MkDocs](https://www.mkdocs.org/getting-started/) *Python based*
   - [mynt](https://mynt.uhnomoli.com/docs/quickstart/) *Python based*
   - [Hyde](http://hyde.github.io/) base on jekyll *Python based*
@@ -16,39 +25,36 @@ Use markdown to create websites
   - [Markdown](https://pypi.org/project/Markdown/) [docs](https://python-markdown.github.io/reference/)
     - [Plugins](https://python-markdown.github.io/extensions/)
   
-Main idea is that it mimics what major javascript frameworks are doing.
-While this project strives to reach something that can create a doc's page on the level of mkdoc it also strives to be a website generator as well.
+The core ideas behind this SSG/framework is the same as all the large Javascript frameworks. So in a way, if you used any type of Javascript framework, then this project should be fairly easy to use.
+
+While this project strives to reach something that can create a doc's page on the level of mkDocs it also strives to be a generic website generator as well.
 
 File Structure and Workflow:
-    - pages
-      - Can be normal html
-      - Can be md files
-      - Can be custom python files
-        - methods return html string while classes must inherit from component class
-      - Each named file gets it's own dir. index and README files stay put but override duplicates
-    - components
-      - Python functions and classes that returns formatted html
-      - Unique importer to retrieve components and put them in templates
-    - templates
-      - Jinja templates
-      - Custom python templating with classes and functions that convert to jinja
-    - static 
-      - assets that will remain untouched. files and directories are translated to the root of the server
-    - config.toml or config.yml
-      - Site name
-      - Site navigation
-      - Global variables
-      - Environment variables
-      - Toggle Features
-      - Override styling
-      - Global toggles
+- pages
+  - Can be normal html
+  - Can be md files
+  - Each named file gets it's own dir. index and README files stay put but override duplicates
+- components
+  - Each one a Jinja2 snippet
+  - Unique importer to retrieve components and put them in templates
+- layouts
+  - Jinja2 templates, meant to be a layout for the page.
+- static 
+  - assets that will remain untouched. files and directories are translated to the root of the server
+- config.toml or config.yml
+  - Site name
+  - Site navigation
+  - Global variables
+  - Environment variables
+  - Toggle Features
+  - Override styling
+  - Global toggles
 
-Guides for:
-    - Jinja templating and how it can be used in this SSG
-    - Markdown-it and how to add plugins for this SSG
-    - Live Serve
-    - Custom python templating/component system
-    - Markdown flavor guide
+There will be guides for:
+- Jinja templating and how it can be used in this SSG
+- Markdown-it and how to add plugins for this SSG
+- Live Server
+- Markdown flavor guide (Specific to the default markdown plugins in this SSG)
 
 Minimal viable product would be the ability to take markdown files and generate them to a static website with auto generated or predefined navigation.
 
@@ -59,10 +65,10 @@ Features:
   * live-server
   * components
   * templating
-  * custom tailwindcss clone/bootstrap
+  * custom tailwindcss clone/bootstrap??
   * searching
-  * Inject custom components into markdown
-  * Themes are just predefined named templates
+  * Inject custom components into markdown. Requires custom python-markdown plugins/manipulation
+  * Themes are just predefined named templates/layouts
 
 Markdown:
     - [PyMdown](https://facelessuser.github.io/pymdown-extensions/#overview)
@@ -98,11 +104,11 @@ Important file structure:
   - **pages**
   - **content**
   - **static**
-  - **templates**
+  - **layouts**
 
 - ***Files***
   - Content is written in `.md` (markdown)
-  - Templates and components are written html files. They use the [Jinja2](https://palletsprojects.com/p/jinja/) templating language to inject data.
+  - Layouts and components are written html files. They use the [Jinja2](https://palletsprojects.com/p/jinja/) templating language to inject data.
   - Non-compiled assets, assets that won't be transformed, should go into the static folder. This is a 1-1 translation to the final file structure. Nothing is changed just copied over.
   - The pages are written in html(jinja2) or markdown.
 
@@ -136,7 +142,7 @@ website/about/me/
 
 Since the compiler is already filtering, transforming, and working it's magic, it will also automatically generate a sitemap.xml, sitemap.xml.gz, and rss.xml along with providing the url's as data to each template.
 
-**GOAL: All data relavent from website generation and user specification is provided to each template.**
+**GOAL: All data relevant from website generation and user specification is provided to each template.**
 
 Framework provided information:
 - ***Pre rendered / Computed*** *(Nested information accessed with `{{ <variable>. }}`)*
@@ -147,38 +153,28 @@ Framework provided information:
   - **content**: The rendered html from a markdown file
 
 - ***Computed during site generation***
-  - **hooks**: *(Big work in progress and a stretch goal)* Idea is a work in progress. Some sort of way of including methods or functions then allowing the user to specify that they want to retrieve that data. (`{{ hook.get_weather() }}`)
+  - **hooks**: *(Maybe not possible with jinja2)* Idea is a work in progress. Some sort of way of including methods or functions then allowing the user to specify that they want to retrieve that data. (`{{ hook.get_weather() }}`)
   - **components**: This is the list of all components specified in the components folder. (`{% include components.dropdown %}`)
-  - **templates**: Gives access to all user and internally defined templates. (`{% include templates.nav %}`) or (`{% extend templates.base_template %}`)
+  - **layouts**: Gives access to all user, and internally defined layouts. (`{% include layouts.nav %}`) or (`{% extend layouts.base_template %}`)
   
 
-- Users may also include other templates as needed using a string ex. `{% include "../path/some_template" %}`.
+- Users may also include other templates as needed using a string. Ex. `{% include "../path/some_template" %}`.
 
-When using markdown files in the pages directory a user must specify a template in the frontmatter or a default template in the config.
+When using markdown files in the pages directory a user must specify a layout in the frontmatter or a default layout in the config. If neither is chosen a basic built-in layout will be used.
 
-HTML files in the pages directory are automatically processed as a full page template. As in somewhere it must include the html elements `<!DOCTYPE html>`, `<html></html>`, and `<body></body>`. The framework will provide the same information as mentioned above.
+HTML files in the pages directory are automatically processed as full page layouts. As in, somewhere in the file, it must include the html tags/elements; `<!DOCTYPE html>`, `<html></html>`, and `<body></body>`. The framework will provide the same information as mentioned above.
 
 Framework provides built in `[slug]` and `[...slug]` features which are "catch all" files. `[slug]` is a catch all for files in a directory while `[...slug]` is a catch all for recursive directories.
 
 - `pages/articles/[slug].html` would map to any file in the `content/articles/` directory (`content/articles/*.md`)
 - `pages/articles/[...slug].html` would map to any file and directory of `content/articles` (`content/articles/**/*.md`)
-___
-
-### Systems
-
-The user will get a suite of tools at their disposal. To start with you will get the ability to write in either markdown, html, or Jinja2 html files. On top of this you can store static assets that are to be pulled into the final site, but not compiled in a folder calls `static/`. This is where images, CSS, Javascript, and other static files should go.
-
-When running the live reload server you will get access to incremental file building, and yes, that does include dynamic routes. Whenever you add a new dynamic route, or add another content file, the server will automatically try building related files with related templates.
-
-There are no hidden magical systems at play here. The framework starts by fetching all the templated files. These are components and layouts. Then it will transfer the static assets 1 for 1 to the `site/` folder. After this, it detects, parses, and compiles valid markdown and html files which are then placed in the corresponding directory. See the previous section for how the framework handles this. Finally, if the framework comes across any dynamic routes `[slug]` or `[...slug]` it will automatically look for corresponding markdown files in the `content/` directory and compile them with the template specified in the `[slug]` or `[...slug]` file.
-
-Below I will list and describe different tools and processes that can be used.
+- 
 ---
 
 ### Workflow
 
 Begin by creating a new project. Right now you need to manually create all the files.
-The file structure will look like the text below.
+A valid file structure will look like the text below. You can add any other folders and files outside of this structure; they will most likely be ignored.
 
 ```plaintext
 project
@@ -198,3 +194,7 @@ project
 When you build or serve the project you will get a `site/` folder added. This is all the files compiled together. These are also the files you can host on a server.
 
 Eventually, when there is an automated way of creating a new project, you will also get example files in the main folders. There will be example layouts, components, content, dynamic routes, pages, and static assets.
+
+Enjoy the use of a live reloading server that incrementally builds your changes that can be seen immediately. 
+
+***Better terminal logging for everything that is happening coming soon*** 
