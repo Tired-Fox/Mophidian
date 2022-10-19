@@ -1,5 +1,5 @@
 from .Base import BaseType
-from .util import color, Color, Style, RESET
+from util import color, Color, Style, RESET
 
 _defualts = {
     "defaults": True,

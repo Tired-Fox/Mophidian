@@ -2,6 +2,7 @@ from pathlib import Path
 import shutil
 import os
 from datetime import datetime
+from typing import TextIO
 
 from compiler.build import Build, Page
 from .BaseHandler import BaseFileSystemEventHandler
@@ -19,9 +20,10 @@ from watchdog.events import (
 
 
 class WatchContent(BaseFileSystemEventHandler):
-    def __init__(self, build: Build):
+    def __init__(self, build: Build, stdout: TextIO):
         super().__init__()
         self.build = build
+        self.stdout = stdout
 
     def on_closed(self, event: FileClosedEvent):
         '''Called when a file opened for writing is closed.'''

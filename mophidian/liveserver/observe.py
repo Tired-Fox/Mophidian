@@ -1,4 +1,5 @@
 import threading
+from typing import TextIO
 from watchdog.observers import Observer
 
 from compiler.build import Build
@@ -12,7 +13,7 @@ class StoppableThread(threading.Thread):
     regularly for the stopped() condition."""
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(daemon=True, *args, **kwargs)
         self._stop_event = threading.Event()
 
     def stop(self):
@@ -23,17 +24,18 @@ class StoppableThread(threading.Thread):
 
 
 class WatchFiles(StoppableThread):
-    def __init__(self, build: Build):
+    def __init__(self, build: Build, stdout: TextIO):
         super().__init__()
 
         # Allow for custom watched dirs
         self.build = build
+        self.stdout = stdout
 
     def run(self):
         # Init file event handlers
-        content_event_handler = WatchContent(self.build)
-        page_event_handler = WatchPages(self.build)
-        static_event_handler = WatchStatic()
+        content_event_handler = WatchContent(build=self.build, stdout=self.stdout)
+        page_event_handler = WatchPages(build=self.build, stdout=self.stdout)
+        static_event_handler = WatchStatic(stdout=self.stdout)
 
         # Create observer and schedule to observe content and pages
         observer = Observer()

@@ -5,35 +5,30 @@ from .Base import BaseType
 from util import color, Color, Style, RESET
 
 
-class Build(BaseType):
-    version_format: str
-    """How the generator should format the version."""
+class Integration(BaseType):
+    tailwind: bool
+    """Auto use and setup tailwind css with node"""
 
-    default_template: str
-    """The name of the default template to use for markdown files."""
+    sass: bool
+    """Auto use and setup sass with node"""
+
+    package_manager: str
+    """The users prefered package manager. Defaults to npm"""
 
     def __init__(self, **kwargs) -> None:
-        set_ = {'version_format': str, 'default_template': str, "delay": [float, int]}
+        set_ = {'tailwind': bool, 'sass': bool, 'package_manager': str}
 
-        self.version_format = "v{}"
-        self.default_template = "moph_base"
-        self.delay = 2.0
+        self.tailwind = False
+        self.sass = False
+        self.package_manager = "npm"
 
         self.errors = []
 
         for entry in kwargs:
             if entry in set_:
-                is_valid = True
-                if isinstance(set_[entry], list):
-                    if type(kwargs[entry]) not in set_[entry]:
-                        is_valid = False
-                else:
-                    if not isinstance(kwargs[entry], set_[entry]):
-                        is_valid = False
-
-                if is_valid:
-                    setattr(self, entry, kwargs[entry])
+                if isinstance(kwargs[entry], set_[entry]):
                     del set_[entry]
+                    setattr(self, entry, kwargs[entry])
                 else:
                     self.errors.append(
                         color(
@@ -41,11 +36,9 @@ class Build(BaseType):
                             color(entry, prefix=[Color.RED]),
                             '": was of type <',
                             color(type(kwargs[entry]).__name__, prefix=[Color.RED]),
-                            "> but was expected to be ",
-                            ', '.join(
-                                "<" + color(t.__name__, prefix=[Color.YELLOW]) + ">"
-                                for t in list(set_[entry])
-                            ),
+                            "> but was expected to be <",
+                            color(set_[entry].__name__, prefix=[Color.YELLOW]),
+                            ">",
                             prefix=[Style.BOLD],
                             suffix=[RESET],
                         )

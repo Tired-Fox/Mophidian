@@ -11,12 +11,13 @@ from jinja2 import Environment, Template
 
 
 class Build:
-    def __init__(self):
+    def __init__(self, tailwind: bool = False):
         self.config = Config()
         self.pages = find_pages()
         self.content = find_content()
         self.components = get_components()
         self.layouts = get_layouts()
+        self.tailwind = tailwind
         self.slugs = []
 
         self.params = {
@@ -25,7 +26,6 @@ class Build:
             "layouts": self.layouts,
         }
 
-    # TODO: Handle updating the information and rebuilding when [slug] or [...slug] is added or moved
     def remove_page(self, path: Path):
         if path.name.replace(path.suffix, "") not in ['[slug]', "[...slug]"]:
             del self.pages[Page.build_uri(path)]
@@ -127,3 +127,4 @@ class Build:
     def full(self):
         init_static()
         self.create_pages()
+        

@@ -1,0 +1,21 @@
+{
+  "site": {
+    "name": "mophidian",
+    "version": "1.0"
+  },
+  "build": {
+    "delay": 5
+  },
+  "markdown": {
+    "append": false,
+    "extensions": [2],
+    "extension_configs": {
+      "non-plugin": {}
+    }
+  },
+  "integration": {
+    "sass": false,
+    "tailwind": true,
+    "package_manager": "yarn"
+  }
+}

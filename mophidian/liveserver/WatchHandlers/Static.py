@@ -1,5 +1,6 @@
 import shutil
 import os
+from typing import TextIO
 
 from compiler.build import Build
 from .BaseHandler import BaseFileSystemEventHandler
@@ -17,6 +18,9 @@ from watchdog.events import (
 
 
 class WatchStatic(BaseFileSystemEventHandler):
+    def __init__(self, stdout: TextIO):
+        self.stdout = stdout
+
     def on_closed(self, event: FileClosedEvent):
         '''Called when a file opened for writing is closed.'''
         # print("closed", event, self.__timestamp().strftime('%T.%f')[:-3])

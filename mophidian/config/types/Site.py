@@ -3,7 +3,7 @@ from mimetypes import suffix_map
 
 
 from .Base import BaseType
-from .util import color, Color, Style, RESET
+from util import color, Color, Style, RESET
 
 
 class Site(BaseType):

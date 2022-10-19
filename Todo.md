@@ -20,3 +20,14 @@
     - [ ] Validating variables
 - [ ] Add custom logging
 - [ ] Add custom errors 
+- [ ] Chunk css for only what page needs
+- [ ] Support for bootstrap
+- [ ] Support for tailwind?? or create pythonic version
+- [ ] Allow users to opt into auto nodejs features like sass
+
+
+Inspirational Sources:
+- [mkDocs Material Theme](https://squidfunk.github.io/mkdocs-material/) ([github](https://github.com/squidfunk/mkdocs-material))
+- [mkDocs](https://www.mkdocs.org/) ([github](https://github.com/mkdocs/mkdocs))
+- [Algolia](https://www.algolia.com/)
+- [Tailwindcss](https://tailwindcss.com/)

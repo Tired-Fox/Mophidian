@@ -1,0 +1,16 @@
+{
+  "name": "mophidian",
+  "version": "1.0.0",
+  "description": "An example site made with mophidian",
+  "main": "index.js",
+  "author": "Zachary Boehm (Tired Fox) <zboehm104@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "tailwindcss": "^3.2.0"
+  },
+  "scripts": {
+    "tailwind": "tailwindcss -i styles/tailwind.css -o site/tailwind.css",
+    "tailwind:mini": "tailwindcss -i styles/tailwind.css -o static/tailwind.min.css --minify",
+    "tailwind:watch": "tailwindcss -i styles/tailwind.css -o static/tailwind.css --watch --poll"
+  }
+}
