@@ -1,17 +1,15 @@
 {
   "site": {
-    "name": "mophidian",
+    "name": "mophv2",
     "version": "1.0"
   },
   "build": {
-    "refresh_delay": 3.0
+    "refresh_delay": 0.3
   },
   "markdown": {
     "append": false,
-    "extensions": [2],
-    "extension_configs": {
-      "non-plugin": {}
-    }
+    "extensions": [],
+    "extension_configs": {}
   },
   "integration": {
     "sass": false,

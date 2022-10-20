@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blogs</title>
+    <link rel="stylesheet" href="/css/header.css">
+</head>
+<style>
+    ul {
+        list-style: disc;
+    }
+    
+    ul li a {
+        text-decoration: none;
+    }
+
+    ul li a:hover {
+        text-decoration: underline;
+    }
+</style>
+<body>
+    {% include cmpt.header %}
+    All content posts
+    {% if cnt|count > 0 %}
+    <ul>
+        {% for post in cnt %}
+        <li id="post-{{ loop.index }}">
+            <a href="/{{ post.uri }}">
+                {{ post.name }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</body>
+</html>

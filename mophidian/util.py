@@ -1,4 +1,4 @@
-class Color:
+class FColor:
     """Ansi color codes for foreground text color.
 
     Options:
@@ -30,6 +30,40 @@ class Color:
     WHITE: int = 37
     """(37) White ansi code"""
     RESET: int = 39
+    """(39) Reset Color ansi code"""
+    
+class BColor:
+    """Ansi color codes for background text color.
+
+    Options:
+    - BLACK
+    - RED
+    - GREEN
+    - YELLOW
+    - BLUE
+    - MAGENTA
+    - CYAN
+    - WHITE
+    - RESET
+    """
+
+    BLACK: int = 40
+    """(30) Red ansi code"""
+    RED: int = 41
+    """(31) Red ansi code"""
+    GREEN: int = 42
+    """(32) Green ansi code"""
+    YELLOW: int = 43
+    """(33) Yellow ansi code"""
+    BLUE: int = 44
+    """(34) Blue ansi code"""
+    MAGENTA: int = 45
+    """(35) Magenta ansi code"""
+    CYAN: int = 46
+    """(36) Cyan ansi code"""
+    WHITE: int = 47
+    """(37) White ansi code"""
+    RESET: int = 49
     """(39) Reset Color ansi code"""
 
 
@@ -71,6 +105,6 @@ def color(*args, **kwargs) -> str:
     suffix: str = (
         f"\x1b[{';'.join([str(s) for s in kwargs['suffix']])}m"
         if "suffix" in kwargs
-        else "\x1b[39m"
+        else f"\x1b[{FColor.RESET};{BColor.RESET}m"
     )
     return f"{prefix}{''.join([str(arg) for arg in args])}{suffix}"

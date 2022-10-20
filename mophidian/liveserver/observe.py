@@ -4,6 +4,7 @@ from watchdog.observers import Observer
 
 from compiler.build import Build
 from .WatchHandlers import WatchContent, WatchPages, WatchStatic
+from moph_logger import Log, LL
 
 all = ["WatchFiles"]
 
@@ -24,18 +25,18 @@ class StoppableThread(threading.Thread):
 
 
 class WatchFiles(StoppableThread):
-    def __init__(self, build: Build, stdout: TextIO):
+    def __init__(self, build: Build, logger: Log):
         super().__init__()
 
         # Allow for custom watched dirs
         self.build = build
-        self.stdout = stdout
+        self._logger = logger
 
     def run(self):
         # Init file event handlers
-        content_event_handler = WatchContent(build=self.build, stdout=self.stdout)
-        page_event_handler = WatchPages(build=self.build, stdout=self.stdout)
-        static_event_handler = WatchStatic(stdout=self.stdout)
+        content_event_handler = WatchContent(build=self.build, logger=self._logger)
+        page_event_handler = WatchPages(build=self.build, logger=self._logger)
+        static_event_handler = WatchStatic(logger=self._logger)
 
         # Create observer and schedule to observe content and pages
         observer = Observer()

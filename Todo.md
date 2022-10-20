@@ -1,7 +1,10 @@
 # Todo
 
+- Allow users to opt into auto nodejs features like sass
+  - [ ] If they opt in and then hit build or serve it should auto setup package.json and install the correct packages
 - [ ] Rewrite next and previous links to be of pages of the same hierarchical level
-- [ ] Pythonic css/sass component similar to tailwind. Or somehow get tailwind working
+- [ ] Add file watching for components and layouts
+- [ ] Startup sass command with `server`
 - Config
   - [ ] 
 - Refactoring
@@ -11,19 +14,19 @@
   - Live Server
     - [ ] Static Watcher
     - [ ] Pages/Content Watcher
-    - [ ] Customize parameters
+    - [ ] Components Watcher
+    - [ ] Layouts Watcher
+    - [x] Customize parameters
       - port
       - entry
       - auto open browser
   - Config
     - [ ] Parsing variables
     - [ ] Validating variables
-- [ ] Add custom logging
-- [ ] Add custom errors 
-- [ ] Chunk css for only what page needs
+- [ ] Add custom errors
 - [ ] Support for bootstrap
-- [ ] Support for tailwind?? or create pythonic version
-- [ ] Allow users to opt into auto nodejs features like sass
+- [x] Add custom logging
+- [x] Integrate tailwindcss
 
 
 Inspirational Sources:

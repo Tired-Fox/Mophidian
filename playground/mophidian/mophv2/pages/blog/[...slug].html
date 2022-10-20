@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ meta.title if "title" in meta else site.name }}</title>
+    <link rel="stylesheet" href="/css/header.css">
+</head>
+<style>
+    #next-prev {
+        display: flex;
+        width: 100%;
+        padding-block: 2rem;
+        padding-inline: 4rem;
+        justify-content: space-between;
+    }
+</style>
+<body>
+    {% include cmpt.header %}
+    {{ content }}
+    <div id="next-prev">
+        <div>
+            {% if page.previous %}
+            <a href="/{{ page.previous }}">Previous</a>
+            {% endif %}
+        </div>
+        <div>
+            {% if page.next %}
+            <a href="/{{ page.next }}">Next</a>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

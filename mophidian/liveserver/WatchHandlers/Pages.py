@@ -1,10 +1,9 @@
 from pathlib import Path
-import re
 import shutil
 import os
-from typing import TextIO
 
 from compiler.build import Build, Page
+from moph_logger import Log, FColor
 from .BaseHandler import BaseFileSystemEventHandler
 from watchdog.events import (
     FileClosedEvent,
@@ -16,14 +15,15 @@ from watchdog.events import (
     DirDeletedEvent,
     FileMovedEvent,
     DirMovedEvent,
+    FileSystemEvent,
 )
 
 
 class WatchPages(BaseFileSystemEventHandler):
-    def __init__(self, build: Build, stdout: TextIO):
+    def __init__(self, build: Build, logger: Log):
         super().__init__()
         self.build = build
-        self.stdout = stdout
+        self._logger = logger
 
     def on_closed(self, event: FileClosedEvent):
         '''Called when a file opened for writing is closed.'''
@@ -34,12 +34,26 @@ class WatchPages(BaseFileSystemEventHandler):
         if not event.is_directory:
             path = Path(event.src_path)
             self.build.add_page(path)
-            print(f"Created file {self.replace_prefix('pages', 'site', event.src_path)}")
+
+            log_path = (
+                f"{Page.build_uri(path)}/index.html"
+                if Page.build_uri(path) != "."
+                else "/index.html"
+            )
+            self._logger.Custom(
+                f"Created page {log_path}",
+                clr=FColor.GREEN,
+                label="Pages",
+            )
         else:
             Path(self.replace_prefix("pages", "site", event.src_path)).mkdir(
                 parents=True, exist_ok=True
             )
-            print(f"Created directory {self.replace_prefix('pages', 'site', event.src_path)}")
+            self._logger.Custom(
+                f"Created directory {self.replace_prefix('pages', 'site', event.src_path)}",
+                clr=FColor.GREEN,
+                label="Pages",
+            )
 
     def on_deleted(self, event: FileDeletedEvent | DirDeletedEvent):
         '''Called when a file or directory is deleted.'''
@@ -54,7 +68,17 @@ class WatchPages(BaseFileSystemEventHandler):
                     shutil.rmtree(os.path.normpath(dir))
                 except:
                     pass
-            print(f"Deleted file {self.replace_prefix('pages', 'site', event.src_path)}")
+
+            log_path = (
+                f"{Page.build_uri(Path(event.src_path))}/index.html"
+                if Page.build_uri(Path(event.src_path)) != "."
+                else "/index.html"
+            )
+            self._logger.Custom(
+                f"Deleted page {log_path}",
+                clr=FColor.RED,
+                label="Pages",
+            )
         else:
             dir = self.replace_prefix('pages', 'site', event.src_path)
             for path in Path(dir).glob(f"./**/*.html"):
@@ -63,15 +87,28 @@ class WatchPages(BaseFileSystemEventHandler):
                 except:
                     pass
 
-            self.build.full()
-            print(f"Deleted directory {self.replace_prefix('pages', 'site', event.src_path)}")
+            self._logger.Custom(
+                f"Deleted directory {self.replace_prefix('pages', 'site', event.src_path)}",
+                clr=FColor.RED,
+                label="Pages",
+            )
 
     def on_modified(self, event: FileModifiedEvent | DirModifiedEvent):
         '''Called when a file or directory is modified.'''
         try:
             if Path(event.src_path).suffix != "":
                 self.build.add_page(Path(event.src_path))
-                print(f"Modified file {self.replace_prefix('pages', 'site', event.src_path)}")
+
+                log_path = (
+                    f"{Page.build_uri(Path(event.src_path))}/index.html"
+                    if Page.build_uri(Path(event.src_path)) != "."
+                    else "/index.html"
+                )
+                self._logger.Custom(
+                    f"Modified page {log_path}",
+                    clr=FColor.YELLOW,
+                    label="Pages",
+                )
         except Exception as e:
             print(e)
 
@@ -92,10 +129,26 @@ class WatchPages(BaseFileSystemEventHandler):
 
             self.build.add_page(Path(event.dest_path))
 
-            print(
-                f"Moved file {self.replace_prefix('pages', 'site', event.src_path)} to {self.replace_prefix('pages', 'site', event.dest_path)}"
+            log_path = (
+                f"{Page.build_uri(Path(event.src_path))}/index.html"
+                if Page.build_uri(Path(event.src_path)) != "."
+                else "/index.html"
+            )
+
+            dlog_path = (
+                f"{Page.build_uri(Path(event.dest_path))}/index.html"
+                if Page.build_uri(Path(event.dest_path)) != "."
+                else "/index.html"
+            )
+
+            self._logger.Custom(
+                f"Moved page {log_path} to {dlog_path}",
+                clr=FColor.CYAN,
+                label="Pages",
             )
         else:
-            print(
-                f"Moved directory {self.replace_prefix('pages', 'site', event.src_path)} to {self.replace_prefix('pages', 'site', event.dest_path)}"
+            self._logger.Custom(
+                f"Moved directory {self.replace_prefix('pages', 'site', event.src_path)} to {self.replace_prefix('pages', 'site', event.dest_path)}",
+                clr=FColor.CYAN,
+                label="Pages",
             )

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mophidian</title>
+    <link rel="stylesheet" href="/css/header.css">
+</head>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+    * {
+        box-sizing: border-box;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .box {
+        padding: 1.5rem;
+        border-width: 2px;
+        border-style: solid;
+        border-color: black;
+        width: fit-content;
+        max-width: 90%;
+        border-radius: .5rem;
+
+        display: flex;
+        flex-direction: column;
+        gap: .25rem;
+
+        margin-inline: auto;
+    }
+
+    h3, p {
+        letter-spacing: .1rem;
+    }
+
+    a {
+        /* 
+        Hover affect credit:
+            By : Harshil Patel 
+            URL: https://css-tricks.com/css-link-hover-effects/#aa-the-rainbow-underline-link-hover-effect 
+        */
+        color: black;
+        text-decoration: none;
+
+        background:
+        linear-gradient(
+        to right,
+        rgba(100, 200, 200, 1),
+        rgba(100, 200, 200, 1)
+        ),
+        linear-gradient(
+        to right,
+        rgba(255, 0, 0, 1),
+        rgba(255, 0, 180, 1),
+        rgba(0, 100, 200, 1)
+        );
+        
+        background-size: 100% 3px, 0 3px;
+        background-position: 100% 100%, 0 100%;
+        background-repeat: no-repeat;
+        transition: background-size 400ms;
+    }
+
+    a:hover {
+        background-size: 0 3px, 100% 3px;
+    }
+
+    #header {
+        margin-bottom: 2rem;
+    }
+</style>
+<body>
+    {% include cmpt.header %}
+    <div class="box">
+        <h1>Hello and welcome to Mophidian, a SSG made in python.</h1>
+        <h3>My goal is to make something that is easy to use, but also gives you as many features as possible.</h3>
+        <p>
+            <a href="https://github.com/Tired-Fox/Mophidian" target="_blank">
+                Please checkout my github to see the current status of the project.
+            </a>
+        </p>
+    </div>
+</body>
+</html>

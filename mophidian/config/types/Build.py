@@ -2,7 +2,7 @@ from __future__ import annotations
 
 
 from .Base import BaseType
-from util import color, Color, Style, RESET
+from util import color, FColor, Style, RESET
 
 
 class Build(BaseType):
@@ -13,11 +13,11 @@ class Build(BaseType):
     """The name of the default template to use for markdown files."""
 
     def __init__(self, **kwargs) -> None:
-        set_ = {'version_format': str, 'default_template': str, "delay": [float, int]}
+        set_ = {'version_format': str, 'default_template': str, "refresh_delay": [float, int]}
 
         self.version_format = "v{}"
         self.default_template = "moph_base"
-        self.delay = 2.0
+        self.refresh_delay = 2.0
 
         self.errors = []
 
@@ -38,12 +38,12 @@ class Build(BaseType):
                     self.errors.append(
                         color(
                             f'"',
-                            color(entry, prefix=[Color.RED]),
+                            color(entry, prefix=[FColor.RED]),
                             '": was of type <',
-                            color(type(kwargs[entry]).__name__, prefix=[Color.RED]),
+                            color(type(kwargs[entry]).__name__, prefix=[FColor.RED]),
                             "> but was expected to be ",
                             ', '.join(
-                                "<" + color(t.__name__, prefix=[Color.YELLOW]) + ">"
+                                "<" + color(t.__name__, prefix=[FColor.YELLOW]) + ">"
                                 for t in list(set_[entry])
                             ),
                             prefix=[Style.BOLD],
@@ -54,7 +54,7 @@ class Build(BaseType):
                 self.errors.append(
                     color(
                         f'"',
-                        color(entry, prefix=[Color.RED]),
+                        color(entry, prefix=[FColor.RED]),
                         '": ' "not a valid option or has been found more than once.",
                         prefix=[Style.BOLD],
                         suffix=[RESET],

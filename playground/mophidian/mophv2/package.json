@@ -1,0 +1,14 @@
+{
+  "name": "mophv2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "tailwindcss": "^3.2.0"
+  },
+  "scripts": {
+    "tailwind": "tailwindcss -i ./styles/tailwind.css -o ./static/tailwind.css",
+    "tailwind:mini": "tailwindcss -i ./styles/tailwind.css -o ./static/tailwind.min.css --minify",
+    "tailwind:watch": "tailwindcss -i ./styles/tailwind.css -o ./static/tailwind.css --watch"
+  }
+}

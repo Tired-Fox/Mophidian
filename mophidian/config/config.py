@@ -53,13 +53,13 @@ class Config:
         self.print_errors()
 
     def print_errors(self):
-        from util import Color, Style, color, RESET
+        from util import FColor, Style, color, RESET
 
         if len(self.errors) > 0:
             print(
                 color(
                     "[",
-                    color("IMPORTANT", prefix=[Color.MAGENTA]),
+                    color("IMPORTANT", prefix=[FColor.MAGENTA]),
                     "]",
                     prefix=[Style.BOLD],
                     suffix=[RESET],

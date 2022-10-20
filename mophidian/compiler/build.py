@@ -8,22 +8,31 @@ from .setup import init_static, find_pages, find_content, get_components, get_la
 from .pages import Page
 from config import Config
 from jinja2 import Environment, Template
+from moph_logger import Log, LL, FColor
 
 
 class Build:
-    def __init__(self, tailwind: bool = False):
+    def __init__(self, logger: Log, debug: bool = False):
         self.config = Config()
         self.pages = find_pages()
         self.content = find_content()
         self.components = get_components()
         self.layouts = get_layouts()
-        self.tailwind = tailwind
+        self.debug = debug
         self.slugs = []
+
+        added_log_levels = []
+        if debug:
+            added_log_levels.append(LL.DEBUG)
+
+        self._logger = logger
 
         self.params = {
             "site": self.config.site,
-            "components": self.components,
-            "layouts": self.layouts,
+            "cmpt": self.components,
+            "lyt": self.layouts,
+            "pgs": self.pages,
+            "cnt": self.content,
         }
 
     def remove_page(self, path: Path):
@@ -81,7 +90,9 @@ class Build:
         path = "site/" + page.uri
         Path(path).mkdir(parents=True, exist_ok=True)
         with open(path + "/index.html", "+w", encoding="utf-8") as page_file:
-            page_file.write(layout.render(**self.params, meta=page.meta, content=content))
+            page_file.write(
+                layout.render(**self.params, meta=page.meta, content=content, page=page)
+            )
 
     def generate_html(self, page: Page):
         path = "site/" + page.uri
@@ -127,4 +138,3 @@ class Build:
     def full(self):
         init_static()
         self.create_pages()
-        

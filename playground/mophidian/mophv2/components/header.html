@@ -1,0 +1,56 @@
+<div id="header">
+    <div><a href="/">Home</a></div>
+    <div id="header-seasons">
+        <a href="/blog">Blog</a>
+    </div>
+</div>
+<style>
+    * {
+        box-sizing: border-box;
+      }
+      
+      #header a {
+        /* 
+          Hover affect credit:
+              By : Harshil Patel 
+              URL: https://css-tricks.com/css-link-hover-effects/#aa-the-rainbow-underline-link-hover-effect 
+          */
+        color: black;
+        text-decoration: none;
+      
+        background: linear-gradient(
+            to right,
+            rgba(100, 200, 200, 1),
+            rgba(100, 200, 200, 1)
+          ),
+          linear-gradient(
+            to right,
+            rgba(255, 0, 0, 1),
+            rgba(255, 0, 180, 1),
+            rgba(0, 100, 200, 1)
+          );
+      
+        background-size: 100% 3px, 0 3px;
+        background-position: 100% 100%, 0 100%;
+        background-repeat: no-repeat;
+        transition: background-size 400ms;
+      }
+      
+      #header a:hover {
+        background-size: 0 3px, 100% 3px;
+      }
+      
+      #header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 5rem;
+      }
+      
+      #header-seasons {
+        display: flex;
+        margin-left: auto;
+        gap: 1rem;
+      }
+</style>

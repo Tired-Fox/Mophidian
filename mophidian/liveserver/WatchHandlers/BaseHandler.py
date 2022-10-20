@@ -17,10 +17,6 @@ class BaseFileSystemEventHandler(FileSystemEventHandler):
 
         return folders
 
-    def on_any_event(self, event: FileSystemEvent):
-        '''Catch-all event handler.'''
-        self.last_timestamp = self.timestamp()
-
     def replace_prefix(self, old: str, new: str, path: str) -> str:
         return path.replace(old, new)
 
