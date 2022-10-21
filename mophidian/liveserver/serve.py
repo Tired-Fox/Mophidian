@@ -1,4 +1,8 @@
 import contextlib
+from json import load
+from pathlib import Path
+from shutil import which
+import subprocess
 import sys
 from livereload import Server
 from subprocess import Popen, PIPE
@@ -8,6 +12,46 @@ from .observe import WatchFiles
 from compiler.build import Build
 from moph_logger import Log, LL, FColor
 from ppm import PPM
+
+
+def check_installed(package: str, logger: Log, package_manager: PPM):
+    logger.Custom(
+        f"{package_manager.ppm.name()} v{subprocess.check_output([str(which(package_manager.ppm.name())), '--version']).decode()}",
+        clr=FColor.YELLOW,
+        label="Version",
+    )
+    logger.Custom(
+        f"You can change your preferred package manager (PPM) in \
+{Log.path('moph.json', 'integrations', 'package_manager', spr=' ► ')}",
+        clr=FColor.MAGENTA,
+        label="Note",
+    )
+
+    if Path("package.json").exists():
+        with open("package.json", "r", encoding="utf-8") as package_json:
+            pkg_json = load(package_json)
+
+        if "devDependencies" in pkg_json:
+            if package in pkg_json["devDependencies"]:
+                # Package exists
+                return
+
+        if "dependencies" in pkg_json:
+            if package in pkg_json["dependencies"]:
+                # Package exists
+                return
+
+        # Install package with preferred package manager (PPM)
+        logger.Info(f"Package {package} was not found.")
+        package_manager.ppm.install(package, "-D")
+    else:
+        # Init with PPM
+        logger.Info(f"package.json was not found. Using preferred package managers init.")
+        package_manager.ppm.init()
+
+        # Install package with PPM
+        package_manager.ppm.install(package, "-D")
+        pass
 
 
 def serve(
@@ -43,11 +87,27 @@ def serve(
             logger.Debug(
                 f"build.config.integration.package_manager: {build.config.integration.package_manager}"
             )
+
             package_manager = PPM(build.config.integration.package_manager)
+
+            if build.config.integration.tailwind or build.config.integration.sass:
+                # Check for node.js
+                if which("node") is not None:
+                    logger.Custom(
+                        f"Node {subprocess.check_output(['node', '--version']).decode()}",
+                        clr=FColor.YELLOW,
+                        label="Version",
+                    )
+                else:
+                    logger.Error(
+                        "Node.js was not found. Install it and try again or disable all integrations."
+                    )
+                    exit(3)
 
             tailwind_thread = None
             logger.Debug(f"build.config.integration.tailwind: {build.config.integration.tailwind}")
             if build.config.integration.tailwind:
+                check_installed("tailwindcss", logger, package_manager)
                 logger.Info("Starting tailwindcss")
                 cmd = package_manager.ppm.run_command("tailwind:watch")
                 tailwind_thread = Popen(cmd, stdout=PIPE, stderr=PIPE)
@@ -55,6 +115,7 @@ def serve(
             sass_thread = None
             logger.Debug(f"build.config.integration.sass: {build.config.integration.sass}")
             if build.config.integration.sass:
+                check_installed("sass", logger, package_manager)
                 logger.Info("Starting sass")
                 cmd = package_manager.ppm.run_command("css:watch")
                 sass_thread = Popen(cmd, stdout=PIPE, stderr=PIPE)
@@ -66,7 +127,7 @@ def serve(
 
             # Start livereload server and auto open site in browser
             try:
-                logger.Info(f"Starting server at http://localhost:{port}/")
+                logger.Info(f"Started server at http://localhost:{port}/")
                 if open:
                     logger.Info("Opening server in browser")
                 server.serve(

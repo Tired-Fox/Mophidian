@@ -100,6 +100,19 @@ class Log:
         else:
             raise TypeError(f"encoding was {type(encoding)} must be of type <class 'str'>")
 
+    @classmethod
+    def path(cls, *args: str, clr: int = FColor.YELLOW, spr: str = " > ") -> str:
+        """Takes all the arguments, segments of path, and combines them with the given seperator and color.
+
+        Args:
+            clr (int): The color to apply to each segment of the path
+            spr (str): The seperator between each segement of the path
+
+        Returns:
+            str: The formatted string
+        """
+        return f"{spr}".join([color(arg, prefix=[clr]) for arg in args])
+
     def Debug(self, *args: str):
         clr = FColor.WHITE
         if self._compare(LL.DEBUG, self._level):

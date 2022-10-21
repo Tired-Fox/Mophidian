@@ -31,8 +31,8 @@ class WatchPages(BaseFileSystemEventHandler):
 
     def on_created(self, event: FileCreatedEvent | DirCreatedEvent):
         '''Called when a file or directory is created.'''
-        if not event.is_directory:
-            path = Path(event.src_path)
+        path = Path(event.src_path)
+        if path.suffix != "":
             self.build.add_page(path)
 
             log_path = (
@@ -57,8 +57,8 @@ class WatchPages(BaseFileSystemEventHandler):
 
     def on_deleted(self, event: FileDeletedEvent | DirDeletedEvent):
         '''Called when a file or directory is deleted.'''
-
-        if Path(event.src_path).suffix != "":
+        path = Path(event.src_path)
+        if path.suffix != "":
             self.build.remove_page(Path(event.src_path))
             dir = 'site/' + Page.build_uri(Path(event.src_path))
             if len(self.folders_in(Path(dir))) > 0:
@@ -70,8 +70,8 @@ class WatchPages(BaseFileSystemEventHandler):
                     pass
 
             log_path = (
-                f"{Page.build_uri(Path(event.src_path))}/index.html"
-                if Page.build_uri(Path(event.src_path)) != "."
+                f"{Page.build_uri(path)}/index.html"
+                if Page.build_uri(path) != "."
                 else "/index.html"
             )
             self._logger.Custom(
@@ -95,28 +95,27 @@ class WatchPages(BaseFileSystemEventHandler):
 
     def on_modified(self, event: FileModifiedEvent | DirModifiedEvent):
         '''Called when a file or directory is modified.'''
-        try:
-            if Path(event.src_path).suffix != "":
-                self.build.add_page(Path(event.src_path))
+        path = Path(event.src_path)
+        if path.suffix != "":
+            self.build.add_page(path)
 
-                log_path = (
-                    f"{Page.build_uri(Path(event.src_path))}/index.html"
-                    if Page.build_uri(Path(event.src_path)) != "."
-                    else "/index.html"
-                )
-                self._logger.Custom(
-                    f"Modified page {log_path}",
-                    clr=FColor.YELLOW,
-                    label="Pages",
-                )
-        except Exception as e:
-            print(e)
+            log_path = (
+                f"{Page.build_uri(path)}/index.html"
+                if Page.build_uri(path) != "."
+                else "/index.html"
+            )
+            self._logger.Custom(
+                f"Modified page {log_path}",
+                clr=FColor.YELLOW,
+                label="Pages",
+            )
 
     def on_moved(self, event: FileMovedEvent | DirMovedEvent):
         '''Called when a file or a directory is moved or renamed.'''
-        if Path(event.src_path).suffix != "":
-            self.build.remove_page(Path(event.src_path))
-            dir = 'site/' + Page.build_uri(Path(event.src_path))
+        path = Path(event.src_path)
+        if path.suffix != "":
+            self.build.remove_page(path)
+            dir = 'site/' + Page.build_uri(path)
             if len(self.folders_in(Path(dir))) > 0:
                 print("Has sub folders")
                 self.remove_file(dir + "/index.html")
@@ -127,17 +126,17 @@ class WatchPages(BaseFileSystemEventHandler):
                 except:
                     pass
 
-            self.build.add_page(Path(event.dest_path))
+            self.build.add_page(path)
 
             log_path = (
-                f"{Page.build_uri(Path(event.src_path))}/index.html"
-                if Page.build_uri(Path(event.src_path)) != "."
+                f"{Page.build_uri(path)}/index.html"
+                if Page.build_uri(path) != "."
                 else "/index.html"
             )
 
             dlog_path = (
-                f"{Page.build_uri(Path(event.dest_path))}/index.html"
-                if Page.build_uri(Path(event.dest_path)) != "."
+                f"{Page.build_uri(path)}/index.html"
+                if Page.build_uri(path) != "."
                 else "/index.html"
             )
 

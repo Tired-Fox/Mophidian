@@ -1,3 +1,4 @@
+from json import JSONEncoder, dumps
 import os
 import shutil
 from typing import Any
@@ -7,8 +8,16 @@ from pathlib import Path
 from .setup import init_static, find_pages, find_content, get_components, get_layouts
 from .pages import Page
 from config import Config
-from jinja2 import Environment, Template
+from jinja2 import Environment, Template, FileSystemLoader
 from moph_logger import Log, LL, FColor
+
+
+class ComplexJSONEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Template):
+            return str(obj)
+        # Let the base class default method raise the TypeError
+        return JSONEncoder.default(self, obj)
 
 
 class Build:
@@ -45,6 +54,75 @@ class Build:
                     os.remove(file)
             else:
                 shutil.rmtree('site/' + removed_page.parent, ignore_errors=True)
+
+    def add_component(self, path: Path):
+        environment = Environment(loader=FileSystemLoader("./"))
+        to_component = path.parent.as_posix().lstrip("components").lstrip("/").split("/", 1)
+        to_component = to_component[1].split("/") if len(to_component) > 1 else to_component
+        to_component = [i for i in to_component if i]
+        current = self.components
+        for token in to_component:
+            if token not in current:
+                current.update({token: {}})
+            current = current[token]
+        current.update(
+            {path.name.replace(path.suffix, ""): environment.get_template(path.as_posix())}
+        )
+
+        self._logger.Debug(
+            f"Added component {path.parent.as_posix()}",
+            dumps(self.components, cls=ComplexJSONEncoder),
+        )
+
+    def remove_component(self, path: Path):
+        to_component = path.parent.as_posix().lstrip("components").lstrip("/").split("/", 1)
+        to_component = to_component[1].split("/") if len(to_component) > 1 else to_component
+        to_component = [i for i in to_component if i]
+        name = path.name.replace(path.suffix, "")
+        current = self.components
+
+        for token in to_component:
+            if token not in current:
+                current.update({token: {}})
+            current = current[token]
+
+        del current[name]
+
+        self._logger.Debug(f"Remove component {path.parent.as_posix()}")
+
+    def add_layout(self, path: Path):
+        environment = Environment(loader=FileSystemLoader("./"))
+        to_component = path.parent.as_posix().lstrip("layouts").lstrip("/").split("/", 1)
+        to_component = to_component[1].split("/") if len(to_component) > 1 else to_component
+        to_component = [i for i in to_component if i]
+        current = self.layouts
+        for token in to_component:
+            if token not in current:
+                current.update({token: {}})
+            current = current[token]
+        current.update(
+            {path.name.replace(path.suffix, ""): environment.get_template(path.as_posix())}
+        )
+
+        self._logger.Debug(
+            f"Added layout {path.parent.as_posix()}", dumps(current, cls=ComplexJSONEncoder)
+        )
+
+    def remove_layout(self, path: Path):
+        to_component = path.parent.as_posix().lstrip("layouts").lstrip("/").split("/", 1)
+        to_component = to_component[1].split("/") if len(to_component) > 1 else to_component
+        to_component = [i for i in to_component if i]
+        name = path.name.replace(path.suffix, "")
+        current = self.layouts
+
+        for token in to_component:
+            if token not in current:
+                current.update({token: {}})
+            current = current[token]
+
+        del current[name]
+
+        self._logger.Debug(f"Remove layout {path.parent.as_posix()}")
 
     def add_page(self, path: Path):
         new_page = Page(path.parent.as_posix(), path.name, path.suffix)

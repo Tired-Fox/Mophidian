@@ -1,9 +1,10 @@
+from pathlib import Path
 import threading
 from typing import TextIO
 from watchdog.observers import Observer
 
 from compiler.build import Build
-from .WatchHandlers import WatchContent, WatchPages, WatchStatic
+from .WatchHandlers import WatchContent, WatchPages, WatchStatic, WatchTemplates
 from moph_logger import Log, LL
 
 all = ["WatchFiles"]
@@ -37,13 +38,25 @@ class WatchFiles(StoppableThread):
         content_event_handler = WatchContent(build=self.build, logger=self._logger)
         page_event_handler = WatchPages(build=self.build, logger=self._logger)
         static_event_handler = WatchStatic(logger=self._logger)
+        template_event_handler = WatchTemplates(build=self.build, logger=self._logger)
 
         # Create observer and schedule to observe content and pages
         observer = Observer()
 
-        observer.schedule(content_event_handler, "content/", recursive=True)
-        observer.schedule(page_event_handler, "pages/", recursive=True)
-        observer.schedule(static_event_handler, 'static/', recursive=True)
+        if Path("content/").exists():
+            observer.schedule(content_event_handler, "content/", recursive=True)
+
+        if Path("pages/").exists():
+            observer.schedule(page_event_handler, "pages/", recursive=True)
+
+        if Path("static/").exists():
+            observer.schedule(static_event_handler, 'static/', recursive=True)
+
+        if Path("components/").exists():
+            observer.schedule(template_event_handler, "components/", recursive=True)
+
+        if Path("layouts/").exists():
+            observer.schedule(template_event_handler, "layouts/", recursive=True)
 
         # Start observing files
         observer.start()

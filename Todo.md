@@ -1,12 +1,10 @@
 # Todo
 
-- Allow users to opt into auto nodejs features like sass
+- Allow users to opt into auto node.js features like sass
   - [ ] If they opt in and then hit build or serve it should auto setup package.json and install the correct packages
 - [ ] Rewrite next and previous links to be of pages of the same hierarchical level
-- [ ] Add file watching for components and layouts
-- [ ] Startup sass command with `server`
-- Config
-  - [ ] 
+- [ ] Add custom errors
+- [ ] Page to component linking for page rebuild on component change.
 - Refactoring
   - [ ] Page discovery
   - [ ] Parsing and storing page data
@@ -23,10 +21,12 @@
   - Config
     - [ ] Parsing variables
     - [ ] Validating variables
-- [ ] Add custom errors
-- [ ] Support for bootstrap
+- [ ] Support for bootstrap??
+- [ ] Support for read time??
 - [x] Add custom logging
 - [x] Integrate tailwindcss
+- [x] Add file watching for components and layouts
+- [x] Startup sass command with `server`
 
 
 Inspirational Sources:
