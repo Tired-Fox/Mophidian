@@ -1,6 +1,6 @@
 {
   "site": {
-    "name": "mophv2",
+    "name": "tailwind",
     "version": "1.0"
   },
   "build": {
@@ -12,8 +12,8 @@
     "extension_configs": {}
   },
   "integration": {
+    "package_manager": "yarn",
     "sass": false,
-    "tailwind": true,
-    "package_manager": "yarn"
+    "tailwind": true
   }
 }

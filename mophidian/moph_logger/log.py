@@ -5,7 +5,7 @@ import sys
 from typing import Callable, TextIO
 from .encoding import encodings
 from .LL import LL
-from util import color, FColor, BColor, Style, RESET
+from .color import color, FColor, BColor, Style, RESET
 
 
 class Log:
@@ -101,7 +101,7 @@ class Log:
             raise TypeError(f"encoding was {type(encoding)} must be of type <class 'str'>")
 
     @classmethod
-    def path(cls, *args: str, clr: int = FColor.YELLOW, spr: str = " > ") -> str:
+    def path(cls, *args: str, clr: str = FColor.YELLOW, spr: str = " > ") -> str:
         """Takes all the arguments, segments of path, and combines them with the given seperator and color.
 
         Args:
@@ -209,7 +209,7 @@ class Log:
             )
             self._output.flush()
 
-    def Custom(self, *args: str, clr: int = FColor.BLUE, label: str = LL.CUSTOM):
+    def Custom(self, *args: str, clr: str = FColor.BLUE, label: str = LL.CUSTOM):
         if self._compare(LL.CUSTOM, self._level):
             self._output.write(
                 color(

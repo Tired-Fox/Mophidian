@@ -1,9 +1,11 @@
 # Todo
 
-- Allow users to opt into auto node.js features like sass
-  - [ ] If they opt in and then hit build or serve it should auto setup package.json and install the correct packages
+- [ ] custom integration classes that handle all logic for installing and managing integrations
+- [ ] if no metadata title parse and inject title from file name
 - [ ] Rewrite next and previous links to be of pages of the same hierarchical level
 - [ ] Add custom errors
+- [ ] Tool for install tailwindcss addon
+- [ ] Tool for selecting presets
 - [ ] Page to component linking for page rebuild on component change.
 - Refactoring
   - [ ] Page discovery

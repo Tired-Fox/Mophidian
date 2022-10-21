@@ -25,6 +25,10 @@ Use markdown to create websites
   - [Markdown](https://pypi.org/project/Markdown/) [docs](https://python-markdown.github.io/reference/)
     - [Plugins](https://python-markdown.github.io/extensions/)
   
+Code highlight done with CodeHilite plugin with `pygmentize -S <theme> -f html -a .codehilite > styles/highlight.css` setting the theme. `pygmentize -L style` for list of themes.
+
+Add font awesome support by downloading the webfonts and adding css files. https://fontawesome.com/docs/web/setup/host-yourself/webfonts. Add an integration for this.
+
 The core ideas behind this SSG/framework is the same as all the large Javascript frameworks. So in a way, if you used any type of Javascript framework, then this project should be fairly easy to use.
 
 While this project strives to reach something that can create a doc's page on the level of mkDocs it also strives to be a generic website generator as well.

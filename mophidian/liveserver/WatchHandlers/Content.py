@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import TextIO
 
 from compiler.build import Build, Page
-from moph_logger import Log, FColor
+from moph_logger import Log, FColor, color
 from .BaseHandler import BaseFileSystemEventHandler
 from watchdog.events import (
     FileClosedEvent,
@@ -42,8 +42,8 @@ class WatchContent(BaseFileSystemEventHandler):
                 else "/index.html"
             )
             self._logger.Custom(
-                f"Created page {log_path}",
-                clr=FColor.GREEN,
+                color("Created", prefix=[FColor.GREEN]),
+                f"page {log_path}",
                 label="Content",
             )
         else:
@@ -78,8 +78,8 @@ class WatchContent(BaseFileSystemEventHandler):
                 else "/index.html"
             )
             self._logger.Custom(
-                f"Deleted page {log_path}",
-                clr=FColor.RED,
+                color("Deleted", prefix=[FColor.RED]),
+                f"page {log_path}",
                 label="Content",
             )
         else:
@@ -91,8 +91,8 @@ class WatchContent(BaseFileSystemEventHandler):
                     pass
 
             self._logger.Custom(
-                f"Deleted directory {self.replace_prefix('content', 'site', event.src_path)}",
-                clr=FColor.RED,
+                color("Deleted", prefix=[FColor.RED]),
+                f"directory {self.replace_prefix('content', 'site', event.src_path)}",
                 label="Content",
             )
 
@@ -110,8 +110,8 @@ class WatchContent(BaseFileSystemEventHandler):
                     else "/index.html"
                 )
                 self._logger.Custom(
-                    f"Modified page {log_path}",
-                    clr=FColor.MAGENTA,
+                    color("Modified", prefix=[FColor.YELLOW]),
+                    f"page {log_path}",
                     label="Content",
                 )
         except Exception as e:
@@ -149,13 +149,13 @@ class WatchContent(BaseFileSystemEventHandler):
                 else "/index.html"
             )
             self._logger.Custom(
-                f"Moved file {log_path} to {dlog_path}",
-                clr=FColor.CYAN,
+                color("Moved", prefix=[FColor.CYAN]),
+                f"file {log_path} to {dlog_path}",
                 label="Content",
             )
         else:
             self._logger.Custom(
-                f"Moved directory {self.replace_prefix('content', 'site', event.src_path)} to {self.replace_prefix('content', 'site', event.dest_path)}",
-                clr=FColor.CYAN,
+                color("Moved", prefix=[FColor.CYAN]),
+                f"directory {self.replace_prefix('content', 'site', event.src_path)} to {self.replace_prefix('content', 'site', event.dest_path)}",
                 label="Content",
             )

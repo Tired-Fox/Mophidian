@@ -1,7 +1,7 @@
 import shutil
 import os
 
-from moph_logger import Log, FColor
+from moph_logger import Log, FColor, color
 from .BaseHandler import BaseFileSystemEventHandler
 from watchdog.events import (
     FileClosedEvent,
@@ -36,8 +36,9 @@ class WatchStatic(BaseFileSystemEventHandler):
                 )
 
                 self._logger.Custom(
-                    f"Created file {self.replace_prefix('static', 'site', event.src_path)}",
-                    clr=FColor.GREEN,
+                    color("Created", prefix=[FColor.GREEN]),
+                    f"file {self.replace_prefix('static', 'site', event.src_path)}",
+                    clr=FColor.MAGENTA,
                     label="Static",
                 )
             else:
@@ -45,11 +46,7 @@ class WatchStatic(BaseFileSystemEventHandler):
                     os.path.normpath(event.src_path),
                     '/'.join(['site', event.src_path.split('/', 1)[1]]),
                 )
-                self._logger.Custom(
-                    f"Created directory {self.replace_prefix('static', 'site', event.src_path)}",
-                    clr=FColor.GREEN,
-                    label="Static",
-                )
+
         except Exception as e:
             print(e)
 
@@ -70,8 +67,9 @@ class WatchStatic(BaseFileSystemEventHandler):
                     )
 
                     self._logger.Custom(
-                        f"Deleted directory {self.replace_prefix('static', 'site', event.src_path)}",
-                        clr=FColor.RED,
+                        color("Deleted", prefix=[FColor.RED]),
+                        f"directory {self.replace_prefix('static', 'site', event.src_path)}",
+                        clr=FColor.MAGENTA,
                         label="Static",
                     )
                 except:
@@ -89,7 +87,8 @@ class WatchStatic(BaseFileSystemEventHandler):
                     os.path.normpath('/'.join(['site', event.src_path.split('/', 1)[1]])),
                 )
                 self._logger.Custom(
-                    f"Modified file {self.replace_prefix('static', 'site', event.src_path)}",
+                    color("Modified", prefix=[FColor.YELLOW]),
+                    f"file {self.replace_prefix('static', 'site', event.src_path)}",
                     clr=FColor.MAGENTA,
                     label="Static",
                 )
@@ -108,8 +107,9 @@ class WatchStatic(BaseFileSystemEventHandler):
                 )
 
                 self._logger.Custom(
-                    f"Moved file {self.replace_prefix('static', 'site', event.src_path)} to {self.replace_prefix('static', 'site', event.dest_path)}",
-                    clr=FColor.CYAN,
+                    color("Moved", prefix=[FColor.CYAN]),
+                    f"file {self.replace_prefix('static', 'site', event.src_path)} to {self.replace_prefix('static', 'site', event.dest_path)}",
+                    clr=FColor.MAGENTA,
                     label="Static",
                 )
             else:
@@ -127,8 +127,9 @@ class WatchStatic(BaseFileSystemEventHandler):
                 )
 
                 self._logger.Custom(
-                    f"Moved directory {self.replace_prefix('static', 'site', event.src_path)} to {self.replace_prefix('static', 'site', event.dest_path)}",
-                    clr=FColor.CYAN,
+                    color("Moved", prefix=[FColor.CYAN]),
+                    f"directory {self.replace_prefix('static', 'site', event.src_path)} to {self.replace_prefix('static', 'site', event.dest_path)}",
+                    clr=FColor.MAGENTA,
                     label="Static",
                 )
         except Exception as e:

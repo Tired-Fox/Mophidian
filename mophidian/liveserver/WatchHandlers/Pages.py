@@ -3,7 +3,7 @@ import shutil
 import os
 
 from compiler.build import Build, Page
-from moph_logger import Log, FColor
+from moph_logger import Log, FColor, color, XTerm
 from .BaseHandler import BaseFileSystemEventHandler
 from watchdog.events import (
     FileClosedEvent,
@@ -24,6 +24,7 @@ class WatchPages(BaseFileSystemEventHandler):
         super().__init__()
         self.build = build
         self._logger = logger
+        self.color = FColor.XTERM(XTerm.Grey85)
 
     def on_closed(self, event: FileClosedEvent):
         '''Called when a file opened for writing is closed.'''
@@ -41,18 +42,14 @@ class WatchPages(BaseFileSystemEventHandler):
                 else "/index.html"
             )
             self._logger.Custom(
-                f"Created page {log_path}",
-                clr=FColor.GREEN,
-                label="Pages",
+                color("Created", prefix=[FColor.GREEN]),
+                f"page {log_path}",
+                clr=self.color,
+                label="Page",
             )
         else:
             Path(self.replace_prefix("pages", "site", event.src_path)).mkdir(
                 parents=True, exist_ok=True
-            )
-            self._logger.Custom(
-                f"Created directory {self.replace_prefix('pages', 'site', event.src_path)}",
-                clr=FColor.GREEN,
-                label="Pages",
             )
 
     def on_deleted(self, event: FileDeletedEvent | DirDeletedEvent):
@@ -75,9 +72,10 @@ class WatchPages(BaseFileSystemEventHandler):
                 else "/index.html"
             )
             self._logger.Custom(
-                f"Deleted page {log_path}",
-                clr=FColor.RED,
-                label="Pages",
+                color("Deleted", prefix=[FColor.RED]),
+                f"page {log_path}",
+                clr=self.color,
+                label="Page",
             )
         else:
             dir = self.replace_prefix('pages', 'site', event.src_path)
@@ -88,9 +86,10 @@ class WatchPages(BaseFileSystemEventHandler):
                     pass
 
             self._logger.Custom(
-                f"Deleted directory {self.replace_prefix('pages', 'site', event.src_path)}",
-                clr=FColor.RED,
-                label="Pages",
+                color("Deleted", prefix=[FColor.RED]),
+                f"directory {self.replace_prefix('pages', 'site', event.src_path)}",
+                clr=self.color,
+                label="Page",
             )
 
     def on_modified(self, event: FileModifiedEvent | DirModifiedEvent):
@@ -105,9 +104,10 @@ class WatchPages(BaseFileSystemEventHandler):
                 else "/index.html"
             )
             self._logger.Custom(
-                f"Modified page {log_path}",
-                clr=FColor.YELLOW,
-                label="Pages",
+                color("Modified", prefix=[FColor.YELLOW]),
+                f"page {log_path}",
+                clr=self.color,
+                label="Page",
             )
 
     def on_moved(self, event: FileMovedEvent | DirMovedEvent):
@@ -141,13 +141,15 @@ class WatchPages(BaseFileSystemEventHandler):
             )
 
             self._logger.Custom(
-                f"Moved page {log_path} to {dlog_path}",
-                clr=FColor.CYAN,
-                label="Pages",
+                color("Moved", prefix=[FColor.CYAN]),
+                f"page {log_path} to {dlog_path}",
+                clr=self.color,
+                label="Page",
             )
         else:
             self._logger.Custom(
-                f"Moved directory {self.replace_prefix('pages', 'site', event.src_path)} to {self.replace_prefix('pages', 'site', event.dest_path)}",
-                clr=FColor.CYAN,
-                label="Pages",
+                color("Moved", prefix=[FColor.CYAN]),
+                f"directory {self.replace_prefix('pages', 'site', event.src_path)} to {self.replace_prefix('pages', 'site', event.dest_path)}",
+                clr=self.color,
+                label="Page",
             )

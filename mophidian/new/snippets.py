@@ -42,14 +42,17 @@ snippets = {
 </body>
 </html>\
 ''',
-    "tailwind_config": '''\
+    "tailwind_config_open": '''\
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["site/**/*.html"],
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [\n\
+''',
+    "tailwind_config_close": '''\
+  ],
 }\
 ''',
     "tailwind_css": """\

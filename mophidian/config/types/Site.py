@@ -3,7 +3,7 @@ from mimetypes import suffix_map
 
 
 from .Base import BaseType
-from util import color, FColor, Style, RESET
+from moph_logger import color, FColor, Style, RESET
 
 
 class Site(BaseType):

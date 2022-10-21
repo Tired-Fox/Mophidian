@@ -1,4 +1,5 @@
 from .new import generate
+from .snippets import snippets
 
 import sys
 

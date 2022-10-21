@@ -57,11 +57,23 @@ class NPM:
 
     @classmethod
     def name(cls) -> str:
+        """Package manager name as lower case."""
         return cls.__name__.lower()
+
+    @classmethod
+    def name_title(cls) -> str:
+        """Package manager name as title case."""
+        name = cls.__name__.lower()
+        return name[0].upper() + name[1:]
+
+    @classmethod
+    def name_upper(cls) -> str:
+        """Package manager name as upper case."""
+        return cls.__name__.upper()
 
     def init(self):
         """Run the init command associated with the package manager."""
-        self._logger.Custom(self._init, label=self.name().upper())
+        self._logger.Custom(self._init, label=self.name_upper())
         system(self._init)
 
     def install(self, package: str, *args: str):
@@ -71,13 +83,13 @@ class NPM:
             package (str): The package that will be installed
         """
         cmd = f"{self._install} {' '.join(args)} {package}"
-        self._logger.Custom(cmd, label=self.name().upper())
+        self._logger.Custom(cmd, label=self.name_upper())
         system(cmd)
 
     def run(self, command: str):
         """Run a command from the package.json using the notation from this package manager."""
         cmd = f"{self._run} {command}"
-        self._logger.Custom(cmd, label=self.name().upper())
+        self._logger.Custom(cmd, label=self.name_upper())
         system(cmd)
 
     def run_command(self, command: str) -> str:

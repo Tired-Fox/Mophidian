@@ -53,7 +53,7 @@ class Config:
         self.print_errors()
 
     def print_errors(self):
-        from util import FColor, Style, color, RESET
+        from moph_logger import FColor, Style, color, RESET
 
         if len(self.errors) > 0:
             print(

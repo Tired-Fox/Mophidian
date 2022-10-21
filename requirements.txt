@@ -5,3 +5,5 @@ livereload==2.6.3
 watchdog==2.1.9
 tornado==6.2
 click
+Pygments
+# js2py

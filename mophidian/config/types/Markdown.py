@@ -1,5 +1,5 @@
 from .Base import BaseType
-from util import color, FColor, Style, RESET
+from moph_logger import color, FColor, Style, RESET
 
 _defualts = {
     "defaults": True,
@@ -12,6 +12,7 @@ _defualts = {
         "md_in_html",
         "tables",
         "wikilinks",
+        "codehilite",
         "pymdownx.betterem",
         "pymdownx.caret",
         "pymdownx.details",

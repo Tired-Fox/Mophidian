@@ -1,6 +1,3 @@
-from .log import Log, FColor, BColor, color, Style, RESET
+from .log import Log
+from .color import FColor, BColor, color, Style, RESET, url, XTerm
 from .LL import LL
-
-import sys
-
-sys.path.insert(0, "../")

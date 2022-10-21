@@ -1,20 +1,23 @@
 import contextlib
-from json import load
 from pathlib import Path
 from shutil import which
 import subprocess
 import sys
+from typing import TextIO
 from livereload import Server
 from subprocess import Popen, PIPE
+
 
 # Mophidian code
 from .observe import WatchFiles
 from compiler.build import Build
 from moph_logger import Log, LL, FColor
 from ppm import PPM
+from new import snippets
+from integration import Integration
 
 
-def check_installed(package: str, logger: Log, package_manager: PPM):
+def check_installed(package: str, logger: Log, package_manager: PPM, stdo: TextIO, stde: TextIO):
     logger.Custom(
         f"{package_manager.ppm.name()} v{subprocess.check_output([str(which(package_manager.ppm.name())), '--version']).decode()}",
         clr=FColor.YELLOW,
@@ -27,31 +30,11 @@ def check_installed(package: str, logger: Log, package_manager: PPM):
         label="Note",
     )
 
-    if Path("package.json").exists():
-        with open("package.json", "r", encoding="utf-8") as package_json:
-            pkg_json = load(package_json)
-
-        if "devDependencies" in pkg_json:
-            if package in pkg_json["devDependencies"]:
-                # Package exists
-                return
-
-        if "dependencies" in pkg_json:
-            if package in pkg_json["dependencies"]:
-                # Package exists
-                return
-
-        # Install package with preferred package manager (PPM)
-        logger.Info(f"Package {package} was not found.")
-        package_manager.ppm.install(package, "-D")
-    else:
-        # Init with PPM
-        logger.Info(f"package.json was not found. Using preferred package managers init.")
-        package_manager.ppm.init()
-
-        # Install package with PPM
-        package_manager.ppm.install(package, "-D")
-        pass
+    with contextlib.redirect_stdout(stdo):
+        with contextlib.redirect_stderr(stde):
+            integration = Integration.build(package, logger, package_manager)
+            if integration is not None and not integration.installed(package):
+                integration.install()
 
 
 def serve(
@@ -107,17 +90,19 @@ def serve(
             tailwind_thread = None
             logger.Debug(f"build.config.integration.tailwind: {build.config.integration.tailwind}")
             if build.config.integration.tailwind:
-                check_installed("tailwindcss", logger, package_manager)
+                check_installed("tailwindcss", logger, package_manager, old_stdout, old_stderr)
                 logger.Info("Starting tailwindcss")
                 cmd = package_manager.ppm.run_command("tailwind:watch")
+                logger.Custom(cmd, label=package_manager.ppm.name_upper())
                 tailwind_thread = Popen(cmd, stdout=PIPE, stderr=PIPE)
 
             sass_thread = None
             logger.Debug(f"build.config.integration.sass: {build.config.integration.sass}")
             if build.config.integration.sass:
-                check_installed("sass", logger, package_manager)
+                check_installed("sass", logger, package_manager, old_stdout, old_stderr)
                 logger.Info("Starting sass")
                 cmd = package_manager.ppm.run_command("css:watch")
+                logger.Custom(cmd, label=package_manager.ppm.name_upper())
                 sass_thread = Popen(cmd, stdout=PIPE, stderr=PIPE)
 
             # Use watchdog as to have an incremental build system

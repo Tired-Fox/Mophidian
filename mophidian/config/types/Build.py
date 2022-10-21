@@ -2,7 +2,7 @@ from __future__ import annotations
 
 
 from .Base import BaseType
-from util import color, FColor, Style, RESET
+from moph_logger import color, FColor, Style, RESET
 
 
 class Build(BaseType):
