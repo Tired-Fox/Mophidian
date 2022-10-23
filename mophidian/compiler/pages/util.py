@@ -1,5 +1,6 @@
 from os import path
 
+
 def normpath(path_: str) -> str:
     """Normalize the path and make it alwasy have forward slash."""
     return path.normpath(path_).replace("\\", "/")
@@ -15,7 +16,14 @@ def create_uri(parent_: str, name_: str) -> str:
     Returns:
         str: The normalized combination of the parent and the name
     """
-    return normpath(path.join(parent_, name_))
+    if parent_ != "" and name_ != "":
+        return normpath(path.join(parent_, name_))
+    elif parent_ == "" and name_ != "":
+        return f"/{name_}"
+    elif parent_ != "" and name_ == "":
+        return f"/{normpath(parent_)}"
+    else:
+        return ""
 
 
 def splitall(path: str) -> list[str]:

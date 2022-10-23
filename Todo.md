@@ -1,6 +1,9 @@
 # Todo
 
-- [ ] custom integration classes that handle all logic for installing and managing integrations
+- [ ] Creating linking between files and others so if one is updated then all related files will be too
+  - [ ] Event system
+- [ ] Stop jinja2 from bricking everything with a compilation error
+- [ ] Fontawesome integration
 - [ ] if no metadata title parse and inject title from file name
 - [ ] Rewrite next and previous links to be of pages of the same hierarchical level
 - [ ] Add custom errors
@@ -29,6 +32,7 @@
 - [x] Integrate tailwindcss
 - [x] Add file watching for components and layouts
 - [x] Startup sass command with `server`
+- [x] custom integration classes that handle all logic for installing and managing integrations
 
 
 Inspirational Sources:

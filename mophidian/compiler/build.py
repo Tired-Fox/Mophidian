@@ -1,6 +1,7 @@
 from json import JSONEncoder, dumps
 import os
 import shutil
+import traceback
 from typing import Any
 import markdown
 from pathlib import Path
@@ -9,7 +10,7 @@ from .setup import init_static, find_pages, find_content, get_components, get_la
 from .pages import Page
 from config import Config
 from jinja2 import Environment, Template, FileSystemLoader
-from moph_logger import Log, LL, FColor
+from moph_logger import Log, LL
 
 
 class ComplexJSONEncoder(JSONEncoder):
@@ -29,6 +30,8 @@ class Build:
         self.layouts = get_layouts()
         self.debug = debug
         self.slugs = []
+        self.tree = {}
+        self.generate_tree()
 
         added_log_levels = []
         if debug:
@@ -65,9 +68,15 @@ class Build:
             if token not in current:
                 current.update({token: {}})
             current = current[token]
-        current.update(
-            {path.name.replace(path.suffix, ""): environment.get_template(path.as_posix())}
-        )
+
+        try:
+            current.update(
+                {path.name.replace(path.suffix, ""): environment.get_template(path.as_posix())}
+            )
+        except Exception as e:
+            self._logger.Error(
+                "Jinja2:", str(e), "\n", "\n".join(traceback.format_tb(e.__traceback__))
+            )
 
         self._logger.Debug(
             f"Added component {path.parent.as_posix()}",
@@ -100,9 +109,15 @@ class Build:
             if token not in current:
                 current.update({token: {}})
             current = current[token]
-        current.update(
-            {path.name.replace(path.suffix, ""): environment.get_template(path.as_posix())}
-        )
+
+        try:
+            current.update(
+                {path.name.replace(path.suffix, ""): environment.get_template(path.as_posix())}
+            )
+        except Exception as e:
+            self._logger.Error(
+                "Jinja2:", str(e), "\n", "\n".join(traceback.format_tb(e.__traceback__))
+            )
 
         self._logger.Debug(
             f"Added layout {path.parent.as_posix()}", dumps(current, cls=ComplexJSONEncoder)
@@ -168,40 +183,89 @@ class Build:
         path = "site/" + page.uri
         Path(path).mkdir(parents=True, exist_ok=True)
         with open(path + "/index.html", "+w", encoding="utf-8") as page_file:
-            page_file.write(
-                layout.render(**self.params, meta=page.meta, content=content, page=page)
-            )
+            try:
+                page_file.write(
+                    layout.render(
+                        **self.params, meta=page.meta, content=content, page=page, nav=self.tree
+                    )
+                )
+            except Exception as e:
+                self._logger.Error(
+                    "Jinja2:", str(e), "\n", "\n".join(traceback.format_tb(e.__traceback__))
+                )
 
     def generate_html(self, page: Page):
         path = "site/" + page.uri
         Path(path).mkdir(parents=True, exist_ok=True)
         with open(path + "/index.html", "+w", encoding="utf-8") as page_file:
-            page_file.write(page.template.render(**self.params, meta=page.meta))
+            try:
+                page_file.write(page.template.render(**self.params, meta=page.meta, nav=self.tree))
+            except Exception as e:
+                self._logger.Error(
+                    "Jinja2:", str(e), "\n", "\n".join(traceback.format_tb(e.__traceback__))
+                )
 
     def generate_page(self, page: Page):
+        self.tree_append_page(page)
+
         if page.ext == ".md":
             self.generate_markdown(page)
         else:
             self.generate_html(page)
 
+    def generate_tree(self):
+        # Add each page and mimic the build process
+        for page in self.pages:
+            if page.name not in ["[slug]", "[...slug]"]:
+                self.tree_append_page(page)
+            elif page.name in ["[slug]", "[...slug]"] and page.ext == ".html":
+                if page.name == "[slug]":
+                    for cpage in self.content:
+                        if cpage.parent == page.parent and cpage.ext == ".md":
+                            self.tree_append_page(cpage)
+                else:
+                    for cpage in self.content:
+                        if page.parent in cpage.uri:
+                            self.tree_append_page(cpage)
+            else:
+                continue
+
+    def tree_append_page(self, page: Page):
+        current = self.tree
+        crumbs = [c for c in page.breadcrumb if c]
+        for token in crumbs:
+            if token not in current:
+                current[token] = {}
+            current = current[token]
+
+        current.update({"index": page.uri})
+
     def generate_content(self, page: Page):
         environment = Environment()
+        slug = None
         with open(page.full_path, "r", encoding="utf-8") as slug_file:
-            slug = environment.from_string(slug_file.read())
+            try:
+                slug = environment.from_string(slug_file.read())
+            except Exception as e:
+                self._logger.Error(
+                    "Jinja2:", str(e), "\n", "\n".join(traceback.format_tb(e.__traceback__))
+                )
 
         if slug is not None:
             if page.name == "[slug]":
                 for cpage in self.content:
                     if cpage.parent == page.parent and cpage.ext == ".md":
                         cpage.template = page.template
-                        print(cpage.template)
                         self.generate_markdown(cpage, page.template)
+
+                        self.tree_append_page(cpage)
             else:
-                slugs = [content.uri for content in self.content]
-                for cpage in slugs:
+                cpages = [content.uri for content in self.content]
+                for cpage in cpages:
                     if page.parent in cpage:
                         self.content[cpage].template = page.template
                         self.generate_markdown(self.content[cpage], page.template)
+                        self.tree_append_page(self.content[cpage])
 
     def create_pages(self):
         for page in self.pages:

@@ -60,8 +60,8 @@ def serve(
     logger.Debug(
         f"open={open}, debug={debug}, port={port}, entry_file={entry_file}, open_delay={open_delay}"
     )
-    with contextlib.redirect_stdout(None):
-        with contextlib.redirect_stderr(None):
+    with contextlib.redirect_stdout(old_stdout):
+        with contextlib.redirect_stderr(old_stderr):
             logger.Info("Setting up server")
             server = Server()
             logger.Debug(f"build.config.build.refresh_delay: {build.config.build.refresh_delay}")

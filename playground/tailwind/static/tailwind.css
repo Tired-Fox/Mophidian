@@ -1,5 +1,5 @@
 /*
-! tailwindcss v3.2.0 | MIT License | https://tailwindcss.com
+! tailwindcss v3.2.1 | MIT License | https://tailwindcss.com
 */
 
 /*
@@ -1169,8 +1169,16 @@ video {
   margin-top: 2.5rem;
 }
 
+.ml-6 {
+  margin-left: 1.5rem;
+}
+
 .flex {
   display: flex;
+}
+
+.h-8 {
+  height: 2rem;
 }
 
 .w-\[90\%\] {
@@ -1181,6 +1189,14 @@ video {
   width: -webkit-fit-content;
   width: -moz-fit-content;
   width: fit-content;
+}
+
+.min-w-\[90\%\] {
+  min-width: 90%;
+}
+
+.min-w-\[85\%\] {
+  min-width: 85%;
 }
 
 .flex-col {
@@ -1216,6 +1232,11 @@ video {
 .px-8 {
   padding-left: 2rem;
   padding-right: 2rem;
+}
+
+.py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 
 .font-serif {

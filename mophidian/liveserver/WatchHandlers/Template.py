@@ -1,7 +1,4 @@
-import shutil
-import os
-
-from moph_logger import Log, FColor
+from moph_logger import Log
 from compiler.build import Build
 from pathlib import Path
 from .BaseHandler import BaseFileSystemEventHandler

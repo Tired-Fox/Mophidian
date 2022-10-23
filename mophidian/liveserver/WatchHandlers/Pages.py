@@ -38,7 +38,7 @@ class WatchPages(BaseFileSystemEventHandler):
 
             log_path = (
                 f"{Page.build_uri(path)}/index.html"
-                if Page.build_uri(path) != "."
+                if Page.build_uri(path) != "/"
                 else "/index.html"
             )
             self._logger.Custom(
@@ -68,7 +68,7 @@ class WatchPages(BaseFileSystemEventHandler):
 
             log_path = (
                 f"{Page.build_uri(path)}/index.html"
-                if Page.build_uri(path) != "."
+                if Page.build_uri(path) != "/"
                 else "/index.html"
             )
             self._logger.Custom(
@@ -96,11 +96,12 @@ class WatchPages(BaseFileSystemEventHandler):
         '''Called when a file or directory is modified.'''
         path = Path(event.src_path)
         if path.suffix != "":
+            self.build.remove_page(path)
             self.build.add_page(path)
 
             log_path = (
                 f"{Page.build_uri(path)}/index.html"
-                if Page.build_uri(path) != "."
+                if Page.build_uri(path) != "/"
                 else "/index.html"
             )
             self._logger.Custom(
@@ -130,13 +131,13 @@ class WatchPages(BaseFileSystemEventHandler):
 
             log_path = (
                 f"{Page.build_uri(path)}/index.html"
-                if Page.build_uri(path) != "."
+                if Page.build_uri(path) != "/"
                 else "/index.html"
             )
 
             dlog_path = (
                 f"{Page.build_uri(path)}/index.html"
-                if Page.build_uri(path) != "."
+                if Page.build_uri(path) != "/"
                 else "/index.html"
             )
 
