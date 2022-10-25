@@ -1,0 +1,24 @@
+{
+  "site": {
+    "version": "0.1",
+    "name": "Mophidian",
+    "src_dir": "pages"
+  },
+  "build": {
+    "version_format": "v{}",
+    "default_template": "post"
+  },
+  "markdown": {
+    "extensions": [33],
+    "extension_configs": {
+      "pymdownx.tilde": 23,
+      "somerandom.plugin": {}
+    }
+  },
+  "nav": {
+    "directory_url": false
+  },
+  "tailwind": {
+    "platform": "windows"
+  }
+}
