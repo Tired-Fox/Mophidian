@@ -1,0 +1,19 @@
+{
+  "site": {
+    "name": "tailwind",
+    "version": "1.0"
+  },
+  "build": {
+    "refresh_delay": 0.3
+  },
+  "markdown": {
+    "append": false,
+    "extensions": [],
+    "extension_configs": {}
+  },
+  "integration": {
+    "package_manager": "yarn",
+    "sass": false,
+    "tailwind": true
+  }
+}

@@ -1,9 +1,9 @@
 from pathlib import Path
-import re
 import shutil
 import os
 
 from compiler.build import Build, Page
+from moph_logger import Log, FColor, color, XTerm
 from .BaseHandler import BaseFileSystemEventHandler
 from watchdog.events import (
     FileClosedEvent,
@@ -15,13 +15,16 @@ from watchdog.events import (
     DirDeletedEvent,
     FileMovedEvent,
     DirMovedEvent,
+    FileSystemEvent,
 )
 
 
 class WatchPages(BaseFileSystemEventHandler):
-    def __init__(self, build: Build):
+    def __init__(self, build: Build, logger: Log):
         super().__init__()
         self.build = build
+        self._logger = logger
+        self.color = FColor.XTERM(XTerm.Grey85)
 
     def on_closed(self, event: FileClosedEvent):
         '''Called when a file opened for writing is closed.'''
@@ -29,20 +32,30 @@ class WatchPages(BaseFileSystemEventHandler):
 
     def on_created(self, event: FileCreatedEvent | DirCreatedEvent):
         '''Called when a file or directory is created.'''
-        if not event.is_directory:
-            path = Path(event.src_path)
+        path = Path(event.src_path)
+        if path.suffix != "":
             self.build.add_page(path)
-            print(f"Created file {self.replace_prefix('pages', 'site', event.src_path)}")
+
+            log_path = (
+                f"{Page.build_uri(path)}/index.html"
+                if Page.build_uri(path) != "/"
+                else "/index.html"
+            )
+            self._logger.Custom(
+                color("Created", prefix=[FColor.GREEN]),
+                f"page {log_path}",
+                clr=self.color,
+                label="Page",
+            )
         else:
             Path(self.replace_prefix("pages", "site", event.src_path)).mkdir(
                 parents=True, exist_ok=True
             )
-            print(f"Created directory {self.replace_prefix('pages', 'site', event.src_path)}")
 
     def on_deleted(self, event: FileDeletedEvent | DirDeletedEvent):
         '''Called when a file or directory is deleted.'''
-
-        if Path(event.src_path).suffix != "":
+        path = Path(event.src_path)
+        if path.suffix != "":
             self.build.remove_page(Path(event.src_path))
             dir = 'site/' + Page.build_uri(Path(event.src_path))
             if len(self.folders_in(Path(dir))) > 0:
@@ -52,7 +65,18 @@ class WatchPages(BaseFileSystemEventHandler):
                     shutil.rmtree(os.path.normpath(dir))
                 except:
                     pass
-            print(f"Deleted file {self.replace_prefix('pages', 'site', event.src_path)}")
+
+            log_path = (
+                f"{Page.build_uri(path)}/index.html"
+                if Page.build_uri(path) != "/"
+                else "/index.html"
+            )
+            self._logger.Custom(
+                color("Deleted", prefix=[FColor.RED]),
+                f"page {log_path}",
+                clr=self.color,
+                label="Page",
+            )
         else:
             dir = self.replace_prefix('pages', 'site', event.src_path)
             for path in Path(dir).glob(f"./**/*.html"):
@@ -61,23 +85,38 @@ class WatchPages(BaseFileSystemEventHandler):
                 except:
                     pass
 
-            self.build.full()
-            print(f"Deleted directory {self.replace_prefix('pages', 'site', event.src_path)}")
+            self._logger.Custom(
+                color("Deleted", prefix=[FColor.RED]),
+                f"directory {self.replace_prefix('pages', 'site', event.src_path)}",
+                clr=self.color,
+                label="Page",
+            )
 
     def on_modified(self, event: FileModifiedEvent | DirModifiedEvent):
         '''Called when a file or directory is modified.'''
-        try:
-            if Path(event.src_path).suffix != "":
-                self.build.add_page(Path(event.src_path))
-                print(f"Modified file {self.replace_prefix('pages', 'site', event.src_path)}")
-        except Exception as e:
-            print(e)
+        path = Path(event.src_path)
+        if path.suffix != "":
+            self.build.remove_page(path)
+            self.build.add_page(path)
+
+            log_path = (
+                f"{Page.build_uri(path)}/index.html"
+                if Page.build_uri(path) != "/"
+                else "/index.html"
+            )
+            self._logger.Custom(
+                color("Modified", prefix=[FColor.YELLOW]),
+                f"page {log_path}",
+                clr=self.color,
+                label="Page",
+            )
 
     def on_moved(self, event: FileMovedEvent | DirMovedEvent):
         '''Called when a file or a directory is moved or renamed.'''
-        if Path(event.src_path).suffix != "":
-            self.build.remove_page(Path(event.src_path))
-            dir = 'site/' + Page.build_uri(Path(event.src_path))
+        path = Path(event.src_path)
+        if path.suffix != "":
+            self.build.remove_page(path)
+            dir = 'site/' + Page.build_uri(path)
             if len(self.folders_in(Path(dir))) > 0:
                 print("Has sub folders")
                 self.remove_file(dir + "/index.html")
@@ -88,12 +127,30 @@ class WatchPages(BaseFileSystemEventHandler):
                 except:
                     pass
 
-            self.build.add_page(Path(event.dest_path))
+            self.build.add_page(path)
 
-            print(
-                f"Moved file {self.replace_prefix('pages', 'site', event.src_path)} to {self.replace_prefix('pages', 'site', event.dest_path)}"
+            log_path = (
+                f"{Page.build_uri(path)}/index.html"
+                if Page.build_uri(path) != "/"
+                else "/index.html"
+            )
+
+            dlog_path = (
+                f"{Page.build_uri(path)}/index.html"
+                if Page.build_uri(path) != "/"
+                else "/index.html"
+            )
+
+            self._logger.Custom(
+                color("Moved", prefix=[FColor.CYAN]),
+                f"page {log_path} to {dlog_path}",
+                clr=self.color,
+                label="Page",
             )
         else:
-            print(
-                f"Moved directory {self.replace_prefix('pages', 'site', event.src_path)} to {self.replace_prefix('pages', 'site', event.dest_path)}"
+            self._logger.Custom(
+                color("Moved", prefix=[FColor.CYAN]),
+                f"directory {self.replace_prefix('pages', 'site', event.src_path)} to {self.replace_prefix('pages', 'site', event.dest_path)}",
+                clr=self.color,
+                label="Page",
             )

@@ -3,7 +3,7 @@ from mimetypes import suffix_map
 
 
 from .Base import BaseType
-from .util import color, Color, Style, RESET
+from moph_logger import color, FColor, Style, RESET
 
 
 class Site(BaseType):
@@ -30,11 +30,11 @@ class Site(BaseType):
                     self.errors.append(
                         color(
                             f'"',
-                            color(entry, prefix=[Color.RED]),
+                            color(entry, prefix=[FColor.RED]),
                             '": was of type <',
-                            color(type(kwargs[entry]).__name__, prefix=[Color.RED]),
+                            color(type(kwargs[entry]).__name__, prefix=[FColor.RED]),
                             "> but was expecting <",
-                            color(set_[entry].__name__, prefix=[Color.YELLOW]),
+                            color(set_[entry].__name__, prefix=[FColor.YELLOW]),
                             ">",
                             prefix=[Style.BOLD],
                             suffix=[RESET],
@@ -44,7 +44,7 @@ class Site(BaseType):
                 self.errors.append(
                     color(
                         f'"',
-                        color(entry, prefix=[Color.RED]),
+                        color(entry, prefix=[FColor.RED]),
                         '": ' "not a valid option or has been found more than once.",
                         prefix=[Style.BOLD],
                         suffix=[RESET],

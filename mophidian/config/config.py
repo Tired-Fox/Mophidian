@@ -2,10 +2,9 @@ from __future__ import annotations
 
 
 from os import path
-from json import load, dumps
-from pprint import pprint  #! DEBUG ONLY
+from json import load
 
-from .types import Markdown, Site, Build
+from .types import Markdown, Site, Build, Integration
 
 
 class Config:
@@ -43,17 +42,31 @@ class Config:
             if self.build.has_errors():
                 self.errors.append(self.build.format_errors())
 
+        self.integration = None
+        if Integration.key() in self._cfg_raw:
+            self.integration = Integration(**self._cfg_raw["integration"])
+            if self.integration.has_errors():
+                self.errors.append(self.integration.format_errors())
+        else:
+            self.integration = Integration()
+
         self.print_errors()
 
     def print_errors(self):
-        from .types.util import Color, Style, color, RESET
+        from moph_logger import FColor, Style, color, RESET
 
-        print(
-            color(
-                "These errors were found while loading the config:\n",
-                prefix=[Color.MAGENTA, Style.BOLD],
+        if len(self.errors) > 0:
+            print(
+                color(
+                    "[",
+                    color("IMPORTANT", prefix=[FColor.MAGENTA]),
+                    "]",
+                    prefix=[Style.BOLD],
+                    suffix=[RESET],
+                ),
+                "These errors were found while loading the config:",
             )
-        )
-        for error in self.errors:
-            print(error)
-            print()
+
+            for error in self.errors:
+                print(error)
+                print()

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from copy import copy
 from json import JSONEncoder
+from msvcrt import kbhit
 from typing import Any, Iterable
 
 from .page import Page
@@ -49,8 +50,6 @@ class Pages:
 
             self[page_.uri] = page_
 
-        # TODO Add previous and next linking
-
     def flat(self) -> Iterable[Page]:
         """Return an iterable of all the pages.
 
@@ -69,10 +68,10 @@ class Pages:
                 elif isinstance(section_[key], Page) and not section_[key].is_blank:
                     yield section_[key]
 
-        if "." in self.pages:
-            yield self.pages["."]["index"]
+        if "index" in self.pages:
+            yield self.pages["index"]
         for key in self.pages:
-            if key != ".":
+            if key != "index":
                 yield from get_values(self.pages[key])
 
     def tolist(self) -> list[Page]:
@@ -92,10 +91,10 @@ class Pages:
                     output.append(section_[key])
             return output
 
-        if "." in self.pages:
-            output.append(self.pages["."]["index"])
+        if "index" in self.pages.keys():
+            output.append(self.pages["index"])
         for key in self.pages:
-            if key != ".":
+            if key != "index":
                 output.extend(get_values(self.pages[key]))
 
         return output
@@ -141,58 +140,73 @@ class Pages:
     def __setitem__(self, dir: str, newvalue: Page):
         # convert an index or slice or tuple/list of indexed and return all that are matching
         current: dict[str, Page | dict] = self.pages
-        for token in splitall(dir):
+        for token in [f for f in splitall(dir) if f]:
             if token not in current:
                 current[token] = {"index": Page.blank()}
             current: dict[str, Page | dict] = current[token]
 
         current["index"] = newvalue
         index = self.index(newvalue.uri)
+
         if index >= 1:
             try:
                 previous = self[index - 1]
-                self[newvalue.uri].previous = previous.uri
-                self[previous.uri].next = newvalue.uri
+                self[newvalue.uri].previous = {"name": previous.name, "uri": previous.uri}
+                self[previous.uri].next = {"name": newvalue.name, "uri": newvalue.uri}
             except Exception as e:
                 self[newvalue.uri].previous = None
 
         try:
             next = self[index + 1]
-            self[newvalue.uri].next = next.uri
-            self[next.uri].previous = newvalue.uri
+            self[newvalue.uri].next = {"name": next.name, "uri": next.uri}
+            self[next.uri].previous = {"name": newvalue.name, "uri": newvalue.uri}
         except Exception as e:
             self[newvalue.uri].next = None
 
     def __delitem__(self, uri: str):
-        current = self.pages
-        nav = splitall(uri)[:-1]
-        last = splitall(uri)[-1]
-        for token in nav:
-            if token in current.keys():
-                current = current[token]
-            else:
-                IndexError(f"Not a valid uir {{ {uri} }}")
+        current: dict[str, Page | dict] = self.pages
+        nav = [f for f in splitall(uri) if f]
 
-        if last not in current.keys():
-            bold = "\x1b[1m"
-            style = "\x1b[31m"
-            rc = "\x1b[37m"
-            reset = "\x1b[0m"
-            raise IndexError(f"{bold}Invalid URI [{'/'.join(nav) + style + last + rc}]{reset}")
+        home_page = len(nav) > 0
+        if home_page:
+            last = nav[-1]
+            nav = nav[:-1]
+            for token in nav:
+                if token in current.keys():
+                    current = current[token]
+                else:
+                    IndexError(f"Not a valid uir {{ {uri} }}")
 
-        # Store the previous and next
-        tp = copy(current[last]["index"].previous)
-        tn = copy(current[last]["index"].next)
+            if last not in current.keys():
+                bold = "\x1b[1m"
+                style = "\x1b[31m"
+                rc = "\x1b[37m"
+                reset = "\x1b[0m"
+                raise IndexError(f"{bold}Invalid URI [{'/'.join(nav) + style + last + rc}]{reset}")
+
+            # Store the previous and next
+            tp = copy(current[last]["index"].previous)
+            tn = copy(current[last]["index"].next)
+        else:
+            # Store the previous and next
+            tp = copy(current["index"].previous)
+            tn = copy(current["index"].next)
 
         # Update previous and next for linked pages
-        self[tp].next = tn
-        self[tn].previous = tp
+        if tp is not None:
+            self[tp].next = tn
 
-        if len(current[last].keys()) > 1:
-            # "delete" the page at the index location
-            current[last]["index"] = Page.blank()
+        if tn is not None:
+            self[tn].previous = tp
+
+        if home_page:
+            if len(current[last].keys()) > 1:
+                # "delete" the page at the index location
+                current[last]["index"] = Page.blank()
+            else:
+                del current[last]
         else:
-            del current[last]
+            del current["index"]
 
     def __len__(self) -> int:
         return self.length
@@ -211,6 +225,10 @@ class Pages:
                 output.append(self.print_sub(f"{path}/{entry}", current[entry], indent=indent + 2))
 
         return '\n'.join(output)
+
+    def get_tree(self) -> dict[str, Page | dict]:
+        """Get the full tree of all the current pages"""
+        return self.pages
 
     def __str__(self) -> str:
         from json import dumps

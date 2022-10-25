@@ -25,6 +25,10 @@ Use markdown to create websites
   - [Markdown](https://pypi.org/project/Markdown/) [docs](https://python-markdown.github.io/reference/)
     - [Plugins](https://python-markdown.github.io/extensions/)
   
+Code highlight done with CodeHilite plugin with `pygmentize -S <theme> -f html -a .codehilite > styles/highlight.css` setting the theme. `pygmentize -L style` for list of themes.
+
+Add font awesome support by downloading the webfonts and adding css files. https://fontawesome.com/docs/web/setup/host-yourself/webfonts. Add an integration for this.
+
 The core ideas behind this SSG/framework is the same as all the large Javascript frameworks. So in a way, if you used any type of Javascript framework, then this project should be fairly easy to use.
 
 While this project strives to reach something that can create a doc's page on the level of mkDocs it also strives to be a generic website generator as well.
@@ -197,4 +201,91 @@ Eventually, when there is an automated way of creating a new project, you will a
 
 Enjoy the use of a live reloading server that incrementally builds your changes that can be seen immediately. 
 
-***Better terminal logging for everything that is happening coming soon*** 
+**File Layout**
+
+Here I will attempt to describe what can be in each file and what a good format may be.
+
+* Lets start with components.
+ 
+Components are html files. I chose this format because most text editors have great language support and highlighting for html. Components are meant to be small reusable snippets that you want in your website. The components filename is converted to the name of the component so that is what you use to access it in your layouts and templates.
+
+Because of the nature of HTML and CSS you can include specific styling in a `<style>` tag at the root level of the component. this means you could make a component that looks like this.
+
+```html
+<div id="header">
+    <a href="/">Home</a>
+    <div id="nav">
+        <a href="/blog">blog</a>
+        <a href="/news">news</a>
+    <div>
+</div>
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    #header {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+
+        padding-block: 1rem;
+        padding-inline: 5rem;
+    }
+
+    #header a{
+        color: black;
+        text-decoration: none;
+    }
+
+    #header a:hover {
+        text-decoration: underline;
+    }
+</style>
+```
+
+After this component is created in the `components/` directory, you can use it in any html template file with `{% include cmpt.header %}`.
+
+**Other html template files**
+
+I recommend reading the [Template Designer Documentation](https://jinja.palletsprojects.com/en/3.1.x/templates/) from Jinja2 as that is the full power of what you can do. You follow the same rules and logic, with added ease of use with mophidian giving access to your components and layouts without having to type in the path. However that is an option too, even though it is not recommended.
+
+Say that you created a template/layout named base.html in the `layouts/` directory. You can do the following to extend a template/layout:
+
+```html[some_layout.html]
+{% extend lyt.base %}
+<head>
+    {% block header}
+    {{ super() }}
+    <link rel="stylesheet" href="/css/header.css">
+    {% endblock %}
+</head>
+{% block content %}
+    {{ content }}
+{% endblock %}
+```
+
+Or if you implemented the `base.html` file somewhere else you can do something like this.
+
+```html[some_layout.html]
+{% extend "path/to/layout/base.html" %}
+<!-- ... Override blocks here ... -->
+```
+
+**Markdown files**
+
+Markdown files are the easiest. If you want data variables from the file you can use frontmatter. 
+
+It will look a little like this:
+
+```yaml
+---
+title: Some Title Goes Here
+readTime: 3 min
+.
+.
+.
+---
+```
+
+This framework then opens these variables up to you with a variable called `meta`. You can call it directly for a layout page that is for a markdown file. Otherwise, if you decide to access the meta file form one of the pages/contents variables you can do `pgs[idx].meta` or `cnt[idx].meta`.

@@ -1,6 +1,7 @@
 import os
 import shutil
 from pathlib import Path
+from typing import Any
 from jinja2 import Environment, FileSystemLoader, Template
 
 from .pages import Page, Pages
@@ -44,23 +45,31 @@ def find_content() -> Pages:
     return content
 
 
-def get_components() -> dict[str, Template]:
+def get_components() -> dict[str, Any]:
     """Get all jinja templates from `componenets/`.
 
     Returns:
         dict[str, Template]: Dictionary of all components (user defined)
-    """
+    """  #
     components = {}
     if os.path.isdir('components'):
         for path in Path('components').glob(f"./**/*.html"):
             environment = Environment(loader=FileSystemLoader("./"))
-            components.update(
+            to_component = path.parent.as_posix().lstrip("components").lstrip("/").split("/", 1)
+            to_component = to_component[1].split("/") if len(to_component) > 1 else to_component
+            to_component = [i for i in to_component if i]
+            current = components
+            for token in to_component:
+                if token not in current:
+                    current.update({token: {}})
+                current = current[token]
+            current.update(
                 {path.name.replace(path.suffix, ""): environment.get_template(path.as_posix())}
             )
     return components
 
 
-def get_layouts() -> dict[str, Template]:
+def get_layouts() -> dict[str, Any]:
     """Get all jinja layouts from `layouts/`
 
     Returns:
@@ -70,7 +79,16 @@ def get_layouts() -> dict[str, Template]:
     environment = Environment(loader=FileSystemLoader("./"))
     if os.path.isdir('layouts'):
         for path in Path('layouts').glob(f"./**/*.html"):
-            layouts.update(
+            environment = Environment(loader=FileSystemLoader("./"))
+            to_component = path.parent.as_posix().lstrip("layouts").lstrip("/").split("/", 1)
+            to_component = to_component[1].split("/") if len(to_component) > 1 else to_component
+            to_component = [i for i in to_component if i]
+            current = layouts
+            for token in to_component:
+                if token not in current:
+                    current.update({token: {}})
+                current = current[token]
+            current.update(
                 {path.name.replace(path.suffix, ""): environment.get_template(path.as_posix())}
             )
 

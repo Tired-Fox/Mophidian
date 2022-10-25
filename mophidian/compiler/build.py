@@ -1,5 +1,7 @@
+from json import JSONEncoder, dumps
 import os
 import shutil
+import traceback
 from typing import Any
 import markdown
 from pathlib import Path
@@ -7,25 +9,44 @@ from pathlib import Path
 from .setup import init_static, find_pages, find_content, get_components, get_layouts
 from .pages import Page
 from config import Config
-from jinja2 import Environment, Template
+from jinja2 import Environment, Template, FileSystemLoader
+from moph_logger import Log, LL
+
+
+class ComplexJSONEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Template):
+            return str(obj)
+        # Let the base class default method raise the TypeError
+        return JSONEncoder.default(self, obj)
 
 
 class Build:
-    def __init__(self):
+    def __init__(self, logger: Log, debug: bool = False):
         self.config = Config()
         self.pages = find_pages()
         self.content = find_content()
         self.components = get_components()
         self.layouts = get_layouts()
+        self.debug = debug
         self.slugs = []
+        self.tree = {}
+        self.generate_tree()
+
+        added_log_levels = []
+        if debug:
+            added_log_levels.append(LL.DEBUG)
+
+        self._logger = logger
 
         self.params = {
             "site": self.config.site,
-            "components": self.components,
-            "layouts": self.layouts,
+            "cmpt": self.components,
+            "lyt": self.layouts,
+            "pgs": self.pages,
+            "cnt": self.content,
         }
 
-    # TODO: Handle updating the information and rebuilding when [slug] or [...slug] is added or moved
     def remove_page(self, path: Path):
         if path.name.replace(path.suffix, "") not in ['[slug]', "[...slug]"]:
             del self.pages[Page.build_uri(path)]
@@ -36,6 +57,87 @@ class Build:
                     os.remove(file)
             else:
                 shutil.rmtree('site/' + removed_page.parent, ignore_errors=True)
+
+    def add_component(self, path: Path):
+        environment = Environment(loader=FileSystemLoader("./"))
+        to_component = path.parent.as_posix().lstrip("components").lstrip("/").split("/", 1)
+        to_component = to_component[1].split("/") if len(to_component) > 1 else to_component
+        to_component = [i for i in to_component if i]
+        current = self.components
+        for token in to_component:
+            if token not in current:
+                current.update({token: {}})
+            current = current[token]
+
+        try:
+            current.update(
+                {path.name.replace(path.suffix, ""): environment.get_template(path.as_posix())}
+            )
+        except Exception as e:
+            self._logger.Error(
+                "Jinja2:", str(e), "\n", "\n".join(traceback.format_tb(e.__traceback__))
+            )
+
+        self._logger.Debug(
+            f"Added component {path.parent.as_posix()}",
+            dumps(self.components, cls=ComplexJSONEncoder),
+        )
+
+    def remove_component(self, path: Path):
+        to_component = path.parent.as_posix().lstrip("components").lstrip("/").split("/", 1)
+        to_component = to_component[1].split("/") if len(to_component) > 1 else to_component
+        to_component = [i for i in to_component if i]
+        name = path.name.replace(path.suffix, "")
+        current = self.components
+
+        for token in to_component:
+            if token not in current:
+                current.update({token: {}})
+            current = current[token]
+
+        del current[name]
+
+        self._logger.Debug(f"Remove component {path.parent.as_posix()}")
+
+    def add_layout(self, path: Path):
+        environment = Environment(loader=FileSystemLoader("./"))
+        to_component = path.parent.as_posix().lstrip("layouts").lstrip("/").split("/", 1)
+        to_component = to_component[1].split("/") if len(to_component) > 1 else to_component
+        to_component = [i for i in to_component if i]
+        current = self.layouts
+        for token in to_component:
+            if token not in current:
+                current.update({token: {}})
+            current = current[token]
+
+        try:
+            current.update(
+                {path.name.replace(path.suffix, ""): environment.get_template(path.as_posix())}
+            )
+        except Exception as e:
+            self._logger.Error(
+                "Jinja2:", str(e), "\n", "\n".join(traceback.format_tb(e.__traceback__))
+            )
+
+        self._logger.Debug(
+            f"Added layout {path.parent.as_posix()}", dumps(current, cls=ComplexJSONEncoder)
+        )
+
+    def remove_layout(self, path: Path):
+        to_component = path.parent.as_posix().lstrip("layouts").lstrip("/").split("/", 1)
+        to_component = to_component[1].split("/") if len(to_component) > 1 else to_component
+        to_component = [i for i in to_component if i]
+        name = path.name.replace(path.suffix, "")
+        current = self.layouts
+
+        for token in to_component:
+            if token not in current:
+                current.update({token: {}})
+            current = current[token]
+
+        del current[name]
+
+        self._logger.Debug(f"Remove layout {path.parent.as_posix()}")
 
     def add_page(self, path: Path):
         new_page = Page(path.parent.as_posix(), path.name, path.suffix)
@@ -81,38 +183,89 @@ class Build:
         path = "site/" + page.uri
         Path(path).mkdir(parents=True, exist_ok=True)
         with open(path + "/index.html", "+w", encoding="utf-8") as page_file:
-            page_file.write(layout.render(**self.params, meta=page.meta, content=content))
+            try:
+                page_file.write(
+                    layout.render(
+                        **self.params, meta=page.meta, content=content, page=page, nav=self.tree
+                    )
+                )
+            except Exception as e:
+                self._logger.Error(
+                    "Jinja2:", str(e), "\n", "\n".join(traceback.format_tb(e.__traceback__))
+                )
 
     def generate_html(self, page: Page):
         path = "site/" + page.uri
         Path(path).mkdir(parents=True, exist_ok=True)
         with open(path + "/index.html", "+w", encoding="utf-8") as page_file:
-            page_file.write(page.template.render(**self.params, meta=page.meta))
+            try:
+                page_file.write(page.template.render(**self.params, meta=page.meta, nav=self.tree))
+            except Exception as e:
+                self._logger.Error(
+                    "Jinja2:", str(e), "\n", "\n".join(traceback.format_tb(e.__traceback__))
+                )
 
     def generate_page(self, page: Page):
+        self.tree_append_page(page)
+
         if page.ext == ".md":
             self.generate_markdown(page)
         else:
             self.generate_html(page)
 
+    def generate_tree(self):
+        # Add each page and mimic the build process
+        for page in self.pages:
+            if page.name not in ["[slug]", "[...slug]"]:
+                self.tree_append_page(page)
+            elif page.name in ["[slug]", "[...slug]"] and page.ext == ".html":
+                if page.name == "[slug]":
+                    for cpage in self.content:
+                        if cpage.parent == page.parent and cpage.ext == ".md":
+                            self.tree_append_page(cpage)
+                else:
+                    for cpage in self.content:
+                        if page.parent in cpage.uri:
+                            self.tree_append_page(cpage)
+            else:
+                continue
+
+    def tree_append_page(self, page: Page):
+        current = self.tree
+        crumbs = [c for c in page.breadcrumb if c]
+        for token in crumbs:
+            if token not in current:
+                current[token] = {}
+            current = current[token]
+
+        current.update({"index": page.uri})
+
     def generate_content(self, page: Page):
         environment = Environment()
+        slug = None
         with open(page.full_path, "r", encoding="utf-8") as slug_file:
-            slug = environment.from_string(slug_file.read())
+            try:
+                slug = environment.from_string(slug_file.read())
+            except Exception as e:
+                self._logger.Error(
+                    "Jinja2:", str(e), "\n", "\n".join(traceback.format_tb(e.__traceback__))
+                )
 
         if slug is not None:
             if page.name == "[slug]":
                 for cpage in self.content:
                     if cpage.parent == page.parent and cpage.ext == ".md":
                         cpage.template = page.template
-                        print(cpage.template)
                         self.generate_markdown(cpage, page.template)
+
+                        self.tree_append_page(cpage)
             else:
-                slugs = [content.uri for content in self.content]
-                for cpage in slugs:
+                cpages = [content.uri for content in self.content]
+                for cpage in cpages:
                     if page.parent in cpage:
                         self.content[cpage].template = page.template
                         self.generate_markdown(self.content[cpage], page.template)
+                        self.tree_append_page(self.content[cpage])
 
     def create_pages(self):
         for page in self.pages:

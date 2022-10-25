@@ -1,7 +1,7 @@
 import shutil
 import os
 
-from compiler.build import Build
+from moph_logger import Log, FColor, color
 from .BaseHandler import BaseFileSystemEventHandler
 from watchdog.events import (
     FileClosedEvent,
@@ -17,6 +17,10 @@ from watchdog.events import (
 
 
 class WatchStatic(BaseFileSystemEventHandler):
+    def __init__(self, logger: Log):
+        super().__init__()
+        self._logger = logger
+
     def on_closed(self, event: FileClosedEvent):
         '''Called when a file opened for writing is closed.'''
         # print("closed", event, self.__timestamp().strftime('%T.%f')[:-3])
@@ -28,15 +32,21 @@ class WatchStatic(BaseFileSystemEventHandler):
             if not event.is_directory:
                 shutil.copyfile(
                     os.path.normpath(event.src_path),
-                    os.path.normpath('/'.join(['site', event.src_path.split('/', 1)[1]])),
+                    os.path.normpath(self.replace_prefix('static', 'site', event.src_path)),
                 )
-                print(f"Created file {self.replace_prefix('static', 'site', event.src_path)}")
+
+                self._logger.Custom(
+                    color("Created", prefix=[FColor.GREEN]),
+                    f"file {self.replace_prefix('static', 'site', event.src_path)}",
+                    clr=FColor.MAGENTA,
+                    label="Static",
+                )
             else:
                 shutil.copytree(
                     os.path.normpath(event.src_path),
                     '/'.join(['site', event.src_path.split('/', 1)[1]]),
                 )
-                print(f"Created directory {self.replace_prefix('static', 'site', event.src_path)}")
+
         except Exception as e:
             print(e)
 
@@ -45,15 +55,22 @@ class WatchStatic(BaseFileSystemEventHandler):
         try:
             if os.path.isfile(self.replace_prefix('static', 'site', event.src_path)):
                 self.remove_file(self.replace_prefix('static', 'site', event.src_path))
-                print(f"Deleted file {self.replace_prefix('static', 'site', event.src_path)}")
+                self._logger.Custom(
+                    f"Deleted file {self.replace_prefix('static', 'site', event.src_path)}",
+                    clr=FColor.RED,
+                    label="Static",
+                )
             else:
                 try:
                     shutil.rmtree(
                         os.path.normpath('/'.join(['site', event.src_path.split('/', 1)[1]]))
                     )
 
-                    print(
-                        f"Deleted directory {self.replace_prefix('static', 'site', event.src_path)}"
+                    self._logger.Custom(
+                        color("Deleted", prefix=[FColor.RED]),
+                        f"directory {self.replace_prefix('static', 'site', event.src_path)}",
+                        clr=FColor.MAGENTA,
+                        label="Static",
                     )
                 except:
                     pass
@@ -69,7 +86,12 @@ class WatchStatic(BaseFileSystemEventHandler):
                     os.path.normpath(event.src_path),
                     os.path.normpath('/'.join(['site', event.src_path.split('/', 1)[1]])),
                 )
-                print(f"Modified file {self.replace_prefix('static', 'site', event.src_path)}")
+                self._logger.Custom(
+                    color("Modified", prefix=[FColor.YELLOW]),
+                    f"file {self.replace_prefix('static', 'site', event.src_path)}",
+                    clr=FColor.MAGENTA,
+                    label="Static",
+                )
         except Exception as e:
             pass
 
@@ -83,8 +105,12 @@ class WatchStatic(BaseFileSystemEventHandler):
                     os.path.normpath(event.dest_path),
                     os.path.normpath(self.replace_prefix('static', 'site', event.dest_path)),
                 )
-                print(
-                    f"Moved file {self.replace_prefix('static', 'site', event.src_path)} to {self.replace_prefix('static', 'site', event.dest_path)}"
+
+                self._logger.Custom(
+                    color("Moved", prefix=[FColor.CYAN]),
+                    f"file {self.replace_prefix('static', 'site', event.src_path)} to {self.replace_prefix('static', 'site', event.dest_path)}",
+                    clr=FColor.MAGENTA,
+                    label="Static",
                 )
             else:
                 try:
@@ -99,8 +125,12 @@ class WatchStatic(BaseFileSystemEventHandler):
                     os.path.normpath(event.dest_path),
                     '/'.join(['site', event.dest_path.split('/', 1)[1]]),
                 )
-                print(
-                    f"Moved directory {self.replace_prefix('static', 'site', event.src_path)} to {self.replace_prefix('static', 'site', event.dest_path)}"
+
+                self._logger.Custom(
+                    color("Moved", prefix=[FColor.CYAN]),
+                    f"directory {self.replace_prefix('static', 'site', event.src_path)} to {self.replace_prefix('static', 'site', event.dest_path)}",
+                    clr=FColor.MAGENTA,
+                    label="Static",
                 )
         except Exception as e:
             pass

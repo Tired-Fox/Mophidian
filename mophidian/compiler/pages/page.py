@@ -49,7 +49,7 @@ class Page:
         """
         prefix = normpath(parent_).split("/")[0]
         self.prefix = prefix if prefix != '.' else ""
-        self.parent = normpath('/'.join(normpath(parent_).split("/")[1:]))
+        self.parent = normpath('/'.join(normpath(parent_).split("/")[1:])).replace(".", "")
         self.name = name_.replace(ext_, '')
         self.file_name = name_
         self.ext = ext_
@@ -85,9 +85,9 @@ class Page:
     def uri(self) -> str:
         """The uri that is associated with this page."""
         if self.name.lower() in ["index", "readme"]:
-            return f'{self.parent}'
+            return f'/{self.parent if self.parent not in [".", "", None] else ""}'
         else:
-            return f'{create_uri(self.parent, self.name)}'
+            return f'/{create_uri(self.parent, self.name)}'
 
     @classmethod
     def build_uri(cls, path: Path) -> str:
@@ -95,9 +95,9 @@ class Page:
         name = path.name.replace(path.suffix, "")
         parent = normpath('/'.join(normpath(path.parent.as_posix()).split("/")[1:]))
         if name.lower() in ["index", "readme"]:
-            return f'{parent}'
+            return f'/{parent if parent not in [".", "", None] else ""}'
         else:
-            return f'{create_uri(parent, name)}'
+            return f'/{create_uri(parent, name)}'
 
     @cached_property
     def breadcrumb(self) -> list[str]:
@@ -131,7 +131,7 @@ class Page:
     def __iter__(self):
         yield "parent", self.parent
         yield "ext", self.ext
-        yield "content", len(self.content)
+        yield "content", f"{len(self.content)} chars"
         yield "name", self.name
         yield "meta", self.meta
         yield "next", self.next

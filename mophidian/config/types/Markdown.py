@@ -1,5 +1,5 @@
 from .Base import BaseType
-from .util import color, Color, Style, RESET
+from moph_logger import color, FColor, Style, RESET
 
 _defualts = {
     "defaults": True,
@@ -12,6 +12,7 @@ _defualts = {
         "md_in_html",
         "tables",
         "wikilinks",
+        "codehilite",
         "pymdownx.betterem",
         "pymdownx.caret",
         "pymdownx.details",
@@ -59,9 +60,9 @@ class Markdown(BaseType):
             else:
                 self.errors["general"].append(
                     '  "append": was of type <'
-                    + color(type(defaults).__name__, prefix=[Color.RED])
+                    + color(type(defaults).__name__, prefix=[FColor.RED])
                     + "> but was expecting <"
-                    + color("bool", prefix=[Color.YELLOW])
+                    + color("bool", prefix=[FColor.YELLOW])
                     + ">"
                 )
 
@@ -76,19 +77,19 @@ class Markdown(BaseType):
                             self.extensions.append(extension)
                     else:
                         self.errors["e_errors"].append(
-                            color(f'    {extensions[i]}', prefix=[Color.RED])
+                            color(f'    {extensions[i]}', prefix=[FColor.RED])
                             + ":  was of type <"
-                            + color(type(extension).__name__, prefix=[Color.RED])
+                            + color(type(extension).__name__, prefix=[FColor.RED])
                             + "> but was expecting <"
-                            + color("str", prefix=[Color.YELLOW])
+                            + color("str", prefix=[FColor.YELLOW])
                             + ">"
                         )
             else:
                 self.errors["e_error"] = (
                     "was of type <"
-                    + color(type(extensions).__name__, prefix=[Color.RED])
+                    + color(type(extensions).__name__, prefix=[FColor.RED])
                     + "> but was expecting <"
-                    + color("list", prefix=[Color.YELLOW])
+                    + color("list", prefix=[FColor.YELLOW])
                     + ">"
                 )
 
@@ -104,31 +105,31 @@ class Markdown(BaseType):
                         else:
                             self.errors["ec_errors"].append(
                                 f'    "{key}": '
-                                + color("value ", prefix=[Color.RED])
+                                + color("value ", prefix=[FColor.RED])
                                 + "was of type <"
                                 + color(
                                     type(extension_configs[key]).__name__,
-                                    prefix=[Color.RED],
-                                    suffix=[Color.RESET],
+                                    prefix=[FColor.RED],
+                                    suffix=[FColor.RESET],
                                 )
                                 + "> but was expecting <"
-                                + color("dict", prefix=[Color.YELLOW])
+                                + color("dict", prefix=[FColor.YELLOW])
                                 + ">"
                             )
                     else:
                         self.errors["ec_errors"].append(
-                            f'    "{color(key, prefix=[Color.RED])}": '
+                            f'    "{color(key, prefix=[FColor.RED])}": '
                             + "is not a know plugin. Make sure it is installed and declared in "
-                            + color("markdown", prefix=[Color.YELLOW])
+                            + color("markdown", prefix=[FColor.YELLOW])
                             + " > "
-                            + color("extensions", prefix=[Color.YELLOW])
+                            + color("extensions", prefix=[FColor.YELLOW])
                         )
             else:
                 self.errors["ec_error"] = (
                     "was of type <"
-                    + color(type(kwargs["extension_configs"]).__name__, prefix=[Color.RED])
+                    + color(type(kwargs["extension_configs"]).__name__, prefix=[FColor.RED])
                     + "> but was expecting <"
-                    + color("dict", prefix=[Color.YELLOW])
+                    + color("dict", prefix=[FColor.YELLOW])
                     + ">"
                 )
 
@@ -161,14 +162,14 @@ class Markdown(BaseType):
             if self.errors['e_error']:
                 return (
                     '  "extensions": '
-                    + color('value ', prefix=[Color.RED])
+                    + color('value ', prefix=[FColor.RED])
                     + self.errors['e_error']
                 )
             elif len(self.errors['e_errors']) > 0:
                 output = ['  "extensions": [']
-                output.append(color("    ...", prefix=[Color.BLUE]))
+                output.append(color("    ...", prefix=[FColor.BLUE]))
                 output.extend(self.errors["e_errors"])
-                return "\n".join(output) + color("\n    ...", prefix=[Color.BLUE]) + "\n  ]"
+                return "\n".join(output) + color("\n    ...", prefix=[FColor.BLUE]) + "\n  ]"
         return ""
 
     def ext_config_errors(self) -> str:
@@ -189,5 +190,5 @@ class Markdown(BaseType):
             self.ext_config_errors(),
             "\n}",
             prefix=[Style.BOLD],
-            suffix=[Style.NOBOLD, Color.RESET],
+            suffix=[Style.NOBOLD, FColor.RESET],
         )
