@@ -15,7 +15,6 @@ from .integration import Tailwindcss, Sass
 from . import utils
 from .config import Config
 from .ppm import PPM
-from v2.core import integration
 
 if TYPE_CHECKING:
     from .pages import Page
