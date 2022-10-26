@@ -1,8 +1,4 @@
 from __future__ import annotations
-from ast import dump
-from inspect import getmembers
-from json import JSONEncoder, dumps
-from lib2to3.pgen2 import token
 
 from typing import TYPE_CHECKING, Optional, Union
 
@@ -158,7 +154,8 @@ def _build_non_directory_url(tokenized: dict, pages: Files, content: Files) -> d
                 if cnt.is_type(".md"):
                     tokenized = _add_non_directory_page(tokenized, cnt)
         else:
-            tokenized = _add_non_directory_page(tokenized, file)
+            if not file.is_static:
+                tokenized = _add_non_directory_page(tokenized, file)
 
     return tokenized
 
@@ -174,7 +171,8 @@ def _build_directory_url(tokenized: dict, pages: Files, content: Files) -> dict:
                 if cnt.is_type(".md"):
                     tokenized = _add_directory_page(tokenized, cnt)
         else:
-            tokenized = _add_directory_page(tokenized, file)
+            if not file.is_static:
+                tokenized = _add_directory_page(tokenized, file)
 
     return tokenized
 
