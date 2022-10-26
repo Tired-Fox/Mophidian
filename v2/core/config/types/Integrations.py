@@ -4,7 +4,7 @@ from __future__ import annotations
 from .Base import BaseType
 
 
-class Integration(BaseType):
+class Integrations(BaseType):
     tailwind: bool
     """Auto use and setup tailwind css with node"""
 
@@ -27,7 +27,7 @@ class Integration(BaseType):
                 'sass': bool,
                 'package_manager': str,
             },
-            **kwargs
+            **kwargs,
         )
 
     def has_errors(self) -> bool:

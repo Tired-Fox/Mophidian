@@ -4,7 +4,7 @@ from __future__ import annotations
 from os import path
 from json import load
 
-from .types import Markdown, Site, Build, Integration, Nav
+from .types import Markdown, Site, Build, Integrations, Nav
 
 
 class Config:
@@ -21,12 +21,12 @@ class Config:
 
         self.errors = []
 
-        sections = [Markdown, Site, Build, Integration, Nav]
+        sections = [Markdown, Site, Build, Integrations, Nav]
 
         self.markdown = Markdown()
         self.site = Site()
         self.build = Build()
-        self.integration = Integration()
+        self.integrations = Integrations()
         self.nav = Nav()
 
         for section in sections:
@@ -38,7 +38,7 @@ class Config:
         self.print_errors()
 
     def print_errors(self):
-        from log import FColor, Style, color, RESET
+        from moph_log import FColor, Style, color, RESET
 
         if len(self.errors) > 0:
             print(

@@ -16,9 +16,10 @@
     }
   },
   "nav": {
-    "directory_url": false
+    "directory_url": true
   },
-  "tailwind": {
-    "platform": "windows"
+  "integrations": {
+    "package_manager": "yarn",
+    "sass": true
   }
 }

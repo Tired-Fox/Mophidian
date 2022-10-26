@@ -1,15 +1,21 @@
 from __future__ import annotations
+import contextlib
 
 
 import os
 from pathlib import Path, PurePath, PurePosixPath
 import posixpath
 from shutil import SameFileError
+import sys
 from typing import TYPE_CHECKING, Iterator, Optional, Tuple
-from log import Logger
+from moph_log import Logger, Log, LL
 from urllib.parse import quote
+
+from .integration import Tailwindcss, Sass
 from . import utils
 from .config import Config
+from .ppm import PPM
+from v2.core import integration
 
 if TYPE_CHECKING:
     from .pages import Page
@@ -71,6 +77,30 @@ class Files:
         for file in self:
             if file.is_static:
                 file.copy_file(dirty)
+
+    def build_all_sass(self, config: Config):
+        """Compile all the sass files into their corresponding css files."""
+
+        sass_file = [file for file in self if file.is_type(FileExtension.SASS)]
+        if len(sass_file) > 0:
+            old_stdo = sys.stdout
+            old_stde = sys.stderr
+
+            logger = Log(output=old_stdo, level=LL.INFO)
+
+            if config.integrations.sass:
+                pkg_mgr = PPM(config.integrations.package_manager, logger)
+                if pkg_mgr.ppm.has_node:
+                    SASS = Sass(logger, pkg_mgr, old_stdo, old_stde)
+
+                    with contextlib.redirect_stdout(None):
+                        with contextlib.redirect_stderr(None):
+                            try:
+                                SASS.install()
+                                for file in sass_file:
+                                    file.build_sass(pkg_mgr, logger)
+                            except:
+                                pass
 
     def template_pages(self, type: FileExtension) -> list[File]:
         """Return list of all template pages."""
@@ -161,7 +191,7 @@ class File:
     @property
     def dest_path(self) -> str:
         """Same path as dest_uri except it will use `\\` on windows. Not recommended"""
-        return os.path.normpath(self.src_uri)
+        return os.path.normpath(self.dest_uri)
 
     @dest_path.setter
     def dest_path(self, new_value: str | PurePath | Path):
@@ -270,7 +300,7 @@ class File:
                 # bar.md or bar.html => bar/index.html
                 return posixpath.join(parent, self.name, "index.html")
         elif self.is_type(FileExtension.SASS):
-            return PurePath(self.src_path).with_suffix("css").as_posix()
+            return PurePath(self.src_path).with_suffix(".css").as_posix()
 
         # If the file is a static file it is one to one
         return self.src_path
@@ -314,6 +344,19 @@ class File:
                 utils.copy_file(self.abs_src_path, self.abs_dest_path)
             except SameFileError:
                 pass
+
+    def build_sass(self, pkg_mgr: PPM, logger: Log):
+        """Build sass file and move to dest directory."""
+        from subprocess import Popen, PIPE
+        from shutil import which
+
+        sass_build = Popen(
+            f"{which(pkg_mgr.ppm.mname)} sass {self.abs_src_path}:{self.abs_dest_path} --style=compressed --no-source-map",
+            stdout=PIPE,
+            stderr=PIPE,
+        )
+
+        sass_build.wait()
 
     def __eq__(self, other) -> bool:
         return (

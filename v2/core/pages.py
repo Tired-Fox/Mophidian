@@ -55,8 +55,12 @@ class Page:
 
     def pretty(self, depth: int = 0) -> str:
         """Generate an indented form of this object."""
-        title = self.title if self.title is not None else "(BLANK)"
-        return f"{'  '*depth}Page(title: {title}, url: {self.url})"
+        title = self.title if self.title is not None else '(BLANK)'
+        url = self.file.url
+        next = self.next.url if self.next is not None else "(BLANK)"
+        prev = self.previous.url if self.previous is not None else "(BLANK)"
+        parent = self.parent.title if self.parent is not None else "(BLANK)"
+        return f"{'  '*depth}Page(title={title}, url='{url}', next: {next}, prev: {prev}, parent: {parent})"
 
     @property
     def breadcrumbs(self):
@@ -100,7 +104,10 @@ class Page:
     def __repr__(self) -> str:
         title = self.title if self.title is not None else '(BLANK)'
         url = self.file.url
-        return f"Page(title={title}, url='{url}')"
+        next = self.next.url if self.next is not None else "(BLANK)"
+        prev = self.previous.url if self.previous is not None else "(BLANK)"
+        parent = self.parent.is_group if self.parent is not None else "(BLANK)"
+        return f"Page(title={title}, url='{url}', next: {next}, prev: {prev}, parent: {parent})"
 
     @property
     def url(self) -> str:

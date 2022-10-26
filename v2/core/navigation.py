@@ -91,9 +91,33 @@ def get_navigation(pages: Files, content: Files, config: Config) -> Nav:
         elif isinstance(tokens[token], File):
             nav.append(Page(tokens[token]))
 
+    _build_np_links(webpages)  # build next and previous links
+    _build_parent_links(nav)  # build parent links
     navigation = Nav(nav, webpages)
-    print(dumps(tokens, indent=2, cls=ComplexJSONEncoder))
+
     print(navigation)
+    return navigation
+
+
+def _build_parent_links(nav) -> None:
+    """Add the parent links to all items in nav object."""
+    for item in nav:
+        if item.is_group:
+            for child in item.children:
+                child.parent = item
+            _build_parent_links(item.children)
+
+
+def _build_np_links(nav: list[Page]):
+    """Build the next and previous links for all pages.
+
+    Args:
+        nav (list[Page]): The list of all [Page][mophidian.core.pages.Page] objects.
+    """
+    pages = [None, *nav, None]
+    zipped = zip(pages[:-2], nav, pages[2:])
+    for prev, cur, next in zipped:
+        cur.previous, cur.next = prev, next
 
 
 def _get_children(tokens: dict) -> tuple[list[Page | Group], list[Page]]:
@@ -103,21 +127,13 @@ def _get_children(tokens: dict) -> tuple[list[Page | Group], list[Page]]:
         if isinstance(tokens[token], dict):
             children, p = _get_children(tokens[token])
             nav.append(Group(token, children))
-            pages.extend(pages)
+            pages.extend(p)
         elif isinstance(tokens[token], File):
-            nav.append(Page(tokens[token]))
+            page = Page(tokens[token])
+            nav.append(page)
+            pages.append(page)
 
     return nav, pages
-
-
-class ComplexJSONEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Files):
-            return repr(obj)
-        elif isinstance(obj, File):
-            return str(obj)
-        # Let the base class default method raise the TypeError
-        return JSONEncoder.default(self, obj)
 
 
 def _get_tokens(pages: Files, content: Files, config: Config) -> dict:

@@ -1,5 +1,5 @@
 from .Base import BaseType
-from log import color, FColor, Style, RESET
+from moph_log import color, FColor, Style, RESET
 
 _defualts = {
     "defaults": True,
