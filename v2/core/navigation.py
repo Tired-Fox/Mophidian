@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Union
 
 from .config.config import Config
-from .files import Files, File
+from .files import Files, File, FileExtension
 from .pages import Page
 
 if TYPE_CHECKING:
@@ -154,7 +154,7 @@ def _build_non_directory_url(tokenized: dict, pages: Files, content: Files) -> d
                 if cnt.is_type(".md"):
                     tokenized = _add_non_directory_page(tokenized, cnt)
         else:
-            if not file.is_static:
+            if not file.is_static and not file.is_type(FileExtension.SASS):
                 tokenized = _add_non_directory_page(tokenized, file)
 
     return tokenized
@@ -171,7 +171,7 @@ def _build_directory_url(tokenized: dict, pages: Files, content: Files) -> dict:
                 if cnt.is_type(".md"):
                     tokenized = _add_directory_page(tokenized, cnt)
         else:
-            if not file.is_static:
+            if not file.is_static and not file.is_type(FileExtension.SASS):
                 tokenized = _add_directory_page(tokenized, file)
 
     return tokenized
