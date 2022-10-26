@@ -40,3 +40,12 @@ class Integrations(BaseType):
 
     def format_errors(self) -> str:
         return '"build": {\n  ' + '\n  '.join(self.errors) + '\n}'
+
+    def __str__(self) -> str:
+        return f"""\
+integrations: {{
+    \"tailwind\": {self.format(self.tailwind)},
+    \"sass\": {self.format(self.sass)},
+    \"package_manager\": {self.format(self.package_manager)},
+}}\
+"""

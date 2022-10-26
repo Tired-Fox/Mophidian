@@ -8,6 +8,19 @@ class BaseType:
     def __init__(self):
         self.errors = []
 
+    def format(self, value, depth: int = 0) -> str:
+        if isinstance(value, str):
+            return f'"{value}"'
+        elif isinstance(value, dict):
+            from json import dumps
+
+            indent = ' ' * depth
+            lines = dumps(value, indent=2).split("\n")
+
+            return f"\n{indent}".join(lines)
+        else:
+            return str(value)
+
     def parse_kwargs(
         self,
         cmap: MutableMapping,

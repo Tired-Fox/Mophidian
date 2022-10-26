@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, Union
-
-from .config.config import Config
 from .files import Files, File, FileExtension
 from .pages import Page
 
+
 if TYPE_CHECKING:
-    from .pages import Page
+    from .config.config import Config
 
 
 class Nav:
@@ -85,13 +84,14 @@ def get_navigation(pages: Files, content: Files, config: Config) -> Nav:
             nav.append(Group(token, children))
             webpages.extend(wp)
         elif isinstance(tokens[token], File):
-            nav.append(Page(tokens[token]))
+            new_page = Page(tokens[token])
+            nav.append(new_page)
+            webpages.append(new_page)
 
     _build_np_links(webpages)  # build next and previous links
     _build_parent_links(nav)  # build parent links
     navigation = Nav(nav, webpages)
 
-    print(navigation)
     return navigation
 
 
@@ -178,7 +178,7 @@ def _build_directory_url(tokenized: dict, pages: Files, content: Files) -> dict:
 
 
 def _add_directory_page(tokenized: dict, file: File):
-    breadcrumbs = [crumb for crumb in file.url.split("/") if crumb]
+    breadcrumbs = [crumb for crumb in file.url.split("/") if crumb not in ["", ".", None]]
     current = tokenized
     for crumb in breadcrumbs:
         if crumb not in current:

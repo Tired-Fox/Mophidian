@@ -15,8 +15,6 @@ class Nav(BaseType):
 
         self.parse_kwargs(
             cmap={
-                'name': str,
-                'version': str,
                 'directory_url': bool,
             },
             **kwargs,
@@ -32,3 +30,10 @@ class Nav(BaseType):
 
     def format_errors(self) -> str:
         return '"nav": {\n  ' + '\n  '.join(self.errors) + '\n}'
+
+    def __str__(self) -> str:
+        return f"""\
+nav: {{
+    \"directory_url\": {self.format(self.directory_url)},
+}}\
+"""

@@ -225,4 +225,4 @@ class Log:
             self._output.flush()
 
 
-Logger = Log()
+Logger = Log(level=LL.INFO)

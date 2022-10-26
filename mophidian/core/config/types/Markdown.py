@@ -44,9 +44,9 @@ class Markdown(BaseType):
     """Flag to tell whether to include the pre chosen plugins or not."""
 
     def __init__(self, **kwargs) -> None:
+        self.defaults = _defualts["defaults"]
         self.extensions = []
         self.extension_configs = {}
-        self.defaults = _defualts["defaults"]
 
         self.errors = {
             "ec_error": "",
@@ -68,6 +68,10 @@ class Markdown(BaseType):
                     + color("bool", prefix=[FColor.YELLOW])
                     + ">"
                 )
+
+        if self.defaults:
+            self.extensions = _defualts["extensions"]
+            self.extension_configs = _defualts["extension_configs"]
 
         if "extensions" in kwargs:
             extensions: list[str] = kwargs["extensions"]
@@ -195,3 +199,23 @@ class Markdown(BaseType):
             prefix=[Style.BOLD],
             suffix=[Style.NOBOLD, FColor.RESET],
         )
+
+    def __str__(self) -> str:
+        newline = ',\n    '
+        return f"""\
+markdown: {{
+  extensions: [
+    {newline.join([self.format(val) for val in self.extensions])}
+  ],
+  extension_configs: {{
+    {
+        newline.join(
+            [
+                f"{self.format(key)}: {self.format(self.extension_configs[key], depth=4)}" 
+                for key, value in self.extension_configs.items()
+            ]
+        )
+    }
+  }}
+}}\
+"""

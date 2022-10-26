@@ -1,14 +1,18 @@
 from __future__ import annotations
-from inspect import getmembers
-from optparse import Option
 
 
-from typing import TYPE_CHECKING, Any, MutableMapping, Optional, Union
+from typing import TYPE_CHECKING, Any, MutableMapping, Optional
 from urllib.parse import urljoin
-from .files import File
+
+from .config.config import Config
+from .files import File, FileExtension
+from moph_log import Logger
+from .utils import MophidianMarkdown, renderTemplate
 
 if TYPE_CHECKING:
     from .navigation import Group
+    from jinja2 import Template
+    from .navigation import Nav
 
 
 class Page:
@@ -19,6 +23,9 @@ class Page:
 
     markdown: Optional[str]
     """The original markdown from the file."""
+
+    template: Optional[Template]
+    """The Jinja2 template associated with this page."""
 
     content: Optional[str]
     """The rendered Markdown or Template from the file. This is what is written to file."""
@@ -91,6 +98,13 @@ class Page:
         self.previous = None
         self.next = None
 
+        # For build process
+        self.template = None
+        self.toc = None
+        self.content = None
+        self.markdown = None
+        self.meta = {}
+
         self._build_urls("https://tired-fox.github.io/mophidian/")
         self.is_page = True
 
@@ -120,3 +134,68 @@ class Page:
             self.full_url = urljoin(domain, self.url)
         else:
             self.full_url = None
+
+    def build_content(self, config: Config, layouts: dict[str, dict | Template]):
+        """Build the pages content. Parse the meta data from a markdown file everything else is the content."""
+        try:
+            # Use utf-8-sig to more reliably ensure utf-8 encoding. utf-8 with BOM
+            with open(self.file.abs_src_path, encoding="utf-8-sig", errors="strict") as source:
+                content = source.read()
+        except OSError:
+            Logger.Error(f"File not found: {self.file.abs_src_path}")
+            raise
+        except ValueError:
+            Logger.Error(f"Encoding error for file: {self.file.abs_src_path}")
+            raise
+
+        if self.file.is_type(FileExtension.Markdown):
+            self.meta, self.markdown, self.template = MophidianMarkdown.parse(
+                content, config, layouts
+            )
+        elif self.file.is_type(FileExtension.Template) and self.template is None:
+            self.content = content
+
+        self._build_title()
+
+    def render(
+        self,
+        config: Config,
+        components: dict[str, dict | Template],
+        layouts: dict[str, dict | Template],
+        nav: Nav,
+    ):
+        """Compiles the page into html.
+
+        Args:
+            config (Config): Mophidian config
+            components (dict[str, dict | Template]): Dictionary of jinja2.Template components
+            layouts (dict[str, dict | Template]): Dictionary of jinja2.Template layouts
+            nav (Nav): Navigation object
+        """
+        if self.file.is_type(FileExtension.Markdown):
+            self.content, self.toc = MophidianMarkdown.render(
+                self, nav, config, components, layouts
+            )
+        else:
+            self.content = renderTemplate(self, nav, config, components, layouts)
+
+    def _build_title(self):
+        """Build the title based on the parsed content."""
+
+        title = None
+        if self.file.is_type(FileExtension.Markdown):
+            if 'title' in self.meta:
+                self.title = self.meta["title"]
+                return
+
+            title = MophidianMarkdown.get_title(self.markdown if self.markdown is not None else "")
+
+        if title is None:
+            if self.is_homepage:
+                title = "Home"
+            else:
+                title = self.file.name.replace('-', ' ').replace('_', ' ')
+                if title.lower() == title:
+                    title = title.capitalize()
+
+        self.title = title

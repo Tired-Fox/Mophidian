@@ -10,14 +10,14 @@ import sys
 from typing import TYPE_CHECKING, Iterator, Optional, Tuple
 from moph_log import Logger, Log, LL
 from urllib.parse import quote
-
-from .integration import Tailwindcss, Sass
 from . import utils
-from .config import Config
-from .ppm import PPM
+
 
 if TYPE_CHECKING:
     from .pages import Page
+    from .integration import Tailwindcss, Sass
+    from .config import Config
+    from .ppm import PPM
 
 
 class FileExtension:
@@ -349,13 +349,16 @@ class File:
         from subprocess import Popen, PIPE
         from shutil import which
 
+        Path(self.abs_dest_path).parent.mkdir(parents=True, exist_ok=True)
+
         sass_build = Popen(
-            f"{which(pkg_mgr.ppm.mname)} sass {self.abs_src_path}:{self.abs_dest_path} --style=compressed --no-source-map",
+            f"{which(pkg_mgr.ppm.mname)} sass {self.abs_src_path} {self.abs_dest_path} --style=compressed --no-source-map",
             stdout=PIPE,
             stderr=PIPE,
         )
 
-        sass_build.wait()
+        if sass_build.wait() != 0:
+            logger.Error(f"Failed to build {self.abs_src_path} to {self.abs_dest_path}")
 
     def __eq__(self, other) -> bool:
         return (

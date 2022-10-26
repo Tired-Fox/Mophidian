@@ -18,6 +18,8 @@ class Config:
                     with open(conf_file, "r", encoding="UTF-8") as cfx:
                         self._cfg_raw = load(cfx)
                     break
+            if not hasattr(self, "_cfg_raw"):
+                self._cfg_raw = {}
 
         self.errors = []
 
@@ -55,3 +57,12 @@ class Config:
             for error in self.errors:
                 print(error)
                 print()
+
+    def __str__(self) -> str:
+        output = []
+        output.append(str(self.markdown))
+        output.append(str(self.site))
+        output.append(str(self.build))
+        output.append(str(self.integrations))
+        output.append(str(self.nav))
+        return ",\n".join(output)

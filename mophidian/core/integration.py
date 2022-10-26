@@ -64,21 +64,25 @@ class Integration:
 
     def installed(self, package: str) -> bool:
         path_pkg_json = Path("package.json")
+        modules = Path("node_modules")
         if path_pkg_json.exists():
-            with open("package.json", "r", encoding="utf-8") as package_json:
-                pkg_json = load(package_json)
+            if modules.exists():
+                with open("package.json", "r", encoding="utf-8") as package_json:
+                    pkg_json = load(package_json)
 
-            if "devDependencies" in pkg_json:
-                if package in pkg_json["devDependencies"]:
-                    # Package exists
-                    return True
+                if "devDependencies" in pkg_json:
+                    if package in pkg_json["devDependencies"]:
+                        # Package exists
+                        return True
 
-            if "dependencies" in pkg_json:
-                if package in pkg_json["dependencies"]:
-                    # Package exists
-                    return True
+                if "dependencies" in pkg_json:
+                    if package in pkg_json["dependencies"]:
+                        # Package exists
+                        return True
 
-            return False
+                return False
+            else:
+                return False
         else:
             self.logger.Info("package.json was not found")
             self.pkgm.ppm.init()

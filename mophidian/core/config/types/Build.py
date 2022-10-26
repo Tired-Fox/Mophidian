@@ -18,13 +18,13 @@ class Build(BaseType):
         super().__init__()
 
         self.version_format = "v{}"
-        self.default_template = "moph_base"
+        self.default_layout = "moph_base"
         self.refresh_delay = 2.0
 
         self.parse_kwargs(
             cmap={
                 'version_format': str,
-                'default_template': str,
+                'default_layout': str,
                 "refresh_delay": [float, int],
             },
             **kwargs,
@@ -40,3 +40,12 @@ class Build(BaseType):
 
     def format_errors(self) -> str:
         return '"build": {\n  ' + '\n  '.join(self.errors) + '\n}'
+
+    def __str__(self) -> str:
+        return f"""\
+build: {{
+    \"version_format\": {self.format(self.version_format)},
+    \"default_layout\": {self.format(self.default_layout)},
+    \"refresh_delay\": {self.format(self.refresh_delay)},
+}}\
+"""

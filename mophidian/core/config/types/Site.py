@@ -59,3 +59,15 @@ class Site(BaseType):
 
     def format_errors(self) -> str:
         return '"site": {\n  ' + '\n  '.join(self.errors) + '\n}'
+
+    def __str__(self) -> str:
+        return f"""\
+site: {{
+    \"name\": {self.format(self.name)},
+    \"version\": {self.format(self.version)},
+    \"src_dir\": {self.format(self.src_dir)},
+    \"dest_dir\": {self.format(self.dest_dir)},
+    \"content_dir\": {self.format(self.content_dir)},
+    \"site_dir\": {self.format(self.site_dir)},
+}}\
+"""
