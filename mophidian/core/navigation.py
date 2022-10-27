@@ -119,11 +119,11 @@ def get_navigation(pages: Files, content: Files, config: Config) -> Nav:
     webpages = []
     for token in tokens:
         if isinstance(tokens[token], dict):
-            children, wp = _get_children(tokens[token])
+            children, wp = _get_children(tokens[token], config)
             nav.append(Group(token, children))
             webpages.extend(wp)
         elif isinstance(tokens[token], File):
-            new_page = Page(tokens[token])
+            new_page = Page(tokens[token], config)
             nav.append(new_page)
             webpages.append(new_page)
 
@@ -155,21 +155,21 @@ def _build_np_links(nav: list[Page]):
         cur.previous, cur.next = prev, next
 
 
-def _get_children(tokens: dict) -> tuple[list[Page | Group], list[Page]]:
+def _get_children(tokens: dict, config: Config) -> tuple[list[Page | Group], list[Page]]:
     nav = []
     pages = []
     for token in tokens:
         if isinstance(tokens[token], dict):
-            children, p = _get_children(tokens[token])
+            children, p = _get_children(tokens[token], config)
             nav.append(Group(token, children))
             pages.extend(p)
         elif isinstance(tokens[token], tuple):
-            page = Page(tokens[token][0])
+            page = Page(tokens[token][0], config)
             page.build_template(tokens[token][1])
             nav.append(page)
             pages.append(page)
         elif isinstance(tokens[token], File):
-            page = Page(tokens[token])
+            page = Page(tokens[token], config)
             nav.append(page)
             pages.append(page)
 

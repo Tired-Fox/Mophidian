@@ -1,6 +1,7 @@
 {
   "site": {
     "name": "Mophidian",
+    "site_dir": "Mophidian",
     "version": "1.0"
   },
   "build": {
