@@ -48,7 +48,7 @@ class Builder:
         static_path = Path("static/")
         if static_path.exists():
             for path in static_path.glob("./**/*.*"):
-                dest_path = Path(path.as_posix().replace("static", "site"))
+                dest_path = Path(path.as_posix().replace("static", self.cfg.site.dest_dir))
                 dest_path.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(path, dest_path)
                 # shutil.copytree("static/", self.cfg.site.dest_dir)
@@ -125,6 +125,7 @@ class Builder:
 
     def full(self):
         """Execute a full site build."""
+        self.cfg.site.dest_dir = self.cfg.site.dest_dir + self.cfg.site.site_dir
 
         self.delete_old()
 

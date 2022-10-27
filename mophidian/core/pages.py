@@ -1,5 +1,7 @@
 from __future__ import annotations
-from pathlib import Path
+import os
+from pathlib import Path, PurePath, PurePosixPath
+import posixpath
 
 
 from typing import TYPE_CHECKING, Any, MutableMapping, Optional
@@ -89,11 +91,10 @@ class Page:
     def is_homepage(self) -> bool:
         return self.is_root_level and self.is_index and self.file.url in [".", "index.html"]
 
-    def __init__(self, file: File, title: Optional[str] = None):
+    def __init__(self, file: File, config: Config, title: Optional[str] = None):
         file.page = self
         self.file = file
         self.title = title
-
         #  Nav
         self.parent = None
         self.children = None
@@ -106,8 +107,9 @@ class Page:
         self.content = None
         self.markdown = None
         self.meta = {}
+        self.full_url = None
 
-        self._build_urls("https://tired-fox.github.io/mophidian/")
+        self._build_urls(config.site.site_dir)
         self.is_page = True
 
     def __eq__(self, other: Page) -> bool:
@@ -127,14 +129,19 @@ class Page:
 
     @property
     def url(self) -> str:
-        return '' if self.file.url == '.' else self.file.url
-
-    def _build_urls(self, domain: str):
-        if domain:
-            if not domain.endswith("/"):
-                domain += "/"
-            self.full_url = urljoin(domain, self.url)
+        print(self.full_url)
+        if self.full_url == None:
+            return '' if self.file.url == '.' else self.file.url
         else:
+            return self.full_url
+
+    def _build_urls(self, root: str):
+        if root != "":
+            root = root.replace("\\", "/").lstrip("/").rstrip("/")
+            self.full_url = PurePosixPath("/" + root + self.file.url).as_posix()
+            print(self.full_url)
+        else:
+            print("NO ROOT")
             self.full_url = None
 
     def build_template(self, file: File):

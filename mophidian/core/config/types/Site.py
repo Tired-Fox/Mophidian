@@ -20,7 +20,7 @@ class Site(BaseType):
     """The directory where content files are located. These files are markdown and they are used in dynamic routes."""
 
     site_dir: str
-    """TODO: Implement site directory and other usefull configs"""
+    """Root directory of the website. Used for links. Ex: https://user.github.io/project/ where project/ is the dir of the website."""
 
     def __init__(self, **kwargs) -> None:
         super().__init__()
