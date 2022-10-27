@@ -1,0 +1,21 @@
+{% extends lyt.base %}
+
+{% block title %}
+<title>{{ site.name }}</title>
+{% endblock %}
+
+{% block links %}
+{{ super() }}
+<link rel="stylesheet" href="/home.css">
+{% endblock %}
+
+{% block header %}
+{% include cmpt.home.header %}
+{% endblock %}
+
+{% block body %}
+<div id="hero-section">
+    <img src="/img/casual-life-3d-green-notebook-with-orange-bookmark.png" alt="Green Book" />
+    <h3>A simple yet effective python SSG</h3>
+</div>
+{% endblock %}

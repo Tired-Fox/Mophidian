@@ -16,11 +16,12 @@ def cli():
 @click.option("--sass", flag_value=True, help=open_help, default=False)
 @click.option("--tailwind", flag_value=True, help=tailwind_help, default=False)
 @click.option("--no_defaults", flag_value=True, help=tailwind_help, default=False)
-@click.option("--template", help=template_help, default="blank")
-def new_command(sass: bool, tailwind: bool, no_defaults: bool, debug: bool):
+@click.option("--template", type=str, show_default=True, help=template_help, default="blank")
+def new_command(sass: bool, tailwind: bool, no_defaults: bool, template: str):
     from core.new import generate
 
-    generate(sass=sass, tailwind=tailwind, no_defaults=no_defaults, debug=debug)
+    print(template)
+    generate(sass=sass, tailwind=tailwind, no_defaults=no_defaults, template=template)
 
 
 @cli.command(name="serve")

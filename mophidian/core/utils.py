@@ -107,14 +107,14 @@ class MophidianMarkdown:
             str: The title parsed from the markown string
         """
         for line in markdown.split('\n'):
-            if re.match(r"[ \t]*#{1}.+", line) is not None:
+            if re.match(r"[ \t]*#{1}[^#]+", line) is not None:
                 return line.strip().lstrip("#")
         return None
 
     @classmethod
     def parse(
-        cls, file: str, config: Config, layouts: dict[str, dict | Template]
-    ) -> tuple[Meta, Content, Template]:
+        cls, file: str, config: Config, layouts: dict[str, dict | Template], template=None
+    ) -> tuple[Meta, Content]:
         """Parse the metadata from the markdown content.
 
         Args:
@@ -149,18 +149,19 @@ class MophidianMarkdown:
 
         layout = None
 
-        # If markdown page specified a layout
-        if 'layout' in meta:
-            layout = get_layout(meta['layout'])
+        if template is None:
+            # If markdown page specified a layout
+            if 'layout' in meta:
+                template = get_layout(meta['layout'])
 
-        # If no layout then attempt to retrive config default
-        if layout is None:
-            layout = get_layout(config.build.default_layout)
-            # If config default is invalid then use the provided default layout
-            if layout is None:
-                layout = layouts["moph_base"]
+            # If no layout then attempt to retrive config default
+            if template is None:
+                template = get_layout(config.build.default_layout)
+                # If config default is invalid then use the provided default layout
+                if template is None:
+                    template = layouts["moph_base"]
 
-        return meta, content, layout
+        return meta, content
 
     @classmethod
     def render(

@@ -1,0 +1,36 @@
+{% extends lyt.base %}
+
+{% block title %}
+<title>Docs | {{ page.title }}</title>
+{% endblock %}
+
+{% block links %}
+{{ super() }}
+<link rel="stylesheet" href="/docs/style.css">
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    const toggleMenu = () => {
+        console.log("Toggle menu");
+        const aside = document.getElementById("doc-aside");
+        aside.classList.toggle("hide-aside");
+    }
+</script>
+{% endblock %}
+
+{% block header %}
+{% include cmpt.docs.header %}
+{% endblock %}
+
+{% block body %}
+<aside id="doc-aside" class="hide-aside">
+    <div>
+        {% include cmpt.docs.nav %}
+    </div>
+</aside>
+<article>
+    {{ content }}
+</article>
+{% endblock %}

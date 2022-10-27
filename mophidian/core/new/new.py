@@ -5,11 +5,11 @@ from json import dumps
 from pathlib import Path
 from typing import TextIO
 
-from integration import Tailwindcss, Sass
+from mophidian.core.integration import Tailwindcss, Sass
 from moph_log import Logger, color, FColor, Style
 
 from .snippets import snippets
-from ppm import PPM
+from mophidian.core.ppm import PPM
 
 
 def create_config(config: dict):
@@ -25,6 +25,8 @@ def setup(
     sass: bool,
     tailwind: bool,
     no_defaults: bool,
+    ostdo: TextIO,
+    ostde: TextIO,
     **kwargs,
 ):
     config = {
@@ -41,9 +43,8 @@ def setup(
 
     if sass or tailwind:
         Logger.Info("Detected integration flags checking for node...")
-
-        with contextlib.redirect_stdout(old_out):
-            with contextlib.redirect_stderr(old_err):
+        with contextlib.redirect_stdout(ostdo):
+            with contextlib.redirect_stderr(ostde):
                 while True:
                     ppm = input(
                         f"Which node package manager whould you like to use?\n\
@@ -57,7 +58,7 @@ def setup(
 
                 if sass:
                     sass_integration = Sass(Logger, package_manager)
-                    sass_integration.install()
+                    sass_integration.install(config)
 
                 if tailwind:
                     tailwind_integration = Tailwindcss(Logger, package_manager)
@@ -109,6 +110,8 @@ def generate(**kwargs):
                 name=name,
                 version=version,
                 logger=Logger,
+                ostdo=old_stdout,
+                ostde=old_stderr,
                 **kwargs,
             )
             Logger.Success(

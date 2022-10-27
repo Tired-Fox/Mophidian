@@ -110,7 +110,7 @@ class NPM:
         system(cmd)
 
     def run(self, command: str):
-        """Run a command from the package.json using the notation from this package manager."""
+        """Run a command using the notation from the preferred package manager."""
         cmd = f"{self._run} {command}"
         self._logger.Custom(cmd, label=self.name_upper())
         system(cmd)

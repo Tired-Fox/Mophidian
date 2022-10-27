@@ -1,4 +1,6 @@
 from __future__ import annotations
+import os
+from tokenize import group
 
 from typing import TYPE_CHECKING, Optional, Union
 from .files import Files, File, FileExtension
@@ -20,6 +22,35 @@ class Nav:
                 self.homepage = page
                 break
 
+    def get_dir(self, dir: str):
+        """Get the item at the given directory. This gives the user the ability to jump to a directory and begin looping there.
+
+        Args:
+            dir (str): The directory/group item.
+        """
+        tokens = [
+            token
+            for token in os.path.normpath(dir).replace("\\", "/").split("/")
+            if token not in ["", ".", None]
+        ]
+
+        def recurse(item: Group, tokens: list) -> Group | None:
+            if len(tokens) == 0:
+                return item
+            else:
+                for i in item.children:
+                    if isinstance(i, Group):
+                        if i.title == tokens[0]:
+                            return recurse(item, tokens[1:])
+                return None
+
+        if len(tokens) > 0:
+            for item in self.items:
+                if isinstance(item, Group):
+                    if item.title == tokens[0]:
+                        return recurse(item, tokens[1:])
+        return None
+
     def __repr__(self):
         return "\n".join(item.pretty() for item in self)
 
@@ -37,7 +68,7 @@ class Group:
     parent: Optional[Group]
     """The immediate parent of the section or `None` if the section is at the top level."""
 
-    children: Optional[list[Union[Page, Group]]]
+    children: list[Union[Page, Group]]
     """An iterable of all child navigation objects. Children may include nested sections, pages and links."""
 
     is_group: bool = False
@@ -51,9 +82,17 @@ class Group:
         self.children = children
         self.title = title
         self.is_group = True
+        self.index = None
 
     def __repr__(self):
         return f"Section(title='{self.title}')"
+
+    def has_index(self) -> bool:
+        for child in self.children:
+            if isinstance(child, Page) and child.file.is_index:
+                self.index = child
+                return True
+        return False
 
     @property
     def breadcrumbs(self):
@@ -124,6 +163,11 @@ def _get_children(tokens: dict) -> tuple[list[Page | Group], list[Page]]:
             children, p = _get_children(tokens[token])
             nav.append(Group(token, children))
             pages.extend(p)
+        elif isinstance(tokens[token], tuple):
+            page = Page(tokens[token][0])
+            page.build_template(tokens[token][1])
+            nav.append(page)
+            pages.append(page)
         elif isinstance(tokens[token], File):
             page = Page(tokens[token])
             nav.append(page)
@@ -165,11 +209,11 @@ def _build_directory_url(tokenized: dict, pages: Files, content: Files) -> dict:
         if file.is_dyn:
             for cnt in content.dir_pages(file.parent):
                 if cnt.is_type(".md"):
-                    tokenized = _add_directory_page(tokenized, cnt)
+                    tokenized = _add_directory_page(tokenized, cnt, file)
         elif file.is_rdyn:
             for cnt in content.rdir_pages(file.parent):
                 if cnt.is_type(".md"):
-                    tokenized = _add_directory_page(tokenized, cnt)
+                    tokenized = _add_directory_page(tokenized, cnt, file)
         else:
             if not file.is_static and not file.is_type(FileExtension.SASS):
                 tokenized = _add_directory_page(tokenized, file)
@@ -177,25 +221,25 @@ def _build_directory_url(tokenized: dict, pages: Files, content: Files) -> dict:
     return tokenized
 
 
-def _add_directory_page(tokenized: dict, file: File):
+def _add_directory_page(tokenized: dict, file: File, template=None):
     breadcrumbs = [crumb for crumb in file.url.split("/") if crumb not in ["", ".", None]]
     current = tokenized
     for crumb in breadcrumbs:
         if crumb not in current:
             current.update({crumb: {}})
         current = current[crumb]
-    current["index"] = file
+    current["index"] = file if template is None else (file, template)
 
     return tokenized
 
 
-def _add_non_directory_page(tokenized: dict, file: File):
+def _add_non_directory_page(tokenized: dict, file: File, template=None):
     breadcrumbs = [crumb for crumb in file.url.split("/") if crumb]
     current = tokenized
     for crumb in breadcrumbs[:-1]:
         if crumb not in current:
             current.update({crumb: {}})
         current = current[crumb]
-    current[breadcrumbs[-1]] = file
+    current[breadcrumbs[-1]] = file if template is None else (file, template)
 
     return tokenized

@@ -1,0 +1,7 @@
+<ul>
+    {% for doc_item in nav.get_dir("docs").children %}
+    {% if doc_item.children %}
+    {% include cmpt.docs.sub_nav %}
+    {% endif %}
+    {% endfor %}
+</ul>

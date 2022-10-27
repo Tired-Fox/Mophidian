@@ -45,9 +45,13 @@ class Builder:
     def copy_all_static_dir(self):
         """If `static/` exists then copy it's contents to the site directory."""
         # Copy all static files from the static/ directory
-        self.delete_old()
-        if os.path.exists("static/"):
-            shutil.copytree("static/", self.cfg.site.dest_dir)
+        static_path = Path("static/")
+        if static_path.exists():
+            for path in static_path.glob("./**/*.*"):
+                dest_path = Path(path.as_posix().replace("static", "site"))
+                dest_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(path, dest_path)
+                # shutil.copytree("static/", self.cfg.site.dest_dir)
 
     def get_template_tree(self, template_dir: str) -> dict:
         """Retrieve all jinja2.Template's from the given directory. These temlates will be exposed to the user and because of that they have a special format for accessing them. The path to the file is split and nested in a dict to allow the user to use dot notation to access any part of the template tree.
@@ -109,6 +113,8 @@ class Builder:
 
         for page in nav.pages:
             page.build_content(self.cfg, layouts)
+
+        for page in nav.pages:
             page.render(self.cfg, components, layouts, nav)
 
             dest = Path(page.file.abs_dest_path)
@@ -120,20 +126,22 @@ class Builder:
     def full(self):
         """Execute a full site build."""
 
+        self.delete_old()
+
         # Build and retrieve data
         Logger.Info("Finding files")
         files, content = self.get_files_and_content()
         Logger.Info("Constructing page data")
         nav = self.get_nav(files, content)
 
+        # Build and apply integrations
+        Logger.Info(f"Building all sass files in {self.cfg.site.src_dir}")
+        files.build_all_sass(self.cfg)
+
         # Copy static files to destination
         Logger.Info("Copying static files")
         self.copy_all_static_dir()
         files.copy_all_static()
-
-        # Build and apply integrations
-        Logger.Info(f"Building all sass files in {self.cfg.site.src_dir}")
-        files.build_all_sass(self.cfg)
 
         # Retrieve components and layouts
         Logger.Info("Retreiving all templates from 'components/' and 'layouts/'")

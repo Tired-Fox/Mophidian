@@ -1,14 +1,14 @@
 from __future__ import annotations
-from cmath import log
-import contextlib
 
 from functools import cached_property
 from json import load
 from pathlib import Path
 import sys
-from typing import TextIO
+from typing import Callable, TextIO
+
+from mophidian.core.config.config import Config
 from .ppm import PPM
-from moph_log import Log, LL, url, color, FColor, Style, RESET
+from moph_log import Log, url, color, FColor, Style
 from .snippets import snippets
 
 
@@ -88,7 +88,7 @@ class Integration:
             self.pkgm.ppm.init()
             return False
 
-    def install(self):
+    def install(self, config: Config):
         if self.pkgm.ppm.has_node:
             if self.link != "":
                 self.logger.Custom(
@@ -100,7 +100,7 @@ class Integration:
             if not self.installed(self.name):
                 self.pkgm.ppm.install(self.name, "-D")
 
-            self.setup()
+            self.setup(config)
 
             if self.has_addons:
                 self.require_addons()
@@ -152,7 +152,7 @@ class Sass(Integration):
         super().__init__(logger, pkgm, ostdo, ostde)
         self.link = "https://sass-lang.com/"
 
-    def setup(self):
+    def setup(self, config: Config):
         """Setup any additional requirements for this package."""
         self.logger.Debug("Adding sass scripts to package.json")
         self.logger.Debug(f"Added\n{snippets['sass_scripts']}")
@@ -162,7 +162,11 @@ class Sass(Integration):
             pj = load(package_json)
             if "scripts" not in pj:
                 pj["scripts"] = {}
-            pj["scripts"].update(snippets["sass_scripts"])
+            for script in snippets["sass_scripts"]:
+                if not isinstance(snippets["sass_scripts"][script], Callable):
+                    pj["scripts"].update({ script: snippets["sass_scripts"][script]})
+                else:
+                    pj["scripts"].update({ script: snippets["sass_scripts"][script](config.site.src_dir) })
 
         with open("./package.json", "w", encoding="utf-8") as package_json:
             package_json.write(dumps(pj, indent=2))

@@ -66,10 +66,11 @@ module.exports = {
         "tailwind:watch": "tailwindcss -i ./styles/tailwind.css -o ./static/tailwind.css --watch",
     },
     "sass_scripts": {
-        "css": "sass styles:static/css",
-        "css:watch": "sass --watch styles:static/css",
-        "css:compress": "sass --style=compressed styles:static/css",
-        "css:watch:compress": "sass --watch --style=compressed styles:static/css",
+        "css": "sass styles:static/css --no-source-map",
+        "css:watch": "sass --watch styles:static/css --no-source-map",
+        "css:src:compress": "sass --style=compressed pages/:site/ --no-source-map",
+        "css:style:compress": "sass --style=compressed styles/:static/css --no-source-map",
+        "css:watch:compress": "sass --watch --style=compressed styles:static/css --no-source-map",
     },
     "integration_file_structure": '''
 project

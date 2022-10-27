@@ -1,0 +1,43 @@
+<div id="header">
+    <a href="/">
+        <h3>Mophidian</h3>
+    </a>
+    <nav>
+        <a href="/blog/">Blog</a>
+        <a href="/docs/">Docs</a>
+    </nav>
+</div>
+<style>
+    #header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        width: 100%;
+        padding: 1rem;
+        margin: 0 0 2rem 0;
+    }
+
+    #header nav {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+
+        width: fit-content;
+    }
+
+    #header nav a,
+    #header h3 {
+        width: fit-content;
+        margin: 0;
+        padding: 0;
+
+        color: #21421e;
+
+        letter-spacing: 1px;
+    }
+
+    #header>a {
+        text-decoration: none;
+    }
+</style>

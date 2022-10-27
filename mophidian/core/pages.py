@@ -1,4 +1,5 @@
 from __future__ import annotations
+from pathlib import Path
 
 
 from typing import TYPE_CHECKING, Any, MutableMapping, Optional
@@ -8,6 +9,7 @@ from .config.config import Config
 from .files import File, FileExtension
 from moph_log import Logger
 from .utils import MophidianMarkdown, renderTemplate
+from jinja2 import Environment
 
 if TYPE_CHECKING:
     from .navigation import Group
@@ -135,6 +137,17 @@ class Page:
         else:
             self.full_url = None
 
+    def build_template(self, file: File):
+        """Build the pages template from a given file.
+
+        Args:
+            file (File): The file to parse into a template.
+        """
+        template_path = Path(file.abs_src_path)
+        if template_path.exists():
+            with open(template_path, "r", encoding="utf-8-sig") as template_file:
+                self.template = Environment().from_string(template_file.read())
+
     def build_content(self, config: Config, layouts: dict[str, dict | Template]):
         """Build the pages content. Parse the meta data from a markdown file everything else is the content."""
         try:
@@ -149,8 +162,8 @@ class Page:
             raise
 
         if self.file.is_type(FileExtension.Markdown):
-            self.meta, self.markdown, self.template = MophidianMarkdown.parse(
-                content, config, layouts
+            self.meta, self.markdown = MophidianMarkdown.parse(
+                content, config, layouts, self.template
             )
         elif self.file.is_type(FileExtension.Template) and self.template is None:
             self.content = content

@@ -1,0 +1,46 @@
+.spacer {
+    flex-grow: 1;
+}
+
+footer {
+    display: flex;
+    justify-content: space-between;
+
+    width: 100%;
+    padding-inline: 2rem;
+    padding-block: .75rem;
+
+
+    &>div {
+        flex: 1;
+        display: flex;
+        &:nth-child(1) {
+            justify-content: start;
+
+            a {
+                font-size: 1.1rem;
+                color: black;
+
+                &:hover {
+                    color: gray;
+                }
+            }
+        }
+
+        &:nth-child(2) {
+            justify-content: center;
+        }
+
+        &:nth-child(3) {
+            justify-content: end;
+            small {
+                opacity: .5;
+                color: gray;
+                a {
+                    color: rgb(76, 76, 255);
+                }
+            }
+        }
+    }
+
+}

@@ -11,13 +11,13 @@ from typing import TYPE_CHECKING, Iterator, Optional, Tuple
 from moph_log import Logger, Log, LL
 from urllib.parse import quote
 from . import utils
+from .ppm import PPM
+from .integration import Tailwindcss, Sass
 
 
 if TYPE_CHECKING:
     from .pages import Page
-    from .integration import Tailwindcss, Sass
     from .config import Config
-    from .ppm import PPM
 
 
 class FileExtension:
@@ -81,6 +81,7 @@ class Files:
         """Compile all the sass files into their corresponding css files."""
 
         sass_file = [file for file in self if file.is_type(FileExtension.SASS)]
+        print(sass_file)
         if len(sass_file) > 0:
             old_stdo = sys.stdout
             old_stde = sys.stderr
@@ -95,11 +96,14 @@ class Files:
                     with contextlib.redirect_stdout(None):
                         with contextlib.redirect_stderr(None):
                             try:
-                                SASS.install()
-                                for file in sass_file:
-                                    file.build_sass(pkg_mgr, logger)
-                            except:
-                                pass
+                                SASS.install(config)
+                                Path(config.site.dest_dir).joinpath("css/").mkdir(
+                                    parents=True, exist_ok=True
+                                )
+                                pkg_mgr.ppm.run("css:style:compress")
+                                pkg_mgr.ppm.run("css:src:compress")
+                            except Exception as e:
+                                logger.Error(str(e))
 
     def template_pages(self, type: FileExtension) -> list[File]:
         """Return list of all template pages."""
@@ -172,6 +176,9 @@ class File:
     abs_parent: str
     """Absolute parent directory of the file. Uses `\\` on windows."""
 
+    is_index: bool
+    """Flag for if the desination file is a index.html file."""
+
     page: Optional[Page]
     """The page object linked to this file."""
 
@@ -242,6 +249,7 @@ class File:
         self._suffix = PurePath(path).suffix
 
         self.dest_path = self._build_dest_path(directory_url)
+        self.is_index = PurePath(self.dest_path).name == "index.html"
         self.abs_dest_path = os.path.normpath(os.path.join(dest_dir, self.dest_path))
 
         self.url = self._build_url(directory_url)
@@ -261,7 +269,7 @@ class File:
             if dir == '':
                 url = '.'
             else:
-                url = dir + '/'
+                url = "/" + dir + '/'
 
         return quote(url)
 
@@ -343,22 +351,6 @@ class File:
                 utils.copy_file(self.abs_src_path, self.abs_dest_path)
             except SameFileError:
                 pass
-
-    def build_sass(self, pkg_mgr: PPM, logger: Log):
-        """Build sass file and move to dest directory."""
-        from subprocess import Popen, PIPE
-        from shutil import which
-
-        Path(self.abs_dest_path).parent.mkdir(parents=True, exist_ok=True)
-
-        sass_build = Popen(
-            f"{which(pkg_mgr.ppm.mname)} sass {self.abs_src_path} {self.abs_dest_path} --style=compressed --no-source-map",
-            stdout=PIPE,
-            stderr=PIPE,
-        )
-
-        if sass_build.wait() != 0:
-            logger.Error(f"Failed to build {self.abs_src_path} to {self.abs_dest_path}")
 
     def __eq__(self, other) -> bool:
         return (

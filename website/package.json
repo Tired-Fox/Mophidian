@@ -1,0 +1,20 @@
+{
+  "name": "mophidian",
+  "version": "1.0.0",
+  "description": "Documentation website for the pythonic SSG Mophidian",
+  "main": "index.js",
+  "repository": "https://github.com/Tired-Fox/Mophidian",
+  "author": "Tired Fox (Zachary Boehm) <zboehm104@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "sass": "^1.55.0"
+  },
+  "scripts": {
+    "css": "sass styles:static/css --no-source-map",
+    "css:watch": "sass --watch styles:static/css --no-source-map",
+    "css:compress": "sass --style=compressed styles:static/css --no-source-map",
+    "css:watch:compress": "sass --watch --style=compressed styles:static/css --no-source-map",
+    "css:src:compress": "sass --style=compressed pages/:static/ --no-source-map",
+    "css:style:compress": "sass --style=compressed styles/:static/css --no-source-map"
+  }
+}
