@@ -1,0 +1,22 @@
+{% extends lyt.base %}
+
+{% block title %}
+<title>{{ page.title }}</title>
+{% endblock %}
+
+{% block links %}
+{{ super() }}
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
+
+{% block header %}
+{% include cmpt.header %}
+{% endblock %}
+
+{% block body %}
+<article>
+    {{ content }}
+</article>
+{% endblock %}

@@ -1,4 +1,0 @@
-markdown-it-py[linkify,plugins]
-python-frontmatter
-Jinja2
-toml

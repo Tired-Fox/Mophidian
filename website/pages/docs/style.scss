@@ -1,0 +1,49 @@
+
+body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+article {
+    overflow: auto;
+    max-height: 100%;
+    padding: 1.5rem;
+}
+
+#doc-aside {
+    width: 15rem;
+    height: calc(100% - 4.5rem);
+    transform: translateY(4.5rem);
+    position: absolute;
+    float: left;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    transition: width ease-in-out 0.4s;
+
+    border-radius: 0 1rem 0 0;
+
+    background-color: #21421e;
+    color: white;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,1), 0 4px 6px -4px rgba(0,0,0,1);
+
+    a {
+        color: white;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+    }
+
+    &>div {
+        margin: 1.5rem;
+        width: 100%;
+    }
+}
+
+.hide-aside {
+    width: 0 !important;
+}
