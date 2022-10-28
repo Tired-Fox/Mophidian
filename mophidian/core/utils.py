@@ -106,9 +106,11 @@ class MophidianMarkdown:
         Returns:
             str: The title parsed from the markown string
         """
-        for line in markdown.split('\n'):
-            if re.match(r"[ \t]*#{1}[^#]+", line) is not None:
-                return line.strip().lstrip("#")
+        lines = markdown.split('\n')
+        if len(lines) > 0 and re.match(r"[ \t]*#{1}[^#]+", lines[0]) is not None:
+            return lines[0].strip().lstrip("#")
+        elif len(lines) > 1 and re.match(r"[ \t]*=+[\s\t]+", lines[1]) is not None:
+            return lines[0].strip()
         return None
 
     @classmethod

@@ -9,9 +9,12 @@
 {% endblock %}
 
 {% block scripts %}
+{{ super() }}
+{% include cmpt.nav.nav_logic %}
 {% endblock %}
 
 {% block header %}
+{% set nav_data = nav.get_dir("blog") %}
 {% include cmpt.header %}
 {% endblock %}
 

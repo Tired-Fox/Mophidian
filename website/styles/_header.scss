@@ -1,80 +1,89 @@
-#header>div {
-    flex: 1;
-}
-
-#header>div:nth-child(1) {
-    display: flex;
-    justify-content: start;
-}
-
-#header>div:nth-child(2) {
-    display: flex;
-    justify-content: center;
-}
-
-#header>div:nth-child(3) {
-    display: flex;
-    justify-content: end;
-}
-
-#header button {
-    background-color: transparent;
-    border: none;
-    width: 2.5rem;
-    height: 2.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-}
-
-#header button:focus {
-    outline: none;
-    border: none;
-    background-color: transparent;
-}
-
-#header button svg {
-    color: #21421e;
-    width: 2rem;
-    height: 2rem;
-    transition: transform ease-in-out 0.1s;
-}
-
-#header button:hover svg {
-    color: #21421e;
-    transform: scale(1.1);
-}
-
 #header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
+    background-color: rgba(255, 255, 255, 0.951);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -2px rgba(0,0,0,.1);
+    border-bottom: 2px solid white;
+    
+    position: sticky;
+    top: 0;
+    z-index: 10;
     width: 100%;
-    padding: 1rem;
+    padding-block: 1rem;
+    padding-inline: 2rem;
     height: 4.5rem;
-}
+    
+    &>div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 80rem;
+        margin-inline: auto;
+        &>div {
+            flex: 1;
+        }
+        &>div:nth-child(1) {
+            display: flex;
+            justify-content: start;
+        }
+        &>div:nth-child(2) {
+            display: flex;
+            justify-content: center;
+        }
+        &>div:nth-child(3) {
+            display: flex;
+            justify-content: end;
+        }
 
-#header nav {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
+        button {
+            background-color: transparent;
+            border: none;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
 
-    width: fit-content;
-}
+            &:focus {
+                outline: none;
+                border: none;
+                background-color: transparent;
+            }
 
-#header nav a,
-#header h3 {
-    width: fit-content;
-    margin: 0;
-    padding: 0;
+            &:hover {
+                svg {
+                    color: #21421e;
+                    transform: scale(1.1);
+                }
+            }
 
-    color: #21421e;
+            svg {
+                color: #21421e;
+                width: 2rem;
+                height: 2rem;
+                transition: transform ease-in-out 0.1s;
+            }
+        }
 
-    letter-spacing: 1px;
-}
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        
+            width: fit-content;
+        }
 
-#header>div>a {
-    text-decoration: none;
+        nav a, h3 {
+            width: fit-content;
+            margin: 0;
+            padding: 0;
+        
+            color: #21421e;
+        
+            letter-spacing: 1px;
+        }
+
+        &>div>a {
+            text-decoration: none;
+        }
+    }
 }

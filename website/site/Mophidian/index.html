@@ -9,6 +9,7 @@
 
 
         <link rel="stylesheet" href="/Mophidian/css/global.css">
+        <link rel="stylesheet" href="/Mophidian/css/highlight.css">
 <link rel="stylesheet" href="/Mophidian/home.css">
 
         <script defer src="/Mophidian/js/brands.min.js"></script>
@@ -17,7 +18,7 @@
     </head>
 
     <body>
-<div id="header">
+<div id="home-header">
     <nav>
         <a href="/Mophidian/blog/">Blog</a>
         <a href="/Mophidian/">
@@ -27,7 +28,7 @@
     </nav>
 </div>
 <style>
-    #header {
+    #home-header {
         width: 100%;
         padding-block: 0;
 
@@ -37,7 +38,7 @@
         align-items: flex-start;
     }
 
-    #header nav {
+    #home-header nav {
         display: flex;
         align-items: flex-end;
         gap: 5rem;
@@ -45,8 +46,8 @@
         width: fit-content;
     }
 
-    #header nav a,
-    #header nav h1 {
+    #home-header nav a,
+    #home-header nav h1 {
         width: fit-content;
         margin: 0;
         padding: 0;
@@ -56,7 +57,7 @@
         letter-spacing: 1px;
     }
 
-    #header nav a:nth-child(2) {
+    #home-header nav a:nth-child(2) {
         text-decoration: none;
     }
 </style>
@@ -68,16 +69,17 @@
 
         <div class="spacer"></div>
 <footer>
-    <div id="footlinks">
+    <div id="footlinks" class="flex-1">
         <a href="https://github.com/Tired-Fox/Mophidian" target="_blank">
             <i class="fa-brands fa-github"></i>
         </a>
     </div>
-    <div>
+    <div id="info" class="flex-2">
         <small>&copy; 2022 Zachary Boehm. All Rights Reserved.</small>
-    </div>
-    <div id="credits">
-        <small>Illustrations by Icons 8</a> from <a href="https://icons8.com/illustrations">Ouch!</a></small>
+
+        <div id="credits">
+            <small>Illustrations by Icons 8</a> from <a href="https://icons8.com/illustrations">Ouch!</a></small>
+        </div>
     </div>
 </footer>
     </body>
