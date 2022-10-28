@@ -27,13 +27,3 @@ class Nav(BaseType):
             bool: True if there are any errors. False if there are none.
         """
         return len(self.errors) > 0
-
-    def format_errors(self) -> str:
-        return '"nav": {\n  ' + '\n  '.join(self.errors) + '\n}'
-
-    def __str__(self) -> str:
-        return f"""\
-nav: {{
-    \"directory_url\": {self.format(self.directory_url)},
-}}\
-"""

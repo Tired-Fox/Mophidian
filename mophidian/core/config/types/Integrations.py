@@ -37,15 +37,3 @@ class Integrations(BaseType):
             bool: True if there are any errors. False if there are none.
         """
         return len(self.errors) > 0
-
-    def format_errors(self) -> str:
-        return '"build": {\n  ' + '\n  '.join(self.errors) + '\n}'
-
-    def __str__(self) -> str:
-        return f"""\
-integrations: {{
-    \"tailwind\": {self.format(self.tailwind)},
-    \"sass\": {self.format(self.sass)},
-    \"package_manager\": {self.format(self.package_manager)},
-}}\
-"""

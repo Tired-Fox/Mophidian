@@ -30,11 +30,9 @@ class BaseType:
         for entry in kwargs:
             if entry in cmap:
                 is_valid = True
+                cmap[entry] = [cmap[entry]] if not isinstance(cmap[entry], list) else cmap[entry]
                 if isinstance(cmap[entry], list):
                     if type(kwargs[entry]) not in cmap[entry]:
-                        is_valid = False
-                else:
-                    if not isinstance(kwargs[entry], cmap[entry]):
                         is_valid = False
 
                 if is_valid:
@@ -44,16 +42,17 @@ class BaseType:
                     self.errors.append(
                         color(
                             error_formats["start"].format(color(entry, prefix=[FColor.RED])),
-                            "was of type",
+                            " was of type ",
                             error_formats["type"].format(
                                 color(type(kwargs[entry]).__name__, prefix=[FColor.RED])
                             ),
-                            "but was expected to be ",
+                            " but was expected to be ",
                             ', '.join(
                                 error_formats["type"].format(
                                     color(t.__name__, prefix=[FColor.YELLOW])
                                 )
-                                for t in list(cmap[entry])
+                                for t in cmap[entry]
+                                if isinstance(cmap[entry], list)
                             ),
                             prefix=[Style.BOLD],
                             suffix=[RESET],
@@ -82,6 +81,22 @@ class BaseType:
         """
         pass
 
-    @abstractmethod
     def format_errors(self) -> str:
-        pass
+        return f'"{self.key()}"' + ': {\n  ' + '\n  '.join(self.errors) + '\n}'
+
+    def __str__(self) -> str:
+        joiner = ",\n    "
+        exclude = ["errors"]
+        return f"""\
+{self.key()}: {{
+    {
+        joiner.join(
+            [
+                f'{self.format(key)}: {self.format(value)}' 
+                for key, value in vars(self).items() 
+                if key not in exclude
+            ]
+        )
+    }
+}}\
+"""

@@ -11,14 +11,14 @@
         <title>{{ page.title }}</title>
         {%- endblock %}
         {%- block links %}
-        <link rel="stylesheet" href="/{{ site.site_dir }}/css/tailwind.min.css">
-        <link rel="stylesheet" href="/{{ site.site_dir }}/css/global.css">
-        <link rel="stylesheet" href="/{{ site.site_dir }}/css/highlight.css">
+        <link rel="stylesheet" href="/{{ site.root }}/css/tailwind.min.css">
+        <link rel="stylesheet" href="/{{ site.root }}/css/global.css">
+        <link rel="stylesheet" href="/{{ site.root }}/css/highlight.css">
         {%- endblock %}
         {%- block scripts %}
-        <script defer src="/{{ site.site_dir }}/js/brands.min.js"></script>
-        <script defer src="/{{ site.site_dir }}/js/solid.min.js"></script>
-        <script defer src="/{{ site.site_dir }}/js/fontawesome.min.js"></script>
+        <script defer src="/{{ site.root }}/js/brands.min.js"></script>
+        <script defer src="/{{ site.root }}/js/solid.min.js"></script>
+        <script defer src="/{{ site.root }}/js/fontawesome.min.js"></script>
         {%- endblock %}
     </head>
 

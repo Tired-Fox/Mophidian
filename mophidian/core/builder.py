@@ -23,7 +23,7 @@ class Builder:
 
     def delete_old(self):
         """If the path to the site already exists delete it."""
-        dest = Path(self.cfg.site.dest_dir)
+        dest = Path(self.cfg.site.dest)
         if dest.exists():
             shutil.rmtree(dest)
 
@@ -53,10 +53,10 @@ class Builder:
         static_path = Path("static/")
         if static_path.exists():
             for path in static_path.glob("./**/*.*"):
-                dest_path = Path(path.as_posix().replace("static", self.cfg.site.dest_dir))
+                dest_path = Path(path.as_posix().replace("static", self.cfg.site.dest))
                 dest_path.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(path, dest_path)
-                # shutil.copytree("static/", self.cfg.site.dest_dir)
+                # shutil.copytree("static/", self.cfg.site.dest)
 
     def get_template_tree(self, template_dir: str) -> dict:
         """Retrieve all jinja2.Template's from the given directory. These temlates will be exposed to the user and because of that they have a special format for accessing them. The path to the file is split and nested in a dict to allow the user to use dot notation to access any part of the template tree.
@@ -138,7 +138,7 @@ class Builder:
                     with contextlib.redirect_stderr(None):
                         try:
                             TAILWIND.install(self.cfg)
-                            Path(self.cfg.site.dest_dir).joinpath("css/").mkdir(
+                            Path(self.cfg.site.dest).joinpath("css/").mkdir(
                                 parents=True, exist_ok=True
                             )
                             pkg_mgr.ppm.run("tailwind:mini")
@@ -147,9 +147,10 @@ class Builder:
 
     def full(self):
         """Execute a full site build."""
-        self.cfg.site.dest_dir = self.cfg.site.dest_dir + self.cfg.site.site_dir
-
         self.delete_old()
+
+        if self.cfg.build.use_root:
+            self.cfg.site.dest = self.cfg.site.dest + self.cfg.site.root
 
         # Build and retrieve data
         Logger.Info("Finding files")
@@ -158,7 +159,7 @@ class Builder:
         nav = self.get_nav(files, content)
 
         # Build and apply integrations
-        Logger.Info(f"Building all sass files in {self.cfg.site.src_dir}")
+        Logger.Info(f"Building all sass files in {self.cfg.site.source}")
         files.build_all_sass(self.cfg)
 
         # Copy static files to destination
