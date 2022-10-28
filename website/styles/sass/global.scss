@@ -99,3 +99,24 @@ hr {
         }
     }
 }
+
+dl {
+    display: flex !important;
+    flex-flow: row wrap !important;
+    border: solid #333 !important;
+    border-width: 1px 1px 0 0 !important;
+}
+dt {
+    flex-basis: 20% !important;
+    padding: 2px 4px !important;
+    background: #333 !important;
+    text-align: right !important;
+    color: #fff !important;
+}
+dd {
+    flex-basis: 70% !important;
+    flex-grow: 1 !important;
+    margin: 0 !important;
+    padding: 2px 4px !important;
+    border-bottom: 1px solid #333 !important;
+}

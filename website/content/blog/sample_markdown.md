@@ -91,8 +91,8 @@ Now a nested list:
 Notice again how text always lines up on 4-space indents (including
 that last line which continues item 3 above).
 
-Here's a link to [a website](http://foo.bar), to a [local
-doc](local-doc.html), and to a [section heading in the current
+Here's a link to [a website](https://www.example.com), to a [local
+doc](/Mophidian/docs/), and to a [section heading in the current
 doc](#an-h2-header). Here's a footnote [^1].
 
 [^1]: Some footnote text.
@@ -104,11 +104,6 @@ Tables can look like this:
 | All Business | 9    | leather     | brown       |
 | Roundabout   | 10   | hemp canvas | natural     |
 | Cinderella   | 11   | glass       | transparent |
-
-Table: Shoes sizes, materials, and colors.
-
-(The above is the caption for the table.) Pandoc also supports
-multi-line tables:
 
 
 | Keyword  | Text                                                       |
@@ -138,10 +133,6 @@ and images can be specified like so:
 
 ![example image](/Mophidian/img/casual-life-3d-green-notebook-with-orange-bookmark.png "An exemplary image")
 
-Inline math equation: $\omega = d\phi / dt$. Display
-math should get its own line like so:
-
-$$I = \int \rho R^{2} dV$$
 
 And note that you can backslash-escape any punctuation characters
 which you wish to be displayed literally, ex.: \`foo\`, \*bar\*, etc.

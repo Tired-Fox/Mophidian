@@ -16,6 +16,8 @@
         <script defer src="/Mophidian/js/brands.min.js"></script>
         <script defer src="/Mophidian/js/solid.min.js"></script>
         <script defer src="/Mophidian/js/fontawesome.min.js"></script>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <script>
     const toggleMenu = () => {
         console.log("Toggle menu");
@@ -58,8 +60,8 @@
     </div>
 
     <aside id="nav-aside"
-    class="w-[15rem] top-[4.5rem] left-0 absolute overflow-x-hidden overflow-y-auto z-10 transition-[width] ease-in-out delay-300 rounded-br-2xl bg-lime-900/[98] text-white shadow-md hide-aside">
-    <div class="p-6 w-[15rem]">
+    class="w-[15rem] top-[4.5rem] left-[1px] absolute overflow-x-hidden overflow-y-auto z-10 transition-all ease-in-out delay-300 rounded-br-2xl bg-lime-900/[98] text-white shadow-md hide-aside">
+    <div class="inner-nav p-2 m-2 border-2 border-dashed border-lime-50/40 rounded-br-2xl">
         <ul>
             
             
@@ -68,8 +70,7 @@
             
 <li>
     
-    <a class="text-white no-underline hover:underline hover:underline-offset-4"
-        href="/Mophidian/blog/sample_markdown">Sample markdown</a>
+    <a class="text-white no-underline hover:text-lime-50/60" href="/Mophidian/blog/sample_markdown">Sample markdown</a>
     
     <ul>
         
@@ -162,7 +163,7 @@ delimited block for Pandoc to syntax highlight it:</p>
 </ol>
 <p>Notice again how text always lines up on 4-space indents (including
 that last line which continues item 3 above).</p>
-<p>Here's a link to <a href="http://foo.bar">a website</a>, to a <a href="local-doc.html">local
+<p>Here's a link to <a href="https://www.example.com">a website</a>, to a <a href="/Mophidian/docs/">local
 doc</a>, and to a <a href="#an-h2-header">section heading in the current
 doc</a>. Here's a footnote <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.</p>
 <p>Tables can look like this:</p>
@@ -196,9 +197,6 @@ doc</a>. Here's a footnote <sup id="fnref:1"><a class="footnote-ref" href="#fn:1
 </tr>
 </tbody>
 </table>
-<p>Table: Shoes sizes, materials, and colors.</p>
-<p>(The above is the caption for the table.) Pandoc also supports
-multi-line tables:</p>
 <table>
 <thead>
 <tr>
@@ -232,9 +230,6 @@ multi-line tables:</p>
 term and  its definition to spread things out more.)</p>
 <p>and images can be specified like so:</p>
 <p><img alt="example image" src="/Mophidian/img/casual-life-3d-green-notebook-with-orange-bookmark.png" title="An exemplary image" /></p>
-<p>Inline math equation: $\omega = d\phi / dt$. Display
-math should get its own line like so:</p>
-<p>$$I = \int \rho R^{2} dV$$</p>
 <p>And note that you can backslash-escape any punctuation characters
 which you wish to be displayed literally, ex.: `foo`, *bar*, etc.</p>
 <div class="footnote">

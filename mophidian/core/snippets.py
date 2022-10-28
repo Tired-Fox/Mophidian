@@ -66,11 +66,11 @@ module.exports = {{
         "tailwind:watch": lambda dest: f"tailwindcss -i ./styles/tailwind.css -o ./{dest}/css/tailwind.min.css --minify --watch",
     },
     "sass_scripts": {
-        "css": "sass styles:static/css --no-source-map",
-        "css:watch": "sass --watch styles:static/css --no-source-map",
+        "css": "sass styles/sass/:static/css --no-source-map",
+        "css:watch": "sass --watch styles/sass/:static/css --no-source-map",
         "css:src:compress": lambda src: f"sass --style=compressed {src}:static/ --no-source-map",
-        "css:style:compress": "sass --style=compressed styles/:static/css --no-source-map",
-        "css:watch:compress": "sass --watch --style=compressed styles:static/css --no-source-map",
+        "css:style:compress": "sass --style=compressed style/sass/:static/ --no-source-map",
+        "css:watch:compress": lambda src: f"sass --watch --style=compressed {src}:static/ --no-source-map",
     },
     "integration_file_structure": '''
 project

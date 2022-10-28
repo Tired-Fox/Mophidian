@@ -1,11 +1,11 @@
 # Todo
 
 - [ ] Custom wsgi_app server with live reloading including watchdog
-- [ ] Stop jinja2 from bricking everything with a compilation error
 - [ ] Fontawesome integration
-- [ ] Tailwindcss Integration
+  - [ ] Javascript & Webfont variants
+- [ ] Math plugin/Integration
 - [ ] Add custom errors
-- [ ] Tool for install tailwindcss addon
+- [ ] Tool for Pygments themes
 - [ ] Tool for selecting presets
 - [ ] Support for bootstrap??
 - [ ] Support for read time??
@@ -16,3 +16,4 @@ Inspirational Sources:
 - [mkDocs](https://www.mkdocs.org/) ([github](https://github.com/mkdocs/mkdocs))
 - [Algolia](https://www.algolia.com/)
 - [Tailwindcss](https://tailwindcss.com/)
+- [Transparent Textures](https://www.transparenttextures.com/)
