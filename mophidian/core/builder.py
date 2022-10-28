@@ -1,7 +1,12 @@
+import contextlib
 import os
 import shutil
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
+from mophidian.core.integration import Tailwindcss
+
+from mophidian.core.ppm import PPM
+from mophidian.moph_log.log import Log
 
 from .config import Config
 from .utils import build_template_dict
@@ -123,6 +128,23 @@ class Builder:
             with open(dest.as_posix(), encoding="utf-8", mode="+w") as page_file:
                 page_file.write(page.content)  # type: ignore
 
+    def build_tailwind(self):
+        if self.cfg.integrations.tailwind:
+            pkg_mgr = PPM(self.cfg.integrations.package_manager, Logger)
+            if pkg_mgr.ppm.has_node:
+                TAILWIND = Tailwindcss(Logger, pkg_mgr)
+
+                with contextlib.redirect_stdout(None):
+                    with contextlib.redirect_stderr(None):
+                        try:
+                            TAILWIND.install(self.cfg)
+                            Path(self.cfg.site.dest_dir).joinpath("css/").mkdir(
+                                parents=True, exist_ok=True
+                            )
+                            pkg_mgr.ppm.run("tailwind:mini")
+                        except Exception as e:
+                            Logger.Error(str(e))
+
     def full(self):
         """Execute a full site build."""
         self.cfg.site.dest_dir = self.cfg.site.dest_dir + self.cfg.site.site_dir
@@ -152,5 +174,7 @@ class Builder:
 
         Logger.Info("Building pages")
         self.build_pages(nav, components, layouts)
+
+        self.build_tailwind()
 
         Logger.Success("Congrats! Your site has been built")

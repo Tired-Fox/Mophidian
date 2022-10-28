@@ -81,7 +81,6 @@ class Files:
         """Compile all the sass files into their corresponding css files."""
 
         sass_file = [file for file in self if file.is_type(FileExtension.SASS)]
-        print(sass_file)
         if len(sass_file) > 0:
             old_stdo = sys.stdout
             old_stde = sys.stderr

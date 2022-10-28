@@ -129,7 +129,6 @@ class Page:
 
     @property
     def url(self) -> str:
-        print(self.full_url)
         if self.full_url == None:
             return '' if self.file.url == '.' else self.file.url
         else:
@@ -139,7 +138,6 @@ class Page:
         if root != "":
             root = root.replace("\\", "/").lstrip("/").rstrip("/")
             self.full_url = PurePosixPath("/" + root + self.file.url).as_posix()
-            print(self.full_url)
         else:
             print("NO ROOT")
             self.full_url = None
