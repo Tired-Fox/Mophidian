@@ -18,8 +18,8 @@
     "css:watch:compress": "sass --watch --style=compressed styles/sass/:static/css --no-source-map",
     "css:src:compress": "sass --style=compressed pages/:static/ --no-source-map",
     "css:style:compress": "sass --style=compressed styles/sass/:static/css --no-source-map",
-    "tailwind": "tailwindcss -i ./styles/tailwind.css -o ./site/Mophidian/css/tailwind.min.css",
-    "tailwind:mini": "tailwindcss -i ./styles/tailwind.css -o ./site/Mophidian/css/tailwind.min.css --minify",
-    "tailwind:watch": "tailwindcss -i ./styles/tailwind.css -o ./site/Mophidian/css/tailwind.min.css --minify --watch"
+    "tailwind": "tailwindcss -i ./styles/tailwind.css -o ./site//css/tailwind.min.css",
+    "tailwind:mini": "tailwindcss -i ./styles/tailwind.css -o ./site//css/tailwind.min.css --minify",
+    "tailwind:watch": "tailwindcss -i ./styles/tailwind.css -o ./site//css/tailwind.min.css --minify --watch"
   }
 }
