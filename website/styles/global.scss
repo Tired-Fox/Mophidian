@@ -4,6 +4,8 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    scroll-behavior: smooth;
+    scroll-margin: 4.5rem;
 }
 
 html {font-size: 100%;} /*16px*/
@@ -46,6 +48,7 @@ small, .text_small {font-size: 0.8rem;}
 
 a {
     text-underline-offset: 2px;
+    color: black;
 }
 
 a:hover {
@@ -68,7 +71,32 @@ ul ul {
     
     padding: 2rem;
     margin-inline: auto;
+
+    ol, ul {
+        padding-left: 1.5rem;
+    }
+
+    ul {
+        list-style: disc;
+    }
+}
+
+pre {
+    padding: .75rem;
+}
+
+.highlight {
+    border-radius: .5rem;
+}
+
+sup a {
+    color: #21421e;
+}
+
+.footnote-backref svg {
+    color: #21421e;
 }
 
 @import "header";
+@import "nav";
 @import "footer";

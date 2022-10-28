@@ -10,37 +10,43 @@ footer {
     padding-inline: 2rem;
     padding-block: .75rem;
 
-
-    &>div {
-        flex: 1;
-        display: flex;
-        &:nth-child(1) {
-            justify-content: start;
-
+    #credits {
+        justify-content: end;
+        small {
+            font-size: .7rem;
+            opacity: .5;
+            color: gray;
             a {
-                font-size: 1.1rem;
-                color: black;
-
-                &:hover {
-                    color: gray;
-                }
-            }
-        }
-
-        &:nth-child(2) {
-            justify-content: center;
-        }
-
-        &:nth-child(3) {
-            justify-content: end;
-            small {
-                opacity: .5;
-                color: gray;
-                a {
-                    color: rgb(76, 76, 255);
-                }
+                color: rgb(76, 76, 255);
             }
         }
     }
 
+    #footlinks {
+        display: flex;
+        justify-content: start;
+
+        a {
+            font-size: 1.1rem;
+            color: black;
+
+            &:hover {
+                color: gray;
+            }
+        }
+    }
+
+    #info {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .flex-1 {
+        flex: 4;
+    }
+
+    .flex-2 {
+        flex: 5;
+    }
 }

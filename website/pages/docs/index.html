@@ -11,25 +11,16 @@
 
 {% block scripts %}
 {{ super() }}
-<script>
-    const toggleMenu = () => {
-        console.log("Toggle menu");
-        const aside = document.getElementById("doc-aside");
-        aside.classList.toggle("hide-aside");
-    }
-</script>
+{% include cmpt.nav.nav_logic %}
 {% endblock %}
 
 {% block header %}
-{% include cmpt.docs.header %}
+{% set nav_data = nav.get_dir("docs") %}
+{% include cmpt.header %}
 {% endblock %}
 
 {% block body %}
-<aside id="doc-aside" class="hide-aside">
-    <div>
-        {% include cmpt.docs.nav %}
-    </div>
-</aside>
+
 <div class="content">
     <h1>Documentation</h1>
     <p>This pythonic static site generator (SSG) is a work in progress. As such, the documentation is also a work in

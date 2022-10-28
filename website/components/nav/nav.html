@@ -1,0 +1,11 @@
+<aside id="nav-aside" class="hide-aside">
+    <div>
+        <ul>
+            {% for nav_item in nav_data.children %}
+            {% if nav_item.children %}
+            {% include cmpt.nav.sub_nav %}
+            {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</aside>
