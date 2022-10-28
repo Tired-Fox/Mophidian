@@ -1,4 +1,5 @@
 from __future__ import annotations
+import contextlib
 
 from functools import cached_property
 from json import load
@@ -115,7 +116,7 @@ class Integration:
                 "integrations will be skipped.",
             )
 
-    def setup(self):
+    def setup(self, config: Config):
         """Setup any additional requirements for this package."""
         pass
 
@@ -164,9 +165,11 @@ class Sass(Integration):
                 pj["scripts"] = {}
             for script in snippets["sass_scripts"]:
                 if not isinstance(snippets["sass_scripts"][script], Callable):
-                    pj["scripts"].update({ script: snippets["sass_scripts"][script]})
+                    pj["scripts"].update({script: snippets["sass_scripts"][script]})
                 else:
-                    pj["scripts"].update({ script: snippets["sass_scripts"][script](config.site.src_dir) })
+                    pj["scripts"].update(
+                        {script: snippets["sass_scripts"][script](config.site.src_dir)}
+                    )
 
         with open("./package.json", "w", encoding="utf-8") as package_json:
             package_json.write(dumps(pj, indent=2))
@@ -210,7 +213,7 @@ class Tailwindcss(Integration):
             ),
         ]
 
-    def add_tailwind_scripts(self):
+    def add_tailwind_scripts(self, config: Config):
         with open("./package.json", "r", encoding="utf-8") as package_json:
             from json import load, dumps
 
@@ -218,7 +221,13 @@ class Tailwindcss(Integration):
             if "scripts" not in pj:
                 pj["scripts"] = {}
 
-            pj["scripts"].update(snippets["tailwind_scripts"])
+            for script in snippets["tailwind_scripts"]:
+                if not isinstance(snippets["tailwind_scripts"][script], Callable):
+                    pj["scripts"].update({script: snippets["tailwind_scripts"][script]})
+                else:
+                    pj["scripts"].update(
+                        {script: snippets["tailwind_scripts"][script](config.site.dest_dir)}
+                    )
 
         with open("./package.json", "w", encoding="utf-8") as package_json:
             package_json.write(dumps(pj, indent=2))
@@ -255,31 +264,52 @@ class Tailwindcss(Integration):
 
                 moph_config.write(dumps(cfg, indent=2))
 
-    def setup(self):
+    def setup(self, config: Config):
         """Setup any additional requirements for this package."""
-        self.add_tailwind_scripts()
+        self.add_tailwind_scripts(config)
         self.add_tailwind_css()
         self.update_refresh_delay()
         self.add_tailwind_config_open()
 
     def require_addons(self):
         """Ask user if they would like certain addons. Then install them and set them up."""
+        self.logger.Important("[Y] yes, [A] all yes [N] no [D] all no")
+        all_yes = False
+        all_no = False
         for addon in self.addons:
-            install = input(
-                color(
-                    f"Would you like to install the @tailwindcss/{addon.url()} plugin? [y/N] ",
-                    prefix=[Style.BOLD],
-                    suffix=[Style.NOBOLD],
-                )
-            )
-            if install.lower() == "y":
-                install = True
-            else:
+            if not self.installed(f"@tailwindcss/{addon.name}"):
                 install = False
+                if not all_yes and not all_no:
+                    with contextlib.redirect_stdout(self.old_stdo):
+                        with contextlib.redirect_stderr(self.old_stde):
+                            try:
+                                install = input(
+                                    color(
+                                        f"Would you like to install the @tailwindcss/{addon.url()} plugin? [y:a:n:D] ",
+                                        prefix=[Style.BOLD],
+                                        suffix=[Style.NOBOLD],
+                                    )
+                                )
+                            except KeyboardInterrupt:
+                                install = "D"
+                                all_no = True
+                                print()
 
-            if install:
-                if not self.installed(f"@tailwindcss/{addon.name}"):
+                    if install.lower() == "y":
+                        install = True
+                    elif install.lower() == "n":
+                        install = False
+                    elif install.lower() == "a":
+                        install = True
+                        all_yes = True
+                    else:
+                        install = False
+                        all_no = True
+
+                if install or all_yes:
                     self.pkgm.ppm.install(f"@tailwindcss/{addon.name}", "-D")
                     self.add_tailwind_config_plugin(addon)
+            else:
+                self.add_tailwind_config_plugin(addon)
 
         self.add_tailwind_config_close()

@@ -61,9 +61,9 @@ module.exports = {
 @tailwind utilities;\
 """,
     "tailwind_scripts": {
-        "tailwind": "tailwindcss -i ./styles/tailwind.css -o ./static/tailwind.css",
-        "tailwind:mini": "tailwindcss -i ./styles/tailwind.css -o ./static/tailwind.min.css --minify",
-        "tailwind:watch": "tailwindcss -i ./styles/tailwind.css -o ./static/tailwind.css --watch",
+        "tailwind": lambda dest: f"tailwindcss -i ./styles/tailwind.css -o ./{dest}/css/tailwind.min.css",
+        "tailwind:mini": lambda dest: f"tailwindcss -i ./styles/tailwind.css -o ./{dest}/css/tailwind.min.css --minify",
+        "tailwind:watch": lambda dest: f"tailwindcss -i ./styles/tailwind.css -o ./{dest}/css/tailwind.min.css --minify --watch",
     },
     "sass_scripts": {
         "css": "sass styles:static/css --no-source-map",

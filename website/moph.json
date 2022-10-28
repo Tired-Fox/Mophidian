@@ -5,7 +5,7 @@
     "version": "1.0"
   },
   "build": {
-    "refresh_delay": 0.3
+    "refresh_delay": 3
   },
   "markdown": {
     "append": true,
@@ -14,7 +14,7 @@
   },
   "integrations": {
     "sass": true,
-    "tailwind": false,
+    "tailwind": true,
     "package_manager": "yarn"
   }
 }
