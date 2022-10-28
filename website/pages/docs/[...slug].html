@@ -6,7 +6,6 @@
 
 {% block links %}
 {{ super() }}
-<link rel="stylesheet" href="/Mophidian/docs/style.css">
 {% endblock %}
 
 {% block scripts %}
@@ -20,7 +19,8 @@
 {% endblock %}
 
 {% block body %}
-<article>
+<article class="prose">
     {{ content }}
 </article>
+<div class="flex-1"></div>
 {% endblock %}

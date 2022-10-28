@@ -8,6 +8,7 @@
 <title>Sample markdown</title>
 
 
+        <link rel="stylesheet" href="/Mophidian/css/tailwind.min.css">
         <link rel="stylesheet" href="/Mophidian/css/global.css">
         <link rel="stylesheet" href="/Mophidian/css/highlight.css">
 
@@ -27,32 +28,38 @@
 
     <body>
 
-<div id="header">
-    <div>
-        <div>
-            <button onclick="toggleMenu()">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor">
+<div id="header"
+    class="bg-white/95 shadow-sm border-b-2 border-solid border white sticky top-0 z-10 w-full py-4 px-8 h-[4.5rem]">
+    <div class="flex justify-between items-center max-w-[80rem] mx-auto">
+        <div class="flex-1 flex justify-start">
+            <button
+                class="bg-transparent border-none w-10 h-10 flex justify-center itemscenter cursor-pointer focus:outline-none focus:border-none focus:bg-transparent text-lime-900 hover:text-gray-500"
+                onclick="toggleMenu()">
+                <svg class="w-8 h-8 transition-transform ease-in-out delay-100" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
                 </svg>
             </button>
         </div>
-        <div>
-            <a href="/Mophidian/">
-                <h3>Mophidian</h3>
+        <div class="flex-1 flex justify-center">
+            <a class="w-fit tracking-wide no-underline" href="/Mophidian/">
+                <h3 class="text-lime-900 text-2xl font-bold">Mophidian</h3>
             </a>
         </div>
-        <div>
-            <nav>
-                <a href="/Mophidian/blog/">Blog</a>
-                <a href="/Mophidian/docs/">Docs</a>
+        <div class="flex-1 flex justify-end">
+            <nav class="flex items-center gap-8 w-fit">
+                <a class="w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
+                    href="/Mophidian/blog/">Blog</a>
+                <a class="w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
+                    href="/Mophidian/docs/">Docs</a>
             </nav>
         </div>
     </div>
 
-    <aside id="nav-aside" class="hide-aside">
-    <div>
+    <aside id="nav-aside"
+    class="w-[15rem] top-[4.5rem] left-0 absolute overflow-x-hidden overflow-y-auto z-10 transition-[width] ease-in-out delay-300 rounded-br-lg bg-lime-900/[98] text-white shadow-md hide-aside">
+    <div class="p-6 w-[15rem]">
         <ul>
             
             
@@ -61,7 +68,8 @@
             
 <li>
     
-    <a href="/Mophidian/blog/sample_markdown">Sample markdown</a>
+    <a class="text-white no-underline hover:underline hover:underline-offset-4"
+        href="/Mophidian/blog/sample_markdown">Sample markdown</a>
     
     <ul>
         
@@ -74,7 +82,7 @@
 </aside>
 </div>
 
-<article>
+<article class="prose">
     <h1>An h1 header</h1>
 <p>Paragraphs are separated by a blank line.</p>
 <p>2<sup>nd</sup> paragraph. <em>Italic</em>, <strong>bold</strong>, and <code>monospace</code>. Itemized lists
@@ -104,8 +112,8 @@ Unicode is supported. ☺</p>
 </ol>
 <p>Note again how the actual text starts at 4 columns in (4 characters
 from the left side). Here's a code sample:</p>
-<div class="highlight"><pre><span></span><code>#<span class="w"> </span><span class="nv">Let</span><span class="w"> </span><span class="nv">me</span><span class="w"> </span><span class="nv">re</span><span class="o">-</span><span class="nv">iterate</span><span class="w"> </span>...<span class="w"></span>
-<span class="k">for</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="nv">in</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span>..<span class="w"> </span><span class="mi">10</span><span class="w"> </span>{<span class="w"> </span><span class="k">do</span><span class="o">-</span><span class="nv">something</span><span class="ss">(</span><span class="nv">i</span><span class="ss">)</span><span class="w"> </span>}<span class="w"></span>
+<div class="highlight"><pre><span></span><code># <span class="nv">Let</span> <span class="nv">me</span> <span class="nv">re</span><span class="o">-</span><span class="nv">iterate</span> ...
+<span class="k">for</span> <span class="nv">i</span> <span class="nv">in</span> <span class="mi">1</span> .. <span class="mi">10</span> { <span class="k">do</span><span class="o">-</span><span class="nv">something</span><span class="ss">(</span><span class="nv">i</span><span class="ss">)</span> }
 </code></pre></div>
 
 <p>As you probably guessed, indented 4 spaces. By the way, instead of
@@ -140,13 +148,13 @@ delimited block for Pandoc to syntax highlight it:</p>
 <li>
 <p>Dump everything in the pot and follow
     this algorithm:</p>
-<div class="highlight"><pre><span></span><code><span class="nv">find</span><span class="w"> </span><span class="nv">wooden</span><span class="w"> </span><span class="nv">spoon</span><span class="w"></span>
-<span class="nv">uncover</span><span class="w"> </span><span class="nv">pot</span><span class="w"></span>
-<span class="nv">stir</span><span class="w"></span>
-<span class="nv">cover</span><span class="w"> </span><span class="nv">pot</span><span class="w"></span>
-<span class="nv">balance</span><span class="w"> </span><span class="nv">wooden</span><span class="w"> </span><span class="nv">spoon</span><span class="w"> </span><span class="nv">precariously</span><span class="w"> </span><span class="nv">on</span><span class="w"> </span><span class="nv">pot</span><span class="w"> </span><span class="nv">handle</span><span class="w"></span>
-<span class="k">wait</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="nv">minutes</span><span class="w"></span>
-<span class="k">goto</span><span class="w"> </span><span class="nl">first</span><span class="w"> </span><span class="nv">step</span><span class="w"> </span><span class="ss">(</span><span class="nv">or</span><span class="w"> </span><span class="nv">shut</span><span class="w"> </span><span class="nv">off</span><span class="w"> </span><span class="nv">burner</span><span class="w"> </span><span class="nv">when</span><span class="w"> </span><span class="nv">done</span><span class="ss">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nv">find</span> <span class="nv">wooden</span> <span class="nv">spoon</span>
+<span class="nv">uncover</span> <span class="nv">pot</span>
+<span class="nv">stir</span>
+<span class="nv">cover</span> <span class="nv">pot</span>
+<span class="nv">balance</span> <span class="nv">wooden</span> <span class="nv">spoon</span> <span class="nv">precariously</span> <span class="nv">on</span> <span class="nv">pot</span> <span class="nv">handle</span>
+<span class="k">wait</span> <span class="mi">10</span> <span class="nv">minutes</span>
+<span class="k">goto</span> <span class="nl">first</span> <span class="nv">step</span> <span class="ss">(</span><span class="nv">or</span> <span class="nv">shut</span> <span class="nv">off</span> <span class="nv">burner</span> <span class="nv">when</span> <span class="nv">done</span><span class="ss">)</span>
 </code></pre></div>
 
 <p>Do not bump wooden spoon or it will fall.</p>
@@ -238,19 +246,21 @@ which you wish to be displayed literally, ex.: `foo`, *bar*, etc.</p>
 </ol>
 </div>
 </article>
+<div class="flex-1"></div>
 
-        <div class="spacer"></div>
-<footer>
-    <div id="footlinks" class="flex-1">
-        <a href="https://github.com/Tired-Fox/Mophidian" target="_blank">
+        <footer class="flex justify-center w-full px-8 py-3">
+    <div id="footlinks" class="flex-[4] flex justify-start">
+        <a class="text-[1.1rem] text-black hover:text-gray-500" href="https://github.com/Tired-Fox/Mophidian"
+            target="_blank">
             <i class="fa-brands fa-github"></i>
         </a>
     </div>
-    <div id="info" class="flex-2">
+    <div id="info" class="flex-[5] flex justify-center flex-col">
         <small>&copy; 2022 Zachary Boehm. All Rights Reserved.</small>
 
         <div id="credits">
-            <small>Illustrations by Icons 8</a> from <a href="https://icons8.com/illustrations">Ouch!</a></small>
+            <small class="text-[.7rem] opacity-50 text-gray-500">Illustrations by Icons 8 from <a
+                    class="text-blue-400/80" href="https://icons8.com/illustrations" target="_blank">Ouch!</a></small>
         </div>
     </div>
 </footer>

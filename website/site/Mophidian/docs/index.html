@@ -8,9 +8,9 @@
 <title>Docs | Mophidian</title>
 
 
+        <link rel="stylesheet" href="/Mophidian/css/tailwind.min.css">
         <link rel="stylesheet" href="/Mophidian/css/global.css">
         <link rel="stylesheet" href="/Mophidian/css/highlight.css">
-<link rel="stylesheet" href="/Mophidian/docs/style.css">
 
 
         <script defer src="/Mophidian/js/brands.min.js"></script>
@@ -28,32 +28,38 @@
 
     <body>
 
-<div id="header">
-    <div>
-        <div>
-            <button onclick="toggleMenu()">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor">
+<div id="header"
+    class="bg-white/95 shadow-sm border-b-2 border-solid border white sticky top-0 z-10 w-full py-4 px-8 h-[4.5rem]">
+    <div class="flex justify-between items-center max-w-[80rem] mx-auto">
+        <div class="flex-1 flex justify-start">
+            <button
+                class="bg-transparent border-none w-10 h-10 flex justify-center itemscenter cursor-pointer focus:outline-none focus:border-none focus:bg-transparent text-lime-900 hover:text-gray-500"
+                onclick="toggleMenu()">
+                <svg class="w-8 h-8 transition-transform ease-in-out delay-100" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
                 </svg>
             </button>
         </div>
-        <div>
-            <a href="/Mophidian/">
-                <h3>Mophidian</h3>
+        <div class="flex-1 flex justify-center">
+            <a class="w-fit tracking-wide no-underline" href="/Mophidian/">
+                <h3 class="text-lime-900 text-2xl font-bold">Mophidian</h3>
             </a>
         </div>
-        <div>
-            <nav>
-                <a href="/Mophidian/blog/">Blog</a>
-                <a href="/Mophidian/docs/">Docs</a>
+        <div class="flex-1 flex justify-end">
+            <nav class="flex items-center gap-8 w-fit">
+                <a class="w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
+                    href="/Mophidian/blog/">Blog</a>
+                <a class="w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
+                    href="/Mophidian/docs/">Docs</a>
             </nav>
         </div>
     </div>
 
-    <aside id="nav-aside" class="hide-aside">
-    <div>
+    <aside id="nav-aside"
+    class="w-[15rem] top-[4.5rem] left-0 absolute overflow-x-hidden overflow-y-auto z-10 transition-[width] ease-in-out delay-300 rounded-br-lg bg-lime-900/[98] text-white shadow-md hide-aside">
+    <div class="p-6 w-[15rem]">
         <ul>
             
             
@@ -62,14 +68,16 @@
             
 <li>
     
-    <a href="/Mophidian/docs/quickstart">Quickstart</a>
+    <a class="text-white no-underline hover:underline hover:underline-offset-4"
+        href="/Mophidian/docs/quickstart">Quickstart</a>
     
     <ul>
         
         
 <li>
     
-    <a href="/Mophidian/docs/quickstart/installation">Installation</a>
+    <a class="text-white no-underline hover:underline hover:underline-offset-4"
+        href="/Mophidian/docs/quickstart/installation">Installation</a>
     
     <ul>
         
@@ -86,25 +94,31 @@
 
 
 <div class="content">
-    <h1>Documentation</h1>
+    <h1 class="text-4xl font-bold">Documentation</h1>
     <p>This pythonic static site generator (SSG) is a work in progress. As such, the documentation is also a work in
-        progress. If you have questions or have issues please open an issue on the <a
-            href="https://github.com/Tired-Fox/Mophidian/issues" target="_blank">github</a>.</p>
+        progress. If you have questions or have issues please open an issue on the
+        <a href="https://github.com/Tired-Fox/Mophidian/issues" target="_blank">
+            github
+        </a>
+        .
+    </p>
 
 </div>
+<div class="flex-1"></div>
 
-        <div class="spacer"></div>
-<footer>
-    <div id="footlinks" class="flex-1">
-        <a href="https://github.com/Tired-Fox/Mophidian" target="_blank">
+        <footer class="flex justify-center w-full px-8 py-3">
+    <div id="footlinks" class="flex-[4] flex justify-start">
+        <a class="text-[1.1rem] text-black hover:text-gray-500" href="https://github.com/Tired-Fox/Mophidian"
+            target="_blank">
             <i class="fa-brands fa-github"></i>
         </a>
     </div>
-    <div id="info" class="flex-2">
+    <div id="info" class="flex-[5] flex justify-center flex-col">
         <small>&copy; 2022 Zachary Boehm. All Rights Reserved.</small>
 
         <div id="credits">
-            <small>Illustrations by Icons 8</a> from <a href="https://icons8.com/illustrations">Ouch!</a></small>
+            <small class="text-[.7rem] opacity-50 text-gray-500">Illustrations by Icons 8 from <a
+                    class="text-blue-400/80" href="https://icons8.com/illustrations" target="_blank">Ouch!</a></small>
         </div>
     </div>
 </footer>

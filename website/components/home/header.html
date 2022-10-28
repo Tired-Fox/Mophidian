@@ -1,43 +1,11 @@
-<div id="home-header">
-    <nav>
-        <a href="/{{ site.site_dir }}/blog/">Blog</a>
-        <a href="/{{ site.site_dir }}/">
-            <h1>Mophidian</h1>
+<div id="home-header" class="w-full py-4 flex justify-center items-start">
+    <nav class="flex items-end gap-20 w-fit">
+        <a class="w-fit tracking-wide text-lime-900 text-lg hover:underline underline-offset-2"
+            href="/{{ site.site_dir }}/blog/">Blog</a>
+        <a class="w-fit no-underline" href="/{{ site.site_dir }}/">
+            <h1 class="tracking-wide text-lime-900 text-5xl font-bold">Mophidian</h1>
         </a>
-        <a href="/{{ site.site_dir }}/docs/">Docs</a>
+        <a class="w-fit tracking-wide text-lime-900 text-lg hover:underline underline-offset-2"
+            href="/{{ site.site_dir }}/docs/">Docs</a>
     </nav>
 </div>
-<style>
-    #home-header {
-        width: 100%;
-        padding-block: 0;
-
-        padding-block: 1rem;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-    }
-
-    #home-header nav {
-        display: flex;
-        align-items: flex-end;
-        gap: 5rem;
-
-        width: fit-content;
-    }
-
-    #home-header nav a,
-    #home-header nav h1 {
-        width: fit-content;
-        margin: 0;
-        padding: 0;
-
-        color: #21421e;
-
-        letter-spacing: 1px;
-    }
-
-    #home-header nav a:nth-child(2) {
-        text-decoration: none;
-    }
-</style>
