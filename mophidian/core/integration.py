@@ -17,6 +17,10 @@ all = ["Tailwind", "Sass"]
 
 
 class Integration:
+    """Base class for integrations. Allows for installation,
+    checking for installed packages, and setting up integrations.
+    """
+
     def __init__(self, logger: Log, pkgm: PPM, ostdo: TextIO, ostde: TextIO):
         self.logger = logger
         self.pkgm = pkgm
@@ -33,6 +37,7 @@ class Integration:
         ostdo: TextIO = sys.stdout,
         ostde: TextIO = sys.stderr,
     ) -> Tailwindcss | Sass | None:
+        """"""
         package = package.lower()
         if package == "tailwindcss":
             return Tailwindcss(logger, pkgm)
@@ -43,16 +48,22 @@ class Integration:
 
     @cached_property
     def has_addons(self) -> bool:
+        """Check if a integration has addons."""
+
         return hasattr(self, "addons") and len(getattr(self, "addons")) > 0
 
     @cached_property
     def addon_names(self) -> list[str]:
+        """Get the addon names for the integration."""
+
         if hasattr(self, "addons"):
             return [addon.name for addon in getattr(self, "addons")]
         else:
             return []
 
     def addon(self, addon: str) -> str:
+        """Get a package name for a given addon."""
+
         if addon in self.addon_names:
             return f"@{self.__class__.__name__.lower()}/{addon}"
         else:
@@ -64,6 +75,16 @@ class Integration:
         return self.__class__.__name__.lower()
 
     def installed(self, package: str) -> bool:
+        """Check if a certain package is installed.
+        Will also automatically init a package.json if needed.
+
+        Args:
+            package (str): The package to check for installation.
+
+        Returns:
+            bool: True if installed, else False
+        """
+
         path_pkg_json = Path("package.json")
         modules = Path("node_modules")
         if path_pkg_json.exists():
@@ -90,6 +111,8 @@ class Integration:
             return False
 
     def install(self, config: Config):
+        """Install the integration and plugins/addons if applicable."""
+
         if self.pkgm.ppm.has_node:
             if self.link != "":
                 self.logger.Custom(
@@ -118,14 +141,14 @@ class Integration:
 
     def setup(self, config: Config):
         """Setup any additional requirements for this package."""
-        pass
 
     def require_addons(self):
         """Ask user if they would like certain addons. Then install them and set them up."""
-        pass
 
 
 class Addon:
+    """Defines a addon and it's associated information."""
+
     def __init__(self, name: str, desc: str, link: str):
         self.name = name
         self.desc = desc
@@ -143,6 +166,8 @@ class Addon:
 
 
 class Sass(Integration):
+    """Sass integration. Installs sass and adds compilation scripts to package.json."""
+
     def __init__(
         self,
         logger: Log,
@@ -155,8 +180,11 @@ class Sass(Integration):
 
     def setup(self, config: Config):
         """Setup any additional requirements for this package."""
+
         self.logger.Debug("Adding sass scripts to package.json")
         self.logger.Debug(f"Added\n{snippets['sass_scripts']}")
+
+        Path("styles/sass/").mkdir(parents=True, exist_ok=True)
         with open("./package.json", "r", encoding="utf-8") as package_json:
             from json import load, dumps
 
@@ -176,6 +204,14 @@ class Sass(Integration):
 
 
 class Tailwindcss(Integration):
+    """Tailwindcss integration. Installs tailwindcss and adds
+    compilation scripts to `package.json`.
+
+    Will also add the `tailwind.config.js` file and auto
+    install plugins after asking if the user wants them. These
+    plugins are automatically added to the `tailwind.config.js` file.
+    """
+
     def __init__(
         self,
         logger: Log,
@@ -214,6 +250,8 @@ class Tailwindcss(Integration):
         ]
 
     def add_tailwind_scripts(self, config: Config):
+        """Adds compilations scripts to `package.json`."""
+
         with open("./package.json", "r", encoding="utf-8") as package_json:
             from json import load, dumps
 
@@ -233,11 +271,16 @@ class Tailwindcss(Integration):
             package_json.write(dumps(pj, indent=2))
 
     def add_tailwind_css(self):
+        """Add base tailwind.css file to project."""
+
         Path("styles").mkdir(parents=True, exist_ok=True)
-        with open("styles/tailwind.css", "+w", encoding="utf-8") as tailwindcss:
-            tailwindcss.write(snippets["tailwind_css"])
+        if not Path("styles/tailwind.css").exists():
+            with open("styles/tailwind.css", "+w", encoding="utf-8") as tailwindcss:
+                tailwindcss.write(snippets["tailwind_css"])
 
     def add_tailwind_config_open(self, config: Config):
+        """Write out the first part of the `tailwind.config.js` file up to plugins section."""
+
         with open("tailwind.config.js", "+w", encoding="utf-8") as tcss_cfg:
             tcss_cfg.write(
                 snippets["tailwind_config_open"](
@@ -246,14 +289,20 @@ class Tailwindcss(Integration):
             )
 
     def add_tailwind_config_close(self):
+        """Add the closing part of the `tailwind.config.js` file."""
+
         with open("tailwind.config.js", "a", encoding="utf-8") as tcss_cfg:
             tcss_cfg.write(snippets["tailwind_config_close"])
 
     def add_tailwind_config_plugin(self, addon: Addon):
+        """Add a tailwind plugins to the `tailwind.config.js` file."""
+
         with open("tailwind.config.js", "a", encoding="utf-8") as tcss_cfg:
             tcss_cfg.write(f'    require("@tailwindcss/{addon.name}"),\n')
 
     def update_refresh_delay(self):
+        """Update the livereload server's refresh delay to account for tailwind build time."""
+
         if Path("moph.json").exists():
             with open("moph.json", "r", encoding="utf-8") as moph_config:
                 cfg = load(moph_config)
@@ -270,6 +319,7 @@ class Tailwindcss(Integration):
 
     def setup(self, config: Config):
         """Setup any additional requirements for this package."""
+
         self.add_tailwind_scripts(config)
         self.add_tailwind_css()
         self.update_refresh_delay()
@@ -277,6 +327,7 @@ class Tailwindcss(Integration):
 
     def require_addons(self):
         """Ask user if they would like certain addons. Then install them and set them up."""
+
         self.logger.Important("[Y] yes, [A] all yes [N] no [D] all no")
         all_yes = False
         all_no = False

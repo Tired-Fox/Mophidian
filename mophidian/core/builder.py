@@ -1,12 +1,12 @@
+"""Builder is a class than combines all core functionality to build a website."""
+
 import contextlib
-import os
 import shutil
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from mophidian.core.integration import Tailwindcss
 
 from mophidian.core.ppm import PPM
-from mophidian.moph_log.log import Log
 
 from .config import Config
 from .utils import build_template_dict
@@ -18,6 +18,8 @@ from moph_log import Logger
 
 
 class Builder:
+    """Builds files into pages. Compiles Sass and Tailwindcss. Static files are also copied to the destination."""
+
     def __init__(self):
         self.cfg = Config()
 
@@ -59,7 +61,11 @@ class Builder:
                 # shutil.copytree("static/", self.cfg.site.dest)
 
     def get_template_tree(self, template_dir: str) -> dict:
-        """Retrieve all jinja2.Template's from the given directory. These temlates will be exposed to the user and because of that they have a special format for accessing them. The path to the file is split and nested in a dict to allow the user to use dot notation to access any part of the template tree.
+        """Retrieve all jinja2.Template's from the given directory.
+        These temlates will be exposed to the user and because of that
+        they have a special format for accessing them. The path to the file is split
+        and nested in a dict to allow the user to use dot notation to access any part
+        of the template tree.
 
         **Example:**
 
@@ -107,8 +113,9 @@ class Builder:
         ) as base_layout:
             layouts["moph_base"] = temp.from_string(base_layout.read())
 
-    def build_pages(self, nav: Nav, components: dict, layouts: dict):
-        """Iterate through all the pages that are in the navigation object and build, render, and write out the pages.
+    def build_pages(self, nav: Nav, components: dict, layouts: dict, dirty: bool = False):
+        """Iterate through all the pages that are in the
+        navigation object and build, render, and write out the pages.
 
         Args:
             nav (Nav): Navigation object containing all the pages.
@@ -117,18 +124,26 @@ class Builder:
         """
 
         for page in nav.pages:
-            page.build_content(self.cfg, layouts)
+            if dirty and not page.file.is_modified():
+                continue
+            else:
+                page.build_content(self.cfg, layouts)
 
         for page in nav.pages:
-            page.render(self.cfg, components, layouts, nav)
+            if dirty and not page.file.is_modified():
+                continue
+            else:
+                page.render(self.cfg, components, layouts, nav)
 
-            dest = Path(page.file.abs_dest_path)
-            dest.parent.mkdir(parents=True, exist_ok=True)
+                dest = Path(page.file.abs_dest_path)
+                dest.parent.mkdir(parents=True, exist_ok=True)
 
-            with open(dest.as_posix(), encoding="utf-8", mode="+w") as page_file:
-                page_file.write(page.content)  # type: ignore
+                with open(dest.as_posix(), encoding="utf-8", mode="+w") as page_file:
+                    page_file.write(page.content)  # type: ignore
 
     def build_tailwind(self):
+        """Build tailwind styles based on the compiled pages."""
+
         if self.cfg.integrations.tailwind:
             pkg_mgr = PPM(self.cfg.integrations.package_manager, Logger)
             if pkg_mgr.ppm.has_node:
@@ -136,18 +151,14 @@ class Builder:
 
                 with contextlib.redirect_stdout(None):
                     with contextlib.redirect_stderr(None):
-                        try:
-                            TAILWIND.install(self.cfg)
-                            Path(self.cfg.site.dest).joinpath("css/").mkdir(
-                                parents=True, exist_ok=True
-                            )
-                            pkg_mgr.ppm.run("tailwind:mini")
-                        except Exception as e:
-                            Logger.Error(str(e))
+                        TAILWIND.install(self.cfg)
+                        Path(self.cfg.site.dest).joinpath("css/").mkdir(parents=True, exist_ok=True)
+                        pkg_mgr.ppm.run("tailwind:mini")
 
-    def full(self):
+    def full(self, dirty: bool = False):
         """Execute a full site build."""
-        self.delete_old()
+        if not dirty:
+            self.delete_old()
 
         if self.cfg.build.use_root:
             self.cfg.site.dest = self.cfg.site.dest + self.cfg.site.root
@@ -160,7 +171,7 @@ class Builder:
 
         # Build and apply integrations
         Logger.Info(f"Building all sass files in {self.cfg.site.source}")
-        files.build_all_sass(self.cfg)
+        files.build_all_sass(self.cfg, dirty)
 
         # Copy static files to destination
         Logger.Info("Copying static files")
@@ -174,7 +185,7 @@ class Builder:
         self.apply_default_layouts(layouts)
 
         Logger.Info("Building pages")
-        self.build_pages(nav, components, layouts)
+        self.build_pages(nav, components, layouts, dirty=dirty)
 
         self.build_tailwind()
 

@@ -1,3 +1,9 @@
+"""Files module provides data structures for reading and handling local files.
+
+Stores files from path and can perform tasks on them like retrieve certain file types 
+and writing the files to a different location.
+"""
+
 from __future__ import annotations
 import contextlib
 
@@ -8,11 +14,11 @@ import posixpath
 from shutil import SameFileError
 import sys
 from typing import TYPE_CHECKING, Iterator, Optional, Tuple
-from moph_log import Logger, Log, LL
 from urllib.parse import quote
+from moph_log import Logger, Log, LL
 from . import utils
 from .ppm import PPM
-from .integration import Tailwindcss, Sass
+from .integration import Sass
 
 
 if TYPE_CHECKING:
@@ -21,6 +27,8 @@ if TYPE_CHECKING:
 
 
 class FileExtension:
+    """Predefined file extensions for important file types in Mophidian."""
+
     Markdown: str = ".md"
     """`.md` | Markdown extension."""
     Template: list[str] = [".html", ".htm"]
@@ -62,13 +70,13 @@ class Files:
     def append(self, file: File):
         """Add file to the collection of files."""
         # Reset the uris so that it can be recalculated
-        self._src_uris
+        self._src_uris = None
         self._files.append(file)
 
     def remove(self, file: File):
         """Remove file from collection of files."""
         # Reset the uris so that it can be recalculated
-        self._src_uris
+        self._src_uris = None
         self._files.remove(file)
 
     def copy_all_static(self, dirty: bool = False):
@@ -77,10 +85,16 @@ class Files:
             if file.is_static:
                 file.copy_file(dirty)
 
-    def build_all_sass(self, config: Config):
+    def build_all_sass(self, config: Config, dirty: bool = False):
         """Compile all the sass files into their corresponding css files."""
 
-        sass_file = [file for file in self if file.is_type(FileExtension.SASS)]
+        sass_file = list(
+            filter(
+                lambda file: file.is_modified() if dirty else True,
+                [file for file in self if file.is_type(FileExtension.SASS)],
+            )
+        )
+        
         if len(sass_file) > 0:
             old_stdo = sys.stdout
             old_stde = sys.stderr
@@ -94,17 +108,14 @@ class Files:
 
                     with contextlib.redirect_stdout(None):
                         with contextlib.redirect_stderr(None):
-                            try:
-                                SASS.install(config)
-                                Path(config.site.dest).joinpath("css/").mkdir(
-                                    parents=True, exist_ok=True
-                                )
-                                pkg_mgr.ppm.run("css:style:compress")
-                                pkg_mgr.ppm.run("css:src:compress")
-                            except Exception as e:
-                                logger.Error(str(e))
+                            SASS.install(config)
+                            Path(config.site.dest).joinpath("css/").mkdir(
+                                parents=True, exist_ok=True
+                            )
+                            pkg_mgr.ppm.run("css:style:compress")
+                            pkg_mgr.ppm.run("css:src:compress")
 
-    def template_pages(self, type: FileExtension) -> list[File]:
+    def template_pages(self) -> list[File]:
         """Return list of all template pages."""
         return [file for file in self if file.is_type(FileExtension.Template)]
 
@@ -124,19 +135,21 @@ class Files:
         """Return list of all javascript pages."""
         return [file for file in self if file.is_type(FileExtension.Javascript)]
 
-    def dir_pages(self, dir: str) -> list[File]:
+    def dir_pages(self, path: str) -> list[File]:
         """Return all files that have the specified parent directory."""
-        return [file for file in self if file.parent == dir]
+        return [file for file in self if file.parent == path]
 
-    def rdir_pages(self, dir: str) -> list[File]:
+    def rdir_pages(self, path: str) -> list[File]:
         """Return all files that contain part of the specified directory."""
-        return [file for file in self if dir in file.parent]
+        return [file for file in self if path in file.parent]
 
     def __getitem__(self, idx: int) -> File:
         return self._files[idx]
 
     def pretty(self) -> Iterator[str]:
-        yield f"Files:"
+        """Iterator to format the string form of each file."""
+
+        yield "Files:"
         for file in self._files:
             yield f"  {repr(file)}"
 
@@ -263,12 +276,12 @@ class File:
     def _build_url(self, directory_url: bool) -> str:
         """Build the url based on the destination path."""
         url = self.dest_uri
-        dir, file = posixpath.split(url)
+        path, file = posixpath.split(url)
         if directory_url and file == 'index.html':
-            if dir == '':
+            if path == '':
                 url = '.'
             else:
-                url = "/" + dir + '/'
+                url = "/" + path + '/'
 
         return quote(url)
 
@@ -338,7 +351,7 @@ class File:
         yield f"  abs_dest_path: {self.abs_dest_path}"
         yield f"  dynamic: {self.is_dyn}"
         yield f"  recursive_dynamic: {self.is_rdyn}"
-        yield f")"
+        yield ")"
 
     def copy_file(self, dirty: bool = False):
         """Copy file to destination, ensuring parent exists. Mainly for static files."""
@@ -375,7 +388,7 @@ def get_files(config: Config) -> Tuple[Files, Files]:
     pages = []
     src_path = Path(config.site.source)
     if src_path.exists():
-        for path in src_path.glob(f"./**/*.*"):
+        for path in src_path.glob("./**/*.*"):
             pages.append(
                 File(
                     path.as_posix(),
@@ -388,7 +401,7 @@ def get_files(config: Config) -> Tuple[Files, Files]:
     content = []
     content_path = Path(config.site.content)
     if content_path.exists():
-        for path in content_path.glob(f"./**/*.*"):
+        for path in content_path.glob("./**/*.*"):
             if path.suffix == ".md":
                 content.append(
                     File(

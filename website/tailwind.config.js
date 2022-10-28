@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["site/**/*.html"],
+  content: ["site/Mophidian/**/*.html"],
   theme: {
     extend: {},
   },

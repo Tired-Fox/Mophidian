@@ -12,14 +12,14 @@
     "tailwindcss": "^3.2.1"
   },
   "scripts": {
-    "css": "sass styles:static/css --no-source-map",
-    "css:watch": "sass --watch styles:static/css --no-source-map",
-    "css:compress": "css --style=compressed",
-    "css:watch:compress": "sass --watch --style=compressed styles:static/css --no-source-map",
+    "css": "sass styles/sass/:static/css --no-source-map",
+    "css:watch": "sass --watch styles/sass/:static/css --no-source-map",
+    "css:compress": "sass styles/sass/:static/css --no-source-map --style=compressed",
+    "css:watch:compress": "sass --watch --style=compressed styles/sass/:static/css --no-source-map",
     "css:src:compress": "sass --style=compressed pages/:static/ --no-source-map",
-    "css:style:compress": "sass --style=compressed styles/:static/css --no-source-map",
-    "tailwind": "tailwindcss -i ./styles/tailwind.css -o ./site//css/tailwind.min.css",
-    "tailwind:mini": "tailwindcss -i ./styles/tailwind.css -o ./site//css/tailwind.min.css --minify",
-    "tailwind:watch": "tailwindcss -i ./styles/tailwind.css -o ./site//css/tailwind.min.css --minify --watch"
+    "css:style:compress": "sass --style=compressed styles/sass/:static/css --no-source-map",
+    "tailwind": "tailwindcss -i ./styles/tailwind.css -o ./site/Mophidian/css/tailwind.min.css",
+    "tailwind:mini": "tailwindcss -i ./styles/tailwind.css -o ./site/Mophidian/css/tailwind.min.css --minify",
+    "tailwind:watch": "tailwindcss -i ./styles/tailwind.css -o ./site/Mophidian/css/tailwind.min.css --minify --watch"
   }
 }
