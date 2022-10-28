@@ -1,11 +1,12 @@
 {
   "site": {
     "name": "Mophidian",
-    "site_dir": "Mophidian",
+    "root": "Mophidian",
     "version": "1.0"
   },
   "build": {
-    "refresh_delay": 3
+    "refresh_delay": 3,
+    "use_root": false
   },
   "markdown": {
     "append": true,

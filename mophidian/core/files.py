@@ -96,7 +96,7 @@ class Files:
                         with contextlib.redirect_stderr(None):
                             try:
                                 SASS.install(config)
-                                Path(config.site.dest_dir).joinpath("css/").mkdir(
+                                Path(config.site.dest).joinpath("css/").mkdir(
                                     parents=True, exist_ok=True
                                 )
                                 pkg_mgr.ppm.run("css:style:compress")
@@ -149,9 +149,9 @@ class File:
 
     Stores important file data and points to the appropriate destination based on that data.
 
-    The `path` argument is relative to the `src_dir`
+    The `path` argument is relative to the `source`
 
-    The `src_dir` and `dest_dir` are the paths from the current working directory (cwd) or absolute paths.
+    The `source` and `dest` are the paths from the current working directory (cwd) or absolute paths.
 
     `directory_url` is a flag on what format the destination paths should follow. True means that each markdown and html file except for index.{md, html} and README.md files get their own directory with their content being represented by a index.html file. Example: `foo.md` = `foo/index.html`. False means the each file is translated to a html file while keeping the same name. Example: `foo.md` = `foo.html`.
 
@@ -232,16 +232,16 @@ class File:
         """Flag for if the file is a recursive dynamic route/file."""
         return self.name == '[...slug]' and self.is_type(FileExtension.Template)
 
-    def __init__(self, path: str, src_dir: str, dest_dir: str, directory_url: bool):
-        if not src_dir.endswith("/"):
-            src_dir += "/"
-        if not dest_dir.endswith("/"):
-            dest_dir += "/"
+    def __init__(self, path: str, source: str, dest: str, directory_url: bool):
+        if not source.endswith("/"):
+            source += "/"
+        if not dest.endswith("/"):
+            dest += "/"
 
-        self.src_path = PurePath(path).as_posix().replace(src_dir, "")
+        self.src_path = PurePath(path).as_posix().replace(source, "")
         self.parent = PurePath(self.src_path).parent.as_posix()
 
-        self.abs_src_path = os.path.normpath(os.path.join(src_dir, self.src_path))
+        self.abs_src_path = os.path.normpath(os.path.join(source, self.src_path))
         self.abs_parent = os.path.normpath(PurePath(self.abs_src_path).parent.as_posix())
 
         self.name = self._build_stem()
@@ -249,7 +249,7 @@ class File:
 
         self.dest_path = self._build_dest_path(directory_url)
         self.is_index = PurePath(self.dest_path).name == "index.html"
-        self.abs_dest_path = os.path.normpath(os.path.join(dest_dir, self.dest_path))
+        self.abs_dest_path = os.path.normpath(os.path.join(dest, self.dest_path))
 
         self.url = self._build_url(directory_url)
         self.page = None
@@ -367,34 +367,34 @@ class File:
 
 
 def get_files(config: Config) -> Tuple[Files, Files]:
-    """Glob the `src_dir` and return a Files collection. Also, glob the `content_dir` and return a File collection.
+    """Glob the `source` and return a Files collection. Also, glob the `content` and return a File collection.
 
     Returns:
         Tuple[Files, Files]: File collection for both pages an content.
     """
     pages = []
-    src_path = Path(config.site.src_dir)
+    src_path = Path(config.site.source)
     if src_path.exists():
         for path in src_path.glob(f"./**/*.*"):
             pages.append(
                 File(
                     path.as_posix(),
-                    config.site.src_dir,
-                    config.site.dest_dir,
+                    config.site.source,
+                    config.site.dest,
                     config.nav.directory_url,
                 )
             )
 
     content = []
-    content_path = Path(config.site.content_dir)
+    content_path = Path(config.site.content)
     if content_path.exists():
         for path in content_path.glob(f"./**/*.*"):
             if path.suffix == ".md":
                 content.append(
                     File(
                         path.as_posix(),
-                        config.site.content_dir,
-                        config.site.dest_dir,
+                        config.site.content,
+                        config.site.dest,
                         directory_url=True,
                     )
                 )

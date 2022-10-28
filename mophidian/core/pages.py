@@ -109,7 +109,7 @@ class Page:
         self.meta = {}
         self.full_url = None
 
-        self._build_urls(config.site.site_dir)
+        self._build_urls(config.site.root)
         self.is_page = True
 
     def __eq__(self, other: Page) -> bool:

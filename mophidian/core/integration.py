@@ -168,7 +168,7 @@ class Sass(Integration):
                     pj["scripts"].update({script: snippets["sass_scripts"][script]})
                 else:
                     pj["scripts"].update(
-                        {script: snippets["sass_scripts"][script](config.site.src_dir)}
+                        {script: snippets["sass_scripts"][script](config.site.source)}
                     )
 
         with open("./package.json", "w", encoding="utf-8") as package_json:
@@ -226,7 +226,7 @@ class Tailwindcss(Integration):
                     pj["scripts"].update({script: snippets["tailwind_scripts"][script]})
                 else:
                     pj["scripts"].update(
-                        {script: snippets["tailwind_scripts"][script](config.site.dest_dir)}
+                        {script: snippets["tailwind_scripts"][script](config.site.dest)}
                     )
 
         with open("./package.json", "w", encoding="utf-8") as package_json:
@@ -237,9 +237,13 @@ class Tailwindcss(Integration):
         with open("styles/tailwind.css", "+w", encoding="utf-8") as tailwindcss:
             tailwindcss.write(snippets["tailwind_css"])
 
-    def add_tailwind_config_open(self):
+    def add_tailwind_config_open(self, config: Config):
         with open("tailwind.config.js", "+w", encoding="utf-8") as tcss_cfg:
-            tcss_cfg.write(snippets["tailwind_config_open"])
+            tcss_cfg.write(
+                snippets["tailwind_config_open"](
+                    config.site.dest.replace("\\", "/").lstrip("/").rstrip("/")
+                )
+            )
 
     def add_tailwind_config_close(self):
         with open("tailwind.config.js", "a", encoding="utf-8") as tcss_cfg:
@@ -269,7 +273,7 @@ class Tailwindcss(Integration):
         self.add_tailwind_scripts(config)
         self.add_tailwind_css()
         self.update_refresh_delay()
-        self.add_tailwind_config_open()
+        self.add_tailwind_config_open(config)
 
     def require_addons(self):
         """Ask user if they would like certain addons. Then install them and set them up."""

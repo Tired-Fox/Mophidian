@@ -42,13 +42,13 @@ snippets = {
 </body>
 </html>\
 ''',
-    "tailwind_config_open": '''\
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ["site/**/*.html"],
-  theme: {
-    extend: {},
-  },
+    "tailwind_config_open": lambda dest: f'''\
+/** @type {{import('tailwindcss').Config}} */
+module.exports = {{
+  content: ["{dest}/**/*.html"],
+  theme: {{
+    extend: {{}},
+  }},
   plugins: [\n\
 ''',
     "tailwind_config_close": '''\

@@ -40,19 +40,10 @@ class Config:
         self.print_errors()
 
     def print_errors(self):
-        from moph_log import FColor, Style, color, RESET
+        from moph_log import Logger
 
         if len(self.errors) > 0:
-            print(
-                color(
-                    "[",
-                    color("IMPORTANT", prefix=[FColor.MAGENTA]),
-                    "]",
-                    prefix=[Style.BOLD],
-                    suffix=[RESET],
-                ),
-                "These errors were found while loading the config:",
-            )
+            Logger.Error("Errors were found in the config:")
 
             for error in self.errors:
                 print(error)
@@ -65,4 +56,4 @@ class Config:
         output.append(str(self.build))
         output.append(str(self.integrations))
         output.append(str(self.nav))
-        return ",\n".join(output)
+        return "\n" + ",\n".join(output)
