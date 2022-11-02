@@ -1,5 +1,6 @@
 # Todo
 
+- [ ] Relative links work with `/` paths
 - [ ] Custom wsgi_app server with live reloading including watchdog
 - [ ] Fontawesome integration
   - [ ] Javascript & Webfont variants
