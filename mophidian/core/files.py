@@ -79,6 +79,23 @@ class Files:
         self._src_uris = None
         self._files.remove(file)
 
+    def contains_dest(self, dest_uri: str) -> Optional[File]:
+        """Tells whether there is a file with the given destination uri."""
+        for file in self._files:
+            if file.abs_dest_path == dest_uri:
+                return file
+        return None
+
+    def contains_src(self, src_uri: str) -> Optional[File]:
+        """Tells whether there is a file with the given source uri."""
+        for file in self._files:
+            if file.src_uri == src_uri:
+                return file
+        return None
+
+    def relative_to(self) -> str:
+        """Returns the relative path to the file given the website root."""
+
     def copy_all_static(self, dirty: bool = False):
         """Copy all static files to destination."""
         for file in self:
@@ -94,17 +111,17 @@ class Files:
                 [file for file in self if file.is_type(FileExtension.SASS)],
             )
         )
-        
+
+        pkg_mgr = PPM(config.integrations.package_manager, Logger)
+        pkg_mgr.ppm.run("css:style:compress")
+
         if len(sass_file) > 0:
             old_stdo = sys.stdout
             old_stde = sys.stderr
 
-            logger = Log(output=old_stdo, level=LL.INFO)
-
             if config.integrations.sass:
-                pkg_mgr = PPM(config.integrations.package_manager, logger)
                 if pkg_mgr.ppm.has_node:
-                    SASS = Sass(logger, pkg_mgr, old_stdo, old_stde)
+                    SASS = Sass(Logger, pkg_mgr, old_stdo, old_stde)
 
                     with contextlib.redirect_stdout(None):
                         with contextlib.redirect_stderr(None):
@@ -112,7 +129,6 @@ class Files:
                             Path(config.site.dest).joinpath("css/").mkdir(
                                 parents=True, exist_ok=True
                             )
-                            pkg_mgr.ppm.run("css:style:compress")
                             pkg_mgr.ppm.run("css:src:compress")
 
     def template_pages(self) -> list[File]:

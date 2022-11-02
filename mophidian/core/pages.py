@@ -1,12 +1,8 @@
 from __future__ import annotations
-import os
-from pathlib import Path, PurePath, PurePosixPath
-import posixpath
+from pathlib import Path, PurePosixPath
 
 
 from typing import TYPE_CHECKING, Any, MutableMapping, Optional
-from urllib.parse import urljoin
-
 from .config.config import Config
 from .files import File, FileExtension
 from moph_log import Logger
@@ -17,6 +13,7 @@ if TYPE_CHECKING:
     from .navigation import Group
     from jinja2 import Template
     from .navigation import Nav
+    from .files import Files
 
 
 class Page:
@@ -134,6 +131,11 @@ class Page:
         else:
             return self.full_url
 
+    @property
+    def url_last_dir(self) -> str:
+        """Get the last segment of the url."""
+        return self.url.rstrip("/").rsplit("/")[-1]
+
     def _build_urls(self, root: str):
         if root != "":
             root = root.replace("\\", "/").lstrip("/").rstrip("/")
@@ -181,6 +183,8 @@ class Page:
         components: dict[str, dict | Template],
         layouts: dict[str, dict | Template],
         nav: Nav,
+        files: Files,
+        contents: Files,
     ):
         """Compiles the page into html.
 
@@ -192,7 +196,7 @@ class Page:
         """
         if self.file.is_type(FileExtension.Markdown):
             self.content, self.toc = MophidianMarkdown.render(
-                self, nav, config, components, layouts
+                self, nav, config, components, layouts, files, contents
             )
         else:
             self.content = renderTemplate(self, nav, config, components, layouts)

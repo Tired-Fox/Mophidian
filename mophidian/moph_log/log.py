@@ -5,7 +5,7 @@ import sys
 from typing import Callable, TextIO
 from .encoding import encodings
 from .LL import LL
-from .color import color, FColor, BColor, Style, RESET
+from teddecor import TED
 
 
 class Log:
@@ -15,7 +15,7 @@ class Log:
     def __init__(
         self,
         output: TextIO | TextIOWrapper = sys.stdout,
-        level: str = LL.ERROR,
+        level: str = LL.INFO,
         compare: Callable = LL.ge,
         encoding: str = "utf-8",
     ):
@@ -101,7 +101,7 @@ class Log:
             raise TypeError(f"encoding was {type(encoding)} must be of type <class 'str'>")
 
     @classmethod
-    def path(cls, *args: str, clr: str = FColor.YELLOW, spr: str = " > ") -> str:
+    def path(cls, *args: str, clr: str = "yellow", spr: str = " > ") -> str:
         """Takes all the arguments, segments of path, and combines them with the given seperator and color.
 
         Args:
@@ -111,118 +111,55 @@ class Log:
         Returns:
             str: The formatted string
         """
-        return f"{spr}".join([color(arg, prefix=[clr]) for arg in args])
+        return f"{spr}".join([TED.parse(f"[@F {clr}]{arg}[@F] ") for arg in args])
 
+    def Out(self, *args: str, label: str, clr: str, gaps: list[bool] = [False]):
+        if len(gaps) == 1:
+            gaps.append(gaps[0])
+
+        if len(gaps) == 2 and gaps[0]:
+            self._output.write("\n")
+            
+        self._output.write(TED.parse(f"*\[[@F{clr}]{label}[@F]\]* ") + " ".join(args) + "\n")
+    
+        if len(gaps) == 2 and gaps[1]:
+            self._output.write("\n")
+
+        self._output.flush()
+        
     def Debug(self, *args: str):
-        clr = FColor.WHITE
         if self._compare(LL.DEBUG, self._level):
-            self._output.write(
-                color(
-                    "[",
-                    color(LL.DEBUG, prefix=[clr]),
-                    "] ",
-                    prefix=[Style.BOLD],
-                    suffix=[Style.NOBOLD],
-                )
-                + " ".join(args)
-                + "\n"
-            )
-            self._output.flush()
+            self.Out(*args, label="Debug", clr="white")
 
     def Info(self, *args: str):
-        clr = FColor.CYAN
         if self._compare(LL.INFO, self._level):
-            self._output.write(
-                color(
-                    "[",
-                    color(LL.INFO, prefix=[clr]),
-                    "] ",
-                    prefix=[Style.BOLD],
-                    suffix=[Style.NOBOLD],
-                )
-                + " ".join(args)
-                + "\n"
-            )
-            self._output.flush()
+            self.Out(*args, label="Info", clr="cyan")
 
     def Warning(self, *args: str):
-        clr = FColor.YELLOW
         if self._compare(LL.WARNING, self._level):
-            self._output.write(
-                color(
-                    "[",
-                    color(LL.WARNING, prefix=[clr]),
-                    "] ",
-                    prefix=[Style.BOLD],
-                    suffix=[Style.NOBOLD],
-                )
-                + " ".join(args)
-                + "\n"
-            )
-            self._output.flush()
+            self.Out(*args, label="Warning", clr="yellow")
 
     def Important(self, *args: str):
-        clr = FColor.MAGENTA
         if self._compare(LL.IMPORTANT, self._level):
-            self._output.write(
-                color(
-                    "[",
-                    color(LL.IMPORTANT, prefix=[clr]),
-                    "] ",
-                    prefix=[Style.BOLD],
-                    suffix=[Style.NOBOLD],
-                )
-                + " ".join(args)
-                + "\n"
-            )
-            self._output.flush()
+            self.Out(*args, label="Important", clr="magenta")
 
     def Success(self, *args: str):
-        clr = FColor.GREEN
         if self._compare(LL.SUCCESS, self._level):
-            self._output.write(
-                color(
-                    "[",
-                    color(LL.SUCCESS, prefix=[clr]),
-                    "] ",
-                    prefix=[Style.BOLD],
-                    suffix=[Style.NOBOLD],
-                )
-                + " ".join(args)
-                + "\n"
-            )
-            self._output.flush()
+            self.Out(*args, label="Success", clr="green")
 
     def Error(self, *args: str):
-        clr = FColor.RED
         if self._compare(LL.ERROR, self._level):
-            self._output.write(
-                color(
-                    "[",
-                    color(LL.ERROR, prefix=[clr]),
-                    "] ",
-                    prefix=[Style.BOLD],
-                    suffix=[Style.NOBOLD],
-                )
-                + " ".join(args)
-                + "\n"
-            )
-            self._output.flush()
+            self.Out(*args, label="Error", clr="red")
 
-    def Custom(self, *args: str, clr: str = FColor.BLUE, label: str = LL.CUSTOM):
+    def Custom(
+        self,
+        *args: str,
+        clr: str = "blue",
+        label: str = LL.CUSTOM,
+        gaps: list[bool] = [False],
+    ):
         if self._compare(LL.CUSTOM, self._level):
-            self._output.write(
-                color(
-                    "[",
-                    color(label, prefix=[clr]),
-                    "] ",
-                    prefix=[Style.BOLD],
-                    suffix=[Style.NOBOLD],
-                )
-                + " ".join(args)
-                + "\n"
-            )
-            self._output.flush()
+            self.Out(*args, label=label, clr=clr, gaps=gaps)
 
 
 Logger = Log(level=LL.INFO)

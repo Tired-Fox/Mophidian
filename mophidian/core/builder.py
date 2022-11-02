@@ -113,7 +113,15 @@ class Builder:
         ) as base_layout:
             layouts["moph_base"] = temp.from_string(base_layout.read())
 
-    def build_pages(self, nav: Nav, components: dict, layouts: dict, dirty: bool = False):
+    def build_pages(
+        self,
+        nav: Nav,
+        components: dict,
+        layouts: dict,
+        files: Files,
+        contents: Files,
+        dirty: bool = False,
+    ):
         """Iterate through all the pages that are in the
         navigation object and build, render, and write out the pages.
 
@@ -133,7 +141,7 @@ class Builder:
             if dirty and not page.file.is_modified():
                 continue
             else:
-                page.render(self.cfg, components, layouts, nav)
+                page.render(self.cfg, components, layouts, nav, files, contents)
 
                 dest = Path(page.file.abs_dest_path)
                 dest.parent.mkdir(parents=True, exist_ok=True)
@@ -185,8 +193,9 @@ class Builder:
         self.apply_default_layouts(layouts)
 
         Logger.Info("Building pages")
-        self.build_pages(nav, components, layouts, dirty=dirty)
+        self.build_pages(nav, components, layouts, files, content, dirty=dirty)
 
+        # Build tailwind css
         self.build_tailwind()
 
         Logger.Success("Congrats! Your site has been built")

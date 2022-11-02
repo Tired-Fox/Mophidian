@@ -11,7 +11,7 @@
             "program": "C:\\Users\\zboehm\\Documents\\Repo\\Mophidian\\mophidian",
             "console": "integratedTerminal",
             "args": ["build"],
-            "cwd": "C:\\Users\\zboehm\\Documents\\Repo\\Mophidian\\playground\\mophidian"
+            "cwd": "C:\\Users\\zboehm\\Documents\\Repo\\Mophidian\\website"
         },
     ]
 }

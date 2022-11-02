@@ -2,20 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles&display=swap");
-
 .hide-aside {
-  left: -15rem;
+  display: hidden !important;
 }
 
 .inner-nav {
-  height: calc(100% - 1rem);
-  width: calc(100% - 1rem);
-  font-family: "Fuzzy Bubbles", cursive;
   font-size: 1.1rem;
   letter-spacing: 0.06em;
-}
-
-#nav-aside {
-  background-image: url("../img/dark-leather.png");
 }

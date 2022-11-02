@@ -1,15 +1,17 @@
 {%- if nav_item.is_page and not nav_item.file.is_index %}
 <li>
-    <a class="text-white no-underline hover:text-lime-50/60" href="{{ nav_item.url|urlencode }}">{{
+    <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
+        href="{{ nav_item.url|urlencode }}">{{
         nav_item.title }}</a>
 </li>
 {%- elif nav_item.is_group %}
 <li>
     {% if nav_item.has_index() %}
-    <a class="text-white no-underline hover:text-lime-50/60" href="{{ nav_item.index.url|urlencode }}">{{
+    <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
+        href="{{ nav_item.index.url|urlencode }}">{{
         nav_item.index.title }}</a>
     {% else %}
-    <p class="text-white">{{ nav_item.title }}</p>
+    <p class="break-words text-black">{{ nav_item.title }}</p>
     {% endif %}
     <ul>
         {%- for nav_item in nav_item.children %}
