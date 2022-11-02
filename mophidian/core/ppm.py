@@ -4,7 +4,7 @@ from __future__ import annotations
 from os import system
 from shutil import which
 
-from moph_log import Log, FColor
+from moph_log import Log
 
 
 def check_nodejs(logger: Log = None) -> bool:
@@ -15,8 +15,9 @@ def check_nodejs(logger: Log = None) -> bool:
         if logger is not None:
             logger.Custom(
                 f"Node {check_output(['node', '--version']).decode()}",
-                clr=FColor.YELLOW,
+                clr="yellow",
                 label="Version",
+                gaps=[True, False]
             )
         return True
     else:

@@ -5,15 +5,19 @@ from functools import cached_property
 from json import load
 from pathlib import Path
 import sys
-from typing import Callable, TextIO
+from typing import Callable, Optional, TextIO
+from teddecor import TED
 
 from mophidian.core.config.config import Config
 from .ppm import PPM
-from moph_log import Log, url, color, FColor, Style
+from moph_log import Log
 from .snippets import snippets
 
 
-all = ["Tailwind", "Sass"]
+__all__ = [
+    "Tailwindcss",
+    "Sass",
+]
 
 
 class Integration:
@@ -117,7 +121,7 @@ class Integration:
             if self.link != "":
                 self.logger.Custom(
                     "Find out more on the package",
-                    url(url=self.link, title=self.name),
+                    TED.parse(f"[~{self.link}]{self.name}[~]"),
                     label="Link",
                 )
 
@@ -131,11 +135,7 @@ class Integration:
         else:
             self.logger.Warning(
                 "You do not have node.js installed.",
-                color(
-                    "Node.js",
-                    prefix=[FColor.YELLOW, Style.BOLD],
-                    suffix=[FColor.RESET, Style.NOBOLD],
-                ),
+                TED.parse("[@F yellow]*Node.js"),
                 "integrations will be skipped.",
             )
 
@@ -154,15 +154,16 @@ class Addon:
         self.desc = desc
         self.link = link
 
-    def url(self) -> str:
+    def url(self, title: Optional[str] = None) -> str:
         """Formatted ansi link to the package link."""
-        return url(url=self.link, title=self.name)
+        name = self.name if title is None else title
+        return f"[~{self.link}]{name}[~]"
 
     def __repr__(self) -> str:
         return str(self)
 
     def __str__(self) -> str:
-        return f"{url(url=self.link, title=self.name)} - {self.desc}"
+        return f"[~{self.link}]{self.name}[~] - {self.desc}"
 
 
 class Sass(Integration):
@@ -328,7 +329,14 @@ class Tailwindcss(Integration):
     def require_addons(self):
         """Ask user if they would like certain addons. Then install them and set them up."""
 
-        self.logger.Important("[Y] yes, [A] all yes [N] no [D] all no")
+        self.logger.Custom(
+            TED.parse(
+                "\[[@F green]*Y*[@F]\] yes, \[[@F blue]*A*[@F]\] all yes \[[@F red]*N*[@F]\] no \[[@F yellow]*D*[@F]\] all no"
+            ),
+            label="CMD",
+            clr="magenta",
+            gaps=[True, False],
+        )
         all_yes = False
         all_no = False
         for addon in self.addons:
@@ -339,10 +347,8 @@ class Tailwindcss(Integration):
                         with contextlib.redirect_stderr(self.old_stde):
                             try:
                                 install = input(
-                                    color(
-                                        f"Would you like to install the @tailwindcss/{addon.url()} plugin? [y:a:n:D] ",
-                                        prefix=[Style.BOLD],
-                                        suffix=[Style.NOBOLD],
+                                    TED.parse(
+                                        f"*Would you like to install the {addon.url(title=f'@tailwindcss/{addon.name}')} plugin? \[[@F green]y[@F]:[@F blue]a[@F]:[@F red]n[@F]:[@F yellow]D[@F]\] "
                                     )
                                 )
                             except KeyboardInterrupt:

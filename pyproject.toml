@@ -1,27 +1,35 @@
 [build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "mophidian"
+version = "0.1.0"
 description = "Static websites with python"
 readme = "README.md"
 license = "MIT"
 authors = [
-    {name="Zachary Boehm", email = "zboehm104@gmail.com"}
+    { name="Tired Fox", email="zboehm104@gmail.com"}
 ]
 classifiers = [
 
 ]
-dynamic = ["Version"]
 requires-python = ">=3.7"
-dependencies = []
+dependencies = [
+    "teddecor>=1.0.2"
+]
 
 [project.optional-dependencies]
-# <section> = []
+tests = [
+    "tedtest >= 1.0.1"
+]
 
 [project.urls]
+"Homepage" = "https://github.com/Tired-Fox/Mophidian"
+"Website" = "https://tired-fox.github.io/Mophidian/"
 
 [project.scripts]
-pymark = "pymark.__main__:cli"
+mophidian = "mophidian.__main__:cli"
 
 # [project.entry-points.""]
 

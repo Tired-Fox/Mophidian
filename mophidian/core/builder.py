@@ -187,6 +187,7 @@ class Builder:
         Logger.Info("Building pages")
         self.build_pages(nav, components, layouts, dirty=dirty)
 
+        # Build tailwind css
         self.build_tailwind()
 
         Logger.Success("Congrats! Your site has been built")
