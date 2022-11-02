@@ -15,7 +15,7 @@ class Log:
     def __init__(
         self,
         output: TextIO | TextIOWrapper = sys.stdout,
-        level: str = LL.ERROR,
+        level: str = LL.INFO,
         compare: Callable = LL.ge,
         encoding: str = "utf-8",
     ):

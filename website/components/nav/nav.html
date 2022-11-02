@@ -1,7 +1,6 @@
-<aside id="nav-aside"
-    class="w-[15rem] top-[4.5rem] left-[1px] absolute overflow-x-hidden overflow-y-auto z-10 transition-all ease-in-out delay-300 rounded-br-2xl bg-lime-900/[98] text-white shadow-md hide-aside">
-    <div class="inner-nav p-2 m-2 border-2 border-dashed border-lime-50/40 rounded-br-2xl">
-        <ul>
+<aside id="nav-aside" class="w-full z-10 text-black p-2 flex justify-center md:col-span-2 row-start-1 col-start-1">
+    <div class="inner-nav w-fit h-fit sticky top-[7rem] md:ml-5">
+        <ul class="flex flex-col gap-1">
             {% for nav_item in nav_data.children %}
             {% if nav_item.children %}
             {% include cmpt.nav.sub_nav %}

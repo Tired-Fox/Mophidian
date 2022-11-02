@@ -17,7 +17,7 @@ def check_nodejs(logger: Log = None) -> bool:
                 f"Node {check_output(['node', '--version']).decode()}",
                 clr="yellow",
                 label="Version",
-                gaps=[True, False]
+                gaps=[True, False],
             )
         return True
     else:

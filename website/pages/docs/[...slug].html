@@ -14,13 +14,18 @@
 {% endblock %}
 
 {% block header %}
-{% set nav_data = nav.get_dir("docs") %}
 {% include cmpt.header %}
 {% endblock %}
 
 {% block body %}
-<article class="prose max-w-[70rem]">
-    {{ content }}
-</article>
+{% set nav_data = nav.get_dir("docs") %}
+{% set section_name = "Docs" %}
+<div class="article-section">
+    {% include cmpt.nav.nav %}
+    <article class="prose max-w-[50rem] col-span-8 col-start-3 row-start-1">
+        {{ content }}
+    </article>
+</div>
 <div class="flex-1"></div>
+{% include cmpt.next_prev %}
 {% endblock %}

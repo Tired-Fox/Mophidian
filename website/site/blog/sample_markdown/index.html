@@ -29,8 +29,7 @@
     </head>
 
     <body class="">
-
-<div id="header"
+<div id="header lg:hidden"
     class="bg-white/95 shadow-sm border-b-2 border-solid border white sticky top-0 z-10 w-full py-4 px-8 h-[4.5rem]">
     <div class="flex justify-between items-center max-w-[80rem] mx-auto">
         <div class="flex-1 flex justify-start">
@@ -58,11 +57,13 @@
             </nav>
         </div>
     </div>
+</div>
 
-    <aside id="nav-aside"
-    class="w-[15rem] top-[4.5rem] left-[1px] absolute overflow-x-hidden overflow-y-auto z-10 transition-all ease-in-out delay-300 rounded-br-2xl bg-lime-900/[98] text-white shadow-md hide-aside">
-    <div class="inner-nav p-2 m-2 border-2 border-dashed border-lime-50/40 rounded-br-2xl">
-        <ul>
+
+<div class="article-section">
+    <aside id="nav-aside" class="w-full z-10 text-black p-2 flex justify-center md:col-span-2 row-start-1 col-start-1">
+    <div class="inner-nav w-fit h-fit sticky top-[7rem] md:ml-5">
+        <ul class="flex flex-col gap-1">
             
             
             
@@ -70,7 +71,8 @@
             
 <li>
     
-    <a class="text-white no-underline hover:text-lime-50/60" href="/Mophidian/blog/sample_markdown">Sample markdown</a>
+    <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
+        href="/Mophidian/blog/sample_markdown">Sample markdown</a>
     
     <ul>
         
@@ -81,10 +83,8 @@
         </ul>
     </div>
 </aside>
-</div>
-
-<article class="prose max-w-[70rem]">
-    <h1>An h1 header</h1>
+    <article class="prose max-w-[50rem] col-span-8">
+        <h1>An h1 header</h1>
 <p>Paragraphs are separated by a blank line.</p>
 <p>2<sup>nd</sup> paragraph. <em>Italic</em>, <strong>bold</strong>, and <code>monospace</code>. Itemized lists
 look like:</p>
@@ -240,7 +240,8 @@ which you wish to be displayed literally, ex.: `foo`, *bar*, etc.</p>
 </li>
 </ol>
 </div>
-</article>
+    </article>
+</div>
 <div class="flex-1"></div>
 
         <footer class="flex justify-center w-full px-8 py-3">
