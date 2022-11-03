@@ -6,13 +6,12 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#ffffff">
         {%- endblock %}
         {%- block title %}
         <title>{{ page.title }}</title>
         {%- endblock %}
-        <link rel="shortcut icon" href="/{{ site.root }}/favicon.svg" type="image/x-icon">
-        <link rel=”mask-icon” href="/{{ site.root }}/favicon.svg” color=”#000000">
-        <link rel="apple-touch-icon" href="/{{ site.root }}/favicon.svg">
+        {% include cmpt.favicon %}
         {%- block links %}
         <link rel="stylesheet" href="/{{ site.root }}/css/tailwind.min.css">
         <link rel="stylesheet" href="/{{ site.root }}/css/global.css">
@@ -22,8 +21,6 @@
         <script defer src="/{{ site.root }}/js/brands.min.js"></script>
         <script defer src="/{{ site.root }}/js/solid.min.js"></script>
         <script defer src="/{{ site.root }}/js/fontawesome.min.js"></script>
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
         {%- endblock %}
     </head>
 

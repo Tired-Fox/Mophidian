@@ -5,11 +5,12 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#ffffff">
 <title>Docs |  Initial Project Templates</title>
 
-        <link rel="shortcut icon" href="/Mophidian/favicon.svg" type="image/x-icon">
-        <link rel=”mask-icon” href="/Mophidian/favicon.svg” color=”#000000">
-        <link rel="apple-touch-icon" href="/Mophidian/favicon.svg">
+        <link rel="shortcut icon" href="/Mophidian/favicon.svg"">
+<link rel=”mask-icon” href=" /Mophidian/favicon.svg” color=”#000000">
+<link rel="apple-touch-icon" href="/Mophidian/favicon.svg">
 
         <link rel="stylesheet" href="/Mophidian/css/tailwind.min.css">
         <link rel="stylesheet" href="/Mophidian/css/global.css">
@@ -19,8 +20,6 @@
         <script defer src="/Mophidian/js/brands.min.js"></script>
         <script defer src="/Mophidian/js/solid.min.js"></script>
         <script defer src="/Mophidian/js/fontawesome.min.js"></script>
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <script>
     const toggleMenu = () => {
         const aside = document.getElementById("nav-aside");
@@ -64,11 +63,11 @@
 
 
 
-<div class="grid grid-cols-11 lg:grid-rows-2">
+<div class="article-container grid grid-cols-11">
     <aside id="nav-aside"
-    class="w-full text-black flex justify-center col-span-3 col-start-1 row-span-2 lg:col-span-2 hide-aside">
+    class="w-full text-black flex justify-center col-span-3 col-start-1 row-span-2 lg:row-span-1 lg:col-span-2 hide-aside">
     <div
-        class="fixed w-screen h-screen z-10 md:z-0 md:w-fit md:h-fit md:sticky md:top-[7rem] md:ml-5 md:px-8 md:py-4 bg-slate-50 md:rounded-md md:mr-5 md:shadow-inner md:shadow-slate-200 flex flex-col justify-center items-center">
+        class="fixed w-screen h-screen z-10 md:z-0 md:w-fit md:h-fit md:sticky md:top-[7rem] md:ml-5 md:px-8 md:py-4 bg-zinc-50 md:bg-slate-50 md:rounded-md md:mr-5 md:shadow-inner md:shadow-slate-200 flex flex-col justify-center items-center">
         <div class="absolute top-4 w-full flex justify-between px-8 md:hidden">
             <button class="border-none focus:outline-none bg-transparent text-slate-700" onclick="toggleMenu()">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -77,27 +76,12 @@
                 </svg>
             </button>
             <nav class="flex gap-5">
-                <a class="text-lime-900 no-underline text-3xl font-bold" href="/Mophidian/blog/">Blog</a>
-                <a class="text-lime-900 no-underline text-3xl font-bold" href="/Mophidian/docs/">Docs</a>
+                <a class="text-lime-900 no-underline text-2xl font-bold" href="/Mophidian/blog/">Blog</a>
+                <a class="text-lime-900 no-underline text-2xl font-bold" href="/Mophidian/docs/">Docs</a>
             </nav>
         </div>
         <ul class="flex flex-col gap-4 p-4 md:p-0 md:gap-1 md:list-decimal">
             
-            
-            
-            
-            
-<li>
-    
-    <a class="break-words text-3xl font-bold md:font-normal md:text-base text-black md:no-underline hover:text-lime-900 md:hover:underline"
-        href="/Mophidian/docs/getting_started" aria-label="Go to  Getting Started page">
-         Getting Started
-    </a>
-    
-    <ul class="list-disc">
-        
-    </ul>
-</li>
             
             
             
@@ -111,6 +95,30 @@
     
     <ul class="list-disc">
         
+        
+<li>
+    
+    <a class="break-words text-3xl font-bold md:font-normal md:text-base text-black md:no-underline hover:text-lime-900 md:hover:underline"
+        href="/Mophidian/docs/commands/build" aria-label="Go to Build page">
+        Build
+    </a>
+    
+    <ul class="list-disc">
+        
+    </ul>
+</li>
+        
+<li>
+    
+    <a class="break-words text-3xl font-bold md:font-normal md:text-base text-black md:no-underline hover:text-lime-900 md:hover:underline"
+        href="/Mophidian/docs/commands/new" aria-label="Go to New page">
+        New
+    </a>
+    
+    <ul class="list-disc">
+        
+    </ul>
+</li>
     </ul>
 </li>
             
@@ -192,7 +200,7 @@
     </article>
     
 <aside id="toc-aside"
-    class="text-black w-[95%] mx-auto flex justify-center col-span-full col-start-1 md:mx-0 md:w-full md:col-span-7 row-start-1 md:col-start-4 lg:col-span-2 lg:col-start-10">
+    class="text-black w-[95%] h-fit mx-auto flex justify-center col-span-full col-start-1 md:mx-0 md:w-full md:col-span-7 row-start-1 md:col-start-4 lg:col-span-2 lg:col-start-10">
     <div
         class="inner-toc w-full lg:w-fit h-fit lg:sticky relative mt-2 lg:mt-0 lg:top-[7rem] py-4 px-8 bg-slate-100 rounded-md lg:mr-5 shadow shadow-slate-300">
         <p class="font-bold mb-2">Table of Contents</p>
@@ -214,20 +222,24 @@
 <div class="flex-1"></div>
 <div
     class="w-[95%] max-w-[65rem] mx-auto p-4 border border-solid border-slate-200 flex justify-between items-center rounded-lg justify-self-center mb-2">
-    <a class="text-right hover:underline font-bold flex gap-2" href="/Mophidian/docs/config" title="Previous">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-            class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-        </svg>
-         Config
-    </a>
-    <a class="hover:underline font-bold flex gap-2" href="/Mophidian/docs/templating" title="Previous">
-         Templating
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-            class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-        </svg>
-    </a>
+    <div>
+        <a class="w-fit hover:underline font-bold flex gap-2" href="/Mophidian/docs/config" title="Previous">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+             Config
+        </a>
+    </div>
+    <div>
+        <a class="hover:underline font-bold flex gap-2 w-fit" href="/Mophidian/docs/templating" title="Previous">
+             Templating
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+        </a>
+    </div>
 </div>
 
         <footer class="flex justify-center w-full px-8 py-3 h-16">

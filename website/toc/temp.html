@@ -1,25 +1,4 @@
-{% extends lyt.base %}
-
-{% block title %}
-<title>{{ page.title }}</title>
-{% endblock %}
-
-{% block links %}
-{{ super() }}
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
-{% include cmpt.blog.nav.nav_logic %}
-{% endblock %}
-
-{% block header %}
-{% include cmpt.header %}
-{% endblock %}
-
-{% block body %}
-<div>
-    {% include cmpt.blog.nav.nav %}
+<div class="">
     <div class="content max-w-[65rem]">
         <h1 class="text-4xl font-bold">Blog</h1>
         <p>This pythonic static site generator (SSG) is a work in progress. As such, the documentation is also a work in
