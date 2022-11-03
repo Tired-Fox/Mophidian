@@ -176,6 +176,7 @@ class Builder:
         files, content = self.get_files_and_content()
         Logger.Info("Constructing page data")
         nav = self.get_nav(files, content)
+        print(nav)
 
         # Build and apply integrations
         Logger.Info(f"Building all sass files in {self.cfg.site.source}")

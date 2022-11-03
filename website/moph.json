@@ -6,7 +6,7 @@
   },
   "build": {
     "refresh_delay": 3,
-    "use_root": false
+    "use_root": true
   },
   "markdown": {
     "append": true,

@@ -148,9 +148,14 @@ code {
     border-radius: .25rem;
 }
 
-.article-section {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0,1fr));
+.article-container  {
+    grid-template-rows: auto 1fr;
+}
+
+@media only screen and (max-width: 768px) {
+    .article-container  {
+        grid-template-rows: 1fr;
+    }
 }
 
 .hide-overflow {

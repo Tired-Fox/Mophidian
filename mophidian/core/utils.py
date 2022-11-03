@@ -127,7 +127,7 @@ class MophidianMarkdown:
     @classmethod
     def parse(
         cls, file: str, config: Config, layouts: dict[str, dict | Template], template=None
-    ) -> tuple[Meta, Content]:
+    ) -> tuple[Meta, Content, Template]:
         """Parse the metadata from the markdown content.
 
         Args:
@@ -160,8 +160,6 @@ class MophidianMarkdown:
         meta: Meta = meta
         content: Content = content
 
-        layout = None
-
         if template is None:
             # If markdown page specified a layout
             if 'layout' in meta:
@@ -174,7 +172,7 @@ class MophidianMarkdown:
                 if template is None:
                     template = layouts["moph_base"]
 
-        return meta, content
+        return meta, content, template
 
     @classmethod
     def render(
@@ -324,7 +322,7 @@ class _RelativePathTreeprocessor(Treeprocessor):
 
         if not Path(target_uri).exists() and target_file is None:
             Logger.Warning(
-                f"Documentation file '{self.file.src_uri}' contains a link to "
+                f"Page '{self.file.src_uri}' contains a link to "
                 f"'{target_uri}' which is not found in the files."
             )
             return url
