@@ -8,12 +8,14 @@
 <li>
     {% if nav_item.has_index() %}
     <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
-        href="{{ nav_item.index.url|urlencode }}">{{
-        nav_item.index.title }}</a>
+        href="{{ nav_item.index.url|urlencode }}" aria-label="Go to {{
+            nav_item.index.title }} page">
+        {{ nav_item.index.title }}
+    </a>
     {% else %}
-    <p class="break-words text-black">{{ nav_item.title }}</p>
+    <span class="break-words text-black">{{ nav_item.title }}</span>
     {% endif %}
-    <ul>
+    <ul class="list-disc">
         {%- for nav_item in nav_item.children %}
         {% include cmpt.nav.sub_nav %}
         {%- endfor %}

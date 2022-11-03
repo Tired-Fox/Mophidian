@@ -64,7 +64,7 @@
 <div class="article-section">
     <aside id="nav-aside" class="w-full z-10 text-black p-2 flex justify-center md:col-span-2 row-start-1 col-start-1">
     <div class="inner-nav w-fit h-fit sticky top-[7rem] md:ml-5">
-        <ul class="flex flex-col gap-1">
+        <ul class="flex flex-col gap-1 list-decimal">
             
             
             
@@ -73,9 +73,11 @@
 <li>
     
     <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
-        href="/Mophidian/docs/getting_started"> Getting Started</a>
+        href="/Mophidian/docs/getting_started" aria-label="Go to  Getting Started page">
+         Getting Started
+    </a>
     
-    <ul>
+    <ul class="list-disc">
         
     </ul>
 </li>
@@ -86,9 +88,11 @@
 <li>
     
     <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
-        href="/Mophidian/docs/commands"> Commands</a>
+        href="/Mophidian/docs/commands" aria-label="Go to  Commands page">
+         Commands
+    </a>
     
-    <ul>
+    <ul class="list-disc">
         
     </ul>
 </li>
@@ -99,9 +103,11 @@
 <li>
     
     <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
-        href="/Mophidian/docs/config"> Config</a>
+        href="/Mophidian/docs/config" aria-label="Go to  Config page">
+         Config
+    </a>
     
-    <ul>
+    <ul class="list-disc">
         
     </ul>
 </li>
@@ -112,9 +118,11 @@
 <li>
     
     <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
-        href="/Mophidian/docs/project_templates"> Initial Project Templates</a>
+        href="/Mophidian/docs/project_templates" aria-label="Go to  Initial Project Templates page">
+         Initial Project Templates
+    </a>
     
-    <ul>
+    <ul class="list-disc">
         
     </ul>
 </li>
@@ -125,9 +133,11 @@
 <li>
     
     <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
-        href="/Mophidian/docs/templating"> Templating</a>
+        href="/Mophidian/docs/templating" aria-label="Go to  Templating page">
+         Templating
+    </a>
     
-    <ul>
+    <ul class="list-disc">
         
     </ul>
 </li>
@@ -137,16 +147,18 @@
             
 <li>
     
-    <p class="break-words text-black">Terms</p>
+    <span class="break-words text-black">Terms</span>
     
-    <ul>
+    <ul class="list-disc">
         
 <li>
     
     <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
-        href="/Mophidian/docs/Terms/ssg"> SSG</a>
+        href="/Mophidian/docs/Terms/ssg" aria-label="Go to  SSG page">
+         SSG
+    </a>
     
-    <ul>
+    <ul class="list-disc">
         
     </ul>
 </li>
@@ -158,7 +170,7 @@
     </div>
 </aside>
     <article class="prose max-w-[50rem] col-span-8 col-start-3 row-start-1">
-        <h1>Getting Started</h1>
+        <h1 id="getting-started">Getting Started</h1>
 <p>This <a href="../Terms/ssg/">SSG</a> is not meant to replace any other SSG already out there. It is purely to
 experiment with what is possible. This python package is heavily inspired by <a href="https://www.mkdocs.org/">mkDocs</a>, but strives to add a lot more functionality. </p>
 <p>This project has a few main goals:</p>
@@ -174,7 +186,7 @@ experiment with what is possible. This python package is heavily inspired by <a 
 </ul>
 <p>To prove a point, this website is built with Mophidian. So feel free to check out the <a href="https://github.com/Tired-Fox/Mophidian">github</a> at any time to see examples of how to achieve different tasks.</p>
 <p>Now lets get started.</p>
-<h2>Installation</h2>
+<h2 id="installation">Installation</h2>
 <p>There are a few dependencies for this project and they include:</p>
 <ul>
 <li><code>teddecor</code> (Also made by me) for terminal formatting.</li>
@@ -193,7 +205,7 @@ experiment with what is possible. This python package is heavily inspired by <a 
 pip3 install --upgrade mophidian
 <span class="c1"># or any other tool that installs pypi packages</span>
 </code></pre></div></p>
-<h2>Creating a project</h2>
+<h2 id="creating-a-project">Creating a project</h2>
 <p>While the cli tool for this part is not required it makes setup go a lot faster.</p>
 <p>To create a new project with the cli tool use the <code>new</code> command:
 <div class="highlight"><pre><span></span><code>mophidian new
@@ -209,7 +221,7 @@ The tool will ask a few questions and can even help to set up integrations such 
 </code></pre></div>
 <p>Notice the <code>index.html</code> file in the <code>pages/</code> directory. Mophidian will start you off with a sort of hello world file so you can make sure everything is working right away.</p>
 <p>Make sure to use the <code>mophidian new -h</code> command to find out what else you can do with this command</p>
-<h3>Initial templates</h3>
+<h3 id="initial-templates">Initial templates</h3>
 <p>Mophidian comes with some helpful templates that are great for getting started.</p>
 <p>You can specify a template to use with <code>mophidian new --template &lt;template name&gt;</code></p>
 <p>The includes templates include:</p>
@@ -219,10 +231,68 @@ The tool will ask a few questions and can even help to set up integrations such 
 <li><code>Blank</code> - The minimal default template</li>
 </ul>
 <p>Don't forget to check out the website <a href="/Mophidian/blog/snippets/"><strong>blog/snippets/</strong></a> page to see code snippets of common things such as navigation, table of contents, styling for markdown, etc.</p>
-<h2>Building your project</h2>
+<h2 id="building-your-project">Building your project</h2>
 <p>Building your project is as simple as running <code>mophidian build</code> from the root directory of all your other files. Given the user provided configurations, Mophidian will build all of the pages and static assets into the <code>site/</code> directory by default.</p>
 <p>From here you just need to upload the contents of the <code>site/</code> directory to your preferred hosting service.</p>
     </article>
+    
+<aside id="toc-aside" class="w-full z-10 text-black flex justify-center md:col-span-2 row-start-1 col-start-11">
+    <div
+        class="inner-toc w-fit h-fit sticky top-[7rem] py-4 px-8 bg-slate-100 rounded-md md:mr-4 shadow-md shadow-slate-400">
+        <ul class="list-disc">
+            
+            <li>
+                <a class="text-black no-underline hover:underline hover:text-lime-900" href="#getting-started"
+                    aria-label="Jump to Getting Started">
+                    Getting Started
+                </a>
+            </li>
+            
+            <ul class="list-disc">
+    
+    <li>
+        <a class="text-black no-underline hover:underline hover:text-lime-900" href="#installation"
+            aria-label="Jump to Installation">
+            Installation
+        </a>
+    </li>
+    
+    
+    <li>
+        <a class="text-black no-underline hover:underline hover:text-lime-900" href="#creating-a-project"
+            aria-label="Jump to Creating A Project">
+            Creating A Project
+        </a>
+    </li>
+    
+    <ul class="list-disc">
+    
+    <li>
+        <a class="text-black no-underline hover:underline hover:text-lime-900" href="#initial-templates"
+            aria-label="Jump to Initial Templates">
+            Initial Templates
+        </a>
+    </li>
+    
+    
+</ul>
+    
+    
+    <li>
+        <a class="text-black no-underline hover:underline hover:text-lime-900" href="#building-your-project"
+            aria-label="Jump to Building Your Project">
+            Building Your Project
+        </a>
+    </li>
+    
+    
+</ul>
+            
+            
+        </ul>
+    </div>
+</aside>
+
 </div>
 <div class="flex-1"></div>
 <div

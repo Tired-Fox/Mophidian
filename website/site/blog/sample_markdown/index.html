@@ -63,7 +63,7 @@
 <div class="article-section">
     <aside id="nav-aside" class="w-full z-10 text-black p-2 flex justify-center md:col-span-2 row-start-1 col-start-1">
     <div class="inner-nav w-fit h-fit sticky top-[7rem] md:ml-5">
-        <ul class="flex flex-col gap-1">
+        <ul class="flex flex-col gap-1 list-decimal">
             
             
             
@@ -72,9 +72,11 @@
 <li>
     
     <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
-        href="/Mophidian/blog/sample_markdown">Sample markdown</a>
+        href="/Mophidian/blog/sample_markdown" aria-label="Go to Sample markdown page">
+        Sample markdown
+    </a>
     
-    <ul>
+    <ul class="list-disc">
         
     </ul>
 </li>
@@ -84,7 +86,7 @@
     </div>
 </aside>
     <article class="prose max-w-[50rem] col-span-8">
-        <h1>An h1 header</h1>
+        <h1 id="an-h1-header">An h1 header</h1>
 <p>Paragraphs are separated by a blank line.</p>
 <p>2<sup>nd</sup> paragraph. <em>Italic</em>, <strong>bold</strong>, and <code>monospace</code>. Itemized lists
 look like:</p>
@@ -104,7 +106,7 @@ if you like.</p>
 <p>Use 3 dashes for an em-dash. Use 2 dashes for ranges (ex., "it's all
 in chapters 12--14"). Three dots ... will be converted to an ellipsis.
 Unicode is supported. ☺</p>
-<h2>An h2 header</h2>
+<h2 id="an-h2-header">An h2 header</h2>
 <p>Here's a numbered list:</p>
 <ol>
 <li>first item</li>
@@ -132,7 +134,7 @@ delimited block for Pandoc to syntax highlight it:</p>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 </code></pre></div>
-<h3>An h3 header</h3>
+<h3 id="an-h3-header">An h3 header</h3>
 <p>Now a nested list:</p>
 <ol>
 <li>

@@ -11,6 +11,7 @@ _defualts = {
         "footnotes",
         "md_in_html",
         "tables",
+        "toc",
         "wikilinks",
         "codehilite",
         "pymdownx.betterem",
