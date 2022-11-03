@@ -1,0 +1,13 @@
+<ul class="list-disc">
+    {% for link in link.children %}
+    <li>
+        <a class="text-black no-underline hover:underline hover:text-lime-900" href="{{link.url()}}"
+            aria-label="Jump to {{link.title|title}}">
+            {{ link.title|title }}
+        </a>
+    </li>
+    {% if link.children|length > 0 %}
+    {% include cmpt.docs.toc.sub_toc %}
+    {% endif %}
+    {% endfor %}
+</ul>

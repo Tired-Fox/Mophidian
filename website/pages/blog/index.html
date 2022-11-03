@@ -10,7 +10,7 @@
 
 {% block scripts %}
 {{ super() }}
-{% include cmpt.nav.nav_logic %}
+{% include cmpt.blog.nav.nav_logic %}
 {% endblock %}
 
 {% block header %}
@@ -18,10 +18,9 @@
 {% endblock %}
 
 {% block body %}
-{% set nav_data = nav.get_dir("blog") %}
-<div class="article-section">
-    {% include cmpt.nav.nav %}
-    <div class="content max-w-[65rem] col-span-10">
+{% include cmpt.blog.nav.nav %}
+<div class="">
+    <div class="content max-w-[65rem]">
         <h1 class="text-4xl font-bold">Blog</h1>
         <p>This pythonic static site generator (SSG) is a work in progress. As such, the documentation is also a work in
             progress. If you have questions or have issues please open an issue on the <a

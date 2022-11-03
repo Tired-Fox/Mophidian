@@ -7,6 +7,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Docs | Mophidian</title>
 
+        <link rel="shortcut icon" href="/Mophidian/favicon.svg" type="image/x-icon">
+        <link rel=”mask-icon” href="/Mophidian/favicon.svg” color=”#000000">
+        <link rel="apple-touch-icon" href="/Mophidian/favicon.svg">
 
         <link rel="stylesheet" href="/Mophidian/css/tailwind.min.css">
         <link rel="stylesheet" href="/Mophidian/css/global.css">
@@ -20,9 +23,9 @@
         <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <script>
     const toggleMenu = () => {
-        console.log("Toggle menu");
         const aside = document.getElementById("nav-aside");
         aside.classList.toggle("hide-aside");
+        document.body.classList.toggle("hide-overflow");
     }
 </script>
 
@@ -34,7 +37,7 @@
     <div class="flex justify-between items-center max-w-[80rem] mx-auto">
         <div class="flex-1 flex justify-start">
             <button
-                class="bg-transparent border-none w-10 h-10 flex justify-center itemscenter cursor-pointer focus:outline-none focus:border-none focus:bg-transparent text-lime-900 hover:text-gray-500"
+                class="md:hidden bg-transparent border-none w-10 h-10 flex justify-center itemscenter cursor-pointer focus:outline-none focus:border-none focus:bg-transparent text-lime-900 hover:text-gray-500"
                 onclick="toggleMenu()">
                 <svg class="w-8 h-8 transition-transform ease-in-out delay-100" xmlns="http://www.w3.org/2000/svg"
                     fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -50,42 +53,35 @@
         </div>
         <div class="flex-1 flex justify-end">
             <nav class="flex items-center gap-8 w-fit">
-                <a class="w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
+                <a class="hidden md:block w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
                     href="/Mophidian/blog/">Blog</a>
-                <a class="w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
+                <a class="hidden md:block w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
                     href="/Mophidian/docs/">Docs</a>
             </nav>
         </div>
     </div>
 </div>
 
-
-<div class="article-section">
-    <aside id="nav-aside" class="w-full z-10 text-black p-2 flex justify-center md:col-span-2 row-start-1 col-start-1">
-    <div class="inner-nav w-fit h-fit sticky top-[7rem] md:ml-5">
-        <ul class="flex flex-col gap-1 list-decimal">
-            
-            
-            
-            
-            
-<li>
-    
-    <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
-        href="/Mophidian/blog/sample_markdown" aria-label="Go to Sample markdown page">
-        Sample markdown
-    </a>
-    
-    <ul class="list-disc">
-        
-    </ul>
-</li>
-            
-            
+<aside id="nav-aside"
+    class="w-full text-black flex justify-center col-span-1 col-start-1 row-span-1 hide-aside md:hidden">
+    <div class="fixed w-screen h-screen z-10 bg-slate-50 flex flex-col justify-center items-center md:hidden">
+        <div class="absolute top-4 w-full flex justify-between px-8 md:hidden">
+            <button class="border-none focus:outline-none bg-transparent text-slate-700" onclick="toggleMenu()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-7 h-7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div></div>
+        </div>
+        <ul class="flex flex-col gap-4 p-4">
+            <a class="text-lime-900 no-underline text-3xl font-bold" href="/Mophidian/blog/">Blog</a>
+            <a class="text-lime-900 no-underline text-3xl font-bold" href="/Mophidian/docs/">Docs</a>
         </ul>
     </div>
 </aside>
-    <div class="content max-w-[65rem] col-span-10">
+<div class="">
+    <div class="content max-w-[65rem]">
         <h1 class="text-4xl font-bold">Blog</h1>
         <p>This pythonic static site generator (SSG) is a work in progress. As such, the documentation is also a work in
             progress. If you have questions or have issues please open an issue on the <a
@@ -95,7 +91,7 @@
 </div>
 <div class="flex-1"></div>
 
-        <footer class="flex justify-center w-full px-8 py-3">
+        <footer class="flex justify-center w-full px-8 py-3 h-16">
     <div id="footlinks" class="flex-[4] flex justify-start">
         <a class="text-[1.1rem] text-black hover:text-gray-500" href="https://github.com/Tired-Fox/Mophidian"
             target="_blank">

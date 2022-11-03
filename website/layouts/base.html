@@ -10,6 +10,9 @@
         {%- block title %}
         <title>{{ page.title }}</title>
         {%- endblock %}
+        <link rel="shortcut icon" href="/{{ site.root }}/favicon.svg" type="image/x-icon">
+        <link rel=”mask-icon” href="/{{ site.root }}/favicon.svg” color=”#000000">
+        <link rel="apple-touch-icon" href="/{{ site.root }}/favicon.svg">
         {%- block links %}
         <link rel="stylesheet" href="/{{ site.root }}/css/tailwind.min.css">
         <link rel="stylesheet" href="/{{ site.root }}/css/global.css">

@@ -1,0 +1,25 @@
+<aside id="nav-aside"
+    class="w-full text-black flex justify-center col-span-3 col-start-1 row-span-2 lg:col-span-2 hide-aside">
+    <div
+        class="fixed w-screen h-screen z-10 md:z-0 md:w-fit md:h-fit md:sticky md:top-[7rem] md:ml-5 md:px-8 md:py-4 bg-slate-50 md:rounded-md md:mr-5 md:shadow-inner md:shadow-slate-200 flex flex-col justify-center items-center">
+        <div class="absolute top-4 w-full flex justify-between px-8 md:hidden">
+            <button class="border-none focus:outline-none bg-transparent text-slate-700" onclick="toggleMenu()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-7 h-7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <nav class="flex gap-5">
+                <a class="text-lime-900 no-underline text-3xl font-bold" href="/{{ site.root }}/blog/">Blog</a>
+                <a class="text-lime-900 no-underline text-3xl font-bold" href="/{{ site.root }}/docs/">Docs</a>
+            </nav>
+        </div>
+        <ul class="flex flex-col gap-4 p-4 md:p-0 md:gap-1 md:list-decimal">
+            {% for nav_item in nav_data.children %}
+            {% if nav_item.children %}
+            {% include cmpt.docs.nav.sub_nav %}
+            {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</aside>
