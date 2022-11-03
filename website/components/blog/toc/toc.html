@@ -1,8 +1,10 @@
 {% if toc|length > 0 %}
-<aside id="toc-aside" class="w-full z-10 text-black flex justify-center md:col-span-2 row-start-1 col-start-11">
+<aside id="toc-aside"
+    class="text-black w-[95%] mx-auto flex justify-center col-span-full col-start-1 row-start-1 md:col-span-3 md:col-start-9">
     <div
-        class="inner-toc w-fit h-fit sticky top-[7rem] py-4 px-8 bg-slate-100 rounded-md md:mr-4 shadow-md shadow-slate-400">
-        <ul class="list-disc">
+        class="w-full h-fit relative mt-2 py-4 px-8 bg-slate-100 rounded-md shadow shadow-slate-300 md:mr-5 md:mt-0 md:w-fit md:sticky md:top-[7rem]">
+        <p class="font-bold mb-2">Table of Contents</p>
+        <ul class="list-none">
             {% for link in toc %}
             <li>
                 <a class="text-black no-underline hover:underline hover:text-lime-900" href="{{link.url()}}"
@@ -11,7 +13,7 @@
                 </a>
             </li>
             {% if link.children|length > 0 %}
-            {% include cmpt.toc.sub_toc %}
+            {% include cmpt.blog.toc.sub_toc %}
             {% endif %}
             {% endfor %}
         </ul>

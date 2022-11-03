@@ -3,7 +3,7 @@
     <div class="flex justify-between items-center max-w-[80rem] mx-auto">
         <div class="flex-1 flex justify-start">
             <button
-                class="bg-transparent border-none w-10 h-10 flex justify-center itemscenter cursor-pointer focus:outline-none focus:border-none focus:bg-transparent text-lime-900 hover:text-gray-500"
+                class="md:hidden bg-transparent border-none w-10 h-10 flex justify-center itemscenter cursor-pointer focus:outline-none focus:border-none focus:bg-transparent text-lime-900 hover:text-gray-500"
                 onclick="toggleMenu()">
                 <svg class="w-8 h-8 transition-transform ease-in-out delay-100" xmlns="http://www.w3.org/2000/svg"
                     fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -19,9 +19,9 @@
         </div>
         <div class="flex-1 flex justify-end">
             <nav class="flex items-center gap-8 w-fit">
-                <a class="w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
+                <a class="hidden md:block w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
                     href="/{{ site.root }}/blog/">Blog</a>
-                <a class="w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
+                <a class="hidden md:block w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
                     href="/{{ site.root }}/docs/">Docs</a>
             </nav>
         </div>

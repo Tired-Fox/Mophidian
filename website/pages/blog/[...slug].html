@@ -10,7 +10,7 @@
 
 {% block scripts %}
 {{ super() }}
-{% include cmpt.nav.nav_logic %}
+{% include cmpt.blog.nav.nav_logic %}
 {% endblock %}
 
 {% block header %}
@@ -18,12 +18,13 @@
 {% endblock %}
 
 {% block body %}
-{% set nav_data = nav.get_dir("blog") %}
-<div class="article-section">
-    {% include cmpt.nav.nav %}
-    <article class="prose max-w-[50rem] col-span-8">
+<div class="grid grid-cols-11 md:grid-rows-2">
+    {% include cmpt.blog.nav.nav %}
+    <article
+        class="prose prose-pre:shadow prose-pre:shadow-slate-700 w-full max-w-[50rem] mx-auto col-start-1 col-span-full md:mx-0 md:col-span-7 md:col-start-2 row-start-2 md:row-start-1">
         {{ content }}
     </article>
+    {% include cmpt.blog.toc.toc %}
 </div>
 <div class="flex-1"></div>
 {% endblock %}

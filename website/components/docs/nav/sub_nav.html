@@ -1,23 +1,23 @@
 {%- if nav_item.is_page and not nav_item.file.is_index %}
 <li>
-    <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
+    <a class="break-words text-3xl font-bold md:font-normal md:text-base text-black md:no-underline hover:text-lime-900 md:hover:underline"
         href="{{ nav_item.url|urlencode }}">{{
         nav_item.title }}</a>
 </li>
 {%- elif nav_item.is_group %}
 <li>
     {% if nav_item.has_index() %}
-    <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
+    <a class="break-words text-3xl font-bold md:font-normal md:text-base text-black md:no-underline hover:text-lime-900 md:hover:underline"
         href="{{ nav_item.index.url|urlencode }}" aria-label="Go to {{
             nav_item.index.title }} page">
         {{ nav_item.index.title }}
     </a>
     {% else %}
-    <span class="break-words text-black">{{ nav_item.title }}</span>
+    <span class="break-words text-3xl font-bold md:font-normal md:text-base text-black">{{ nav_item.title }}</span>
     {% endif %}
     <ul class="list-disc">
         {%- for nav_item in nav_item.children %}
-        {% include cmpt.nav.sub_nav %}
+        {% include cmpt.docs.nav.sub_nav %}
         {%- endfor %}
     </ul>
 </li>

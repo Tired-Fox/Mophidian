@@ -7,6 +7,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Docs |  Templating</title>
 
+        <link rel="shortcut icon" href="/Mophidian/favicon.svg" type="image/x-icon">
+        <link rel=”mask-icon” href="/Mophidian/favicon.svg” color=”#000000">
+        <link rel="apple-touch-icon" href="/Mophidian/favicon.svg">
 
         <link rel="stylesheet" href="/Mophidian/css/tailwind.min.css">
         <link rel="stylesheet" href="/Mophidian/css/global.css">
@@ -20,9 +23,9 @@
         <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <script>
     const toggleMenu = () => {
-        console.log("Toggle menu");
         const aside = document.getElementById("nav-aside");
         aside.classList.toggle("hide-aside");
+        document.body.classList.toggle("hide-overflow");
     }
 </script>
 
@@ -34,7 +37,7 @@
     <div class="flex justify-between items-center max-w-[80rem] mx-auto">
         <div class="flex-1 flex justify-start">
             <button
-                class="bg-transparent border-none w-10 h-10 flex justify-center itemscenter cursor-pointer focus:outline-none focus:border-none focus:bg-transparent text-lime-900 hover:text-gray-500"
+                class="md:hidden bg-transparent border-none w-10 h-10 flex justify-center itemscenter cursor-pointer focus:outline-none focus:border-none focus:bg-transparent text-lime-900 hover:text-gray-500"
                 onclick="toggleMenu()">
                 <svg class="w-8 h-8 transition-transform ease-in-out delay-100" xmlns="http://www.w3.org/2000/svg"
                     fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -50,9 +53,9 @@
         </div>
         <div class="flex-1 flex justify-end">
             <nav class="flex items-center gap-8 w-fit">
-                <a class="w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
+                <a class="hidden md:block w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
                     href="/Mophidian/blog/">Blog</a>
-                <a class="w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
+                <a class="hidden md:block w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
                     href="/Mophidian/docs/">Docs</a>
             </nav>
         </div>
@@ -61,10 +64,24 @@
 
 
 
-<div class="article-section">
-    <aside id="nav-aside" class="w-full z-10 text-black p-2 flex justify-center md:col-span-2 row-start-1 col-start-1">
-    <div class="inner-nav w-fit h-fit sticky top-[7rem] md:ml-5">
-        <ul class="flex flex-col gap-1 list-decimal">
+<div class="grid grid-cols-11 lg:grid-rows-2">
+    <aside id="nav-aside"
+    class="w-full text-black flex justify-center col-span-3 col-start-1 row-span-2 lg:col-span-2 hide-aside">
+    <div
+        class="fixed w-screen h-screen z-10 md:z-0 md:w-fit md:h-fit md:sticky md:top-[7rem] md:ml-5 md:px-8 md:py-4 bg-slate-50 md:rounded-md md:mr-5 md:shadow-inner md:shadow-slate-200 flex flex-col justify-center items-center">
+        <div class="absolute top-4 w-full flex justify-between px-8 md:hidden">
+            <button class="border-none focus:outline-none bg-transparent text-slate-700" onclick="toggleMenu()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-7 h-7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <nav class="flex gap-5">
+                <a class="text-lime-900 no-underline text-3xl font-bold" href="/Mophidian/blog/">Blog</a>
+                <a class="text-lime-900 no-underline text-3xl font-bold" href="/Mophidian/docs/">Docs</a>
+            </nav>
+        </div>
+        <ul class="flex flex-col gap-4 p-4 md:p-0 md:gap-1 md:list-decimal">
             
             
             
@@ -72,7 +89,7 @@
             
 <li>
     
-    <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
+    <a class="break-words text-3xl font-bold md:font-normal md:text-base text-black md:no-underline hover:text-lime-900 md:hover:underline"
         href="/Mophidian/docs/getting_started" aria-label="Go to  Getting Started page">
          Getting Started
     </a>
@@ -87,7 +104,7 @@
             
 <li>
     
-    <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
+    <a class="break-words text-3xl font-bold md:font-normal md:text-base text-black md:no-underline hover:text-lime-900 md:hover:underline"
         href="/Mophidian/docs/commands" aria-label="Go to  Commands page">
          Commands
     </a>
@@ -102,7 +119,7 @@
             
 <li>
     
-    <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
+    <a class="break-words text-3xl font-bold md:font-normal md:text-base text-black md:no-underline hover:text-lime-900 md:hover:underline"
         href="/Mophidian/docs/config" aria-label="Go to  Config page">
          Config
     </a>
@@ -117,7 +134,7 @@
             
 <li>
     
-    <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
+    <a class="break-words text-3xl font-bold md:font-normal md:text-base text-black md:no-underline hover:text-lime-900 md:hover:underline"
         href="/Mophidian/docs/project_templates" aria-label="Go to  Initial Project Templates page">
          Initial Project Templates
     </a>
@@ -132,7 +149,7 @@
             
 <li>
     
-    <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
+    <a class="break-words text-3xl font-bold md:font-normal md:text-base text-black md:no-underline hover:text-lime-900 md:hover:underline"
         href="/Mophidian/docs/templating" aria-label="Go to  Templating page">
          Templating
     </a>
@@ -147,13 +164,13 @@
             
 <li>
     
-    <span class="break-words text-black">Terms</span>
+    <span class="break-words text-3xl font-bold md:font-normal md:text-base text-black">Terms</span>
     
     <ul class="list-disc">
         
 <li>
     
-    <a class="break-words text-black no-underline hover:text-lime-900 hover:underline"
+    <a class="break-words text-3xl font-bold md:font-normal md:text-base text-black md:no-underline hover:text-lime-900 md:hover:underline"
         href="/Mophidian/docs/Terms/ssg" aria-label="Go to  SSG page">
          SSG
     </a>
@@ -169,14 +186,17 @@
         </ul>
     </div>
 </aside>
-    <article class="prose max-w-[50rem] col-span-8 col-start-3 row-start-1">
+    <article
+        class="prose prose-pre:shadow prose-pre:shadow-slate-700 w-full max-w-[50rem] mx-auto col-start-1 col-span-full md:mx-0 md:col-span-7 md:col-start-4 row-start-2 lg:col-start-3 lg:row-start-1">
         <h1 id="templating">Templating</h1>
     </article>
     
-<aside id="toc-aside" class="w-full z-10 text-black flex justify-center md:col-span-2 row-start-1 col-start-11">
+<aside id="toc-aside"
+    class="text-black w-[95%] mx-auto flex justify-center col-span-full col-start-1 md:mx-0 md:w-full md:col-span-7 row-start-1 md:col-start-4 lg:col-span-2 lg:col-start-10">
     <div
-        class="inner-toc w-fit h-fit sticky top-[7rem] py-4 px-8 bg-slate-100 rounded-md md:mr-4 shadow-md shadow-slate-400">
-        <ul class="list-disc">
+        class="inner-toc w-full lg:w-fit h-fit lg:sticky relative mt-2 lg:mt-0 lg:top-[7rem] py-4 px-8 bg-slate-100 rounded-md lg:mr-5 shadow shadow-slate-300">
+        <p class="font-bold mb-2">Table of Contents</p>
+        <ul class="list-none">
             
             <li>
                 <a class="text-black no-underline hover:underline hover:text-lime-900" href="#templating"
@@ -210,7 +230,7 @@
     </a>
 </div>
 
-        <footer class="flex justify-center w-full px-8 py-3">
+        <footer class="flex justify-center w-full px-8 py-3 h-16">
     <div id="footlinks" class="flex-[4] flex justify-start">
         <a class="text-[1.1rem] text-black hover:text-gray-500" href="https://github.com/Tired-Fox/Mophidian"
             target="_blank">
