@@ -1,5 +1,7 @@
 from __future__ import annotations
 from pathlib import Path, PurePosixPath
+import posixpath
+import posixpath
 
 
 from typing import TYPE_CHECKING, Any, MutableMapping, Optional
@@ -136,6 +138,13 @@ class Page:
         """Get the last segment of the url."""
         return self.url.rstrip("/").rsplit("/")[-1]
 
+    def in_dir(self, path: str) -> bool:
+        """Check to see if the current pages directory is nested in a given directory."""
+
+        if posixpath.normpath(path.replace("\\", "/")).lstrip("/") in self.file.parent:
+            return True
+        return False
+
     def _build_urls(self, root: str):
         if root != "":
             root = root.replace("\\", "/").lstrip("/").rstrip("/")
@@ -169,7 +178,7 @@ class Page:
             raise
 
         if self.file.is_type(FileExtension.Markdown):
-            self.meta, self.markdown = MophidianMarkdown.parse(
+            self.meta, self.markdown, self.template = MophidianMarkdown.parse(
                 content, config, layouts, self.template
             )
         elif self.file.is_type(FileExtension.Template) and self.template is None:

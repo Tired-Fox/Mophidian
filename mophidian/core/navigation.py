@@ -116,16 +116,16 @@ def get_navigation(pages: Files, content: Files, config: Config) -> Nav:
     tokens = _get_tokens(pages, content, config)
 
     nav = []
-    webpages = []
     for token in tokens:
         if isinstance(tokens[token], dict):
-            children, wp = _get_children(tokens[token], config)
+            children = _get_children(tokens[token], config)
             nav.append(Group(token, children))
-            webpages.extend(wp)
         elif isinstance(tokens[token], File):
             new_page = Page(tokens[token], config)
             nav.append(new_page)
-            webpages.append(new_page)
+
+    _sort_links(nav)
+    webpages = _extract_links(nav)
 
     _build_np_links(webpages)  # build next and previous links
     _build_parent_links(nav)  # build parent links
@@ -155,25 +155,21 @@ def _build_np_links(nav: list[Page]):
         cur.previous, cur.next = prev, next
 
 
-def _get_children(tokens: dict, config: Config) -> tuple[list[Page | Group], list[Page]]:
+def _get_children(tokens: dict, config: Config) -> list[Page | Group]:
     nav = []
-    pages = []
     for token in tokens:
         if isinstance(tokens[token], dict):
-            children, p = _get_children(tokens[token], config)
+            children = _get_children(tokens[token], config)
             nav.append(Group(token, children))
-            pages.extend(p)
         elif isinstance(tokens[token], tuple):
             page = Page(tokens[token][0], config)
             page.build_template(tokens[token][1])
             nav.append(page)
-            pages.append(page)
         elif isinstance(tokens[token], File):
             page = Page(tokens[token], config)
             nav.append(page)
-            pages.append(page)
 
-    return nav, pages
+    return nav
 
 
 def _get_tokens(pages: Files, content: Files, config: Config) -> dict:
@@ -243,3 +239,42 @@ def _add_non_directory_page(tokenized: dict, file: File, template=None):
     current[breadcrumbs[-1]] = file if template is None else (file, template)
 
     return tokenized
+
+
+def _extract_links(links: list):
+    def get_links(items: list) -> list:
+        result = []
+
+        for item in items:
+            if isinstance(item, Page):
+                result.append(item)
+            else:
+                result.extend(get_links(item.children))
+
+        return result
+
+    return get_links(links)
+
+
+def _sort_links(links: list):
+    def sort_group(children: list) -> list:
+        result = []
+        pages = list(filter(lambda item: item.is_page, children))
+        groups = list(filter(lambda item: item.is_group, children))
+
+        def sort_func(e):
+            if e.file.name == "index":
+                return e.file.name
+            else:
+                return f"_{e.file.name}"
+
+        pages.sort(key=sort_func)
+        result.extend(pages)
+
+        for item in groups:
+            item.children = sort_group(item.children)
+            result.append(item)
+
+        return result
+
+    links = sort_group(links)
