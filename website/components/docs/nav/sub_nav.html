@@ -6,7 +6,7 @@
 </li>
 {%- elif nav_item.is_group %}
 <li>
-    {% if nav_item.has_index() %}
+    {%- if nav_item.has_index() %}
     <a class="break-words text-3xl font-bold md:font-normal md:text-base text-black md:no-underline hover:text-lime-900 md:hover:underline"
         href="{{ nav_item.index.url|urlencode }}" aria-label="Go to {{
             nav_item.index.title }} page">
@@ -14,7 +14,7 @@
     </a>
     {% else %}
     <span class="break-words text-3xl font-bold md:font-normal md:text-base text-black">{{ nav_item.title }}</span>
-    {% endif %}
+    {%- endif %}
     <ul class="list-disc">
         {%- for nav_item in nav_item.children %}
         {% include cmpt.docs.nav.sub_nav %}

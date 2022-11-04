@@ -102,34 +102,31 @@ class Files:
             if file.is_static:
                 file.copy_file(dirty)
 
-    def build_all_sass(self, config: Config, dirty: bool = False):
+    def build_all_sass(self, config: Config, pkg_mgr: PPM, dirty: bool = False):
         """Compile all the sass files into their corresponding css files."""
 
-        sass_file = list(
-            filter(
-                lambda file: file.is_modified() if dirty else True,
-                [file for file in self if file.is_type(FileExtension.SASS)],
+        if config.integrations.sass:
+            sass_file = list(
+                filter(
+                    lambda file: file.is_modified() if dirty else True,
+                    [file for file in self if file.is_type(FileExtension.SASS)],
+                )
             )
-        )
 
-        pkg_mgr = PPM(config.integrations.package_manager, Logger)
-        pkg_mgr.ppm.run("css:style:compress")
-
-        if len(sass_file) > 0:
             old_stdo = sys.stdout
             old_stde = sys.stderr
 
-            if config.integrations.sass:
-                if pkg_mgr.ppm.has_node:
-                    SASS = Sass(Logger, pkg_mgr, old_stdo, old_stde)
+            if pkg_mgr.ppm.has_node:
+                SASS = Sass(Logger, pkg_mgr, old_stdo, old_stde)
 
-                    with contextlib.redirect_stdout(None):
-                        with contextlib.redirect_stderr(None):
-                            SASS.install(config)
-                            Path(config.site.dest).joinpath("css/").mkdir(
-                                parents=True, exist_ok=True
-                            )
-                            pkg_mgr.ppm.run("css:src:compress")
+                with contextlib.redirect_stdout(None):
+                    with contextlib.redirect_stderr(None):
+                        SASS.install(config)
+                        Path(config.site.dest).joinpath("css/").mkdir(parents=True, exist_ok=True)
+                        if dirty and not len(sass_file) > 0:
+                            pass
+                        else:
+                            pkg_mgr.ppm.run("css:compress")
 
     def template_pages(self) -> list[File]:
         """Return list of all template pages."""

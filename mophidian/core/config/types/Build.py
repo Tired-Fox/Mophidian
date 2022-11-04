@@ -8,7 +8,7 @@ class Build(BaseType):
     version_format: str
     """How the generator should format the version."""
 
-    default_template: str
+    default_layout: str
     """The name of the default template to use for markdown files."""
 
     refresh_delay: float | int

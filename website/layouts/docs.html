@@ -1,23 +1,23 @@
 {% extends lyt.base %}
 
-{% block title %}
+{%- block title %}
 <title>Docs | {{ page.title }}</title>
-{% endblock %}
+{%- endblock %}
 
-{% block links %}
+{%- block links %}
 {{ super() }}
-{% endblock %}
+{%- endblock %}
 
-{% block scripts %}
+{%- block scripts %}
 {{ super() }}
 {% include cmpt.docs.nav.nav_logic %}
-{% endblock %}
+{%- endblock %}
 
-{% block header %}
+{%- block header %}
 {% include cmpt.header %}
-{% endblock %}
+{%- endblock %}
 
-{% block body %}
+{%- block body %}
 {% set nav_data = nav.get_dir("docs") %}
 {% set section_name = "Docs" %}
 <div class="article-container grid grid-cols-11">
@@ -30,4 +30,4 @@
 </div>
 <div class="flex-1"></div>
 {% include cmpt.next_prev %}
-{% endblock %}
+{%- endblock %}

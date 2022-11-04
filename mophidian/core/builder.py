@@ -1,12 +1,15 @@
 """Builder is a class than combines all core functionality to build a website."""
 
 import contextlib
+import os
 import shutil
 from pathlib import Path
+from threading import Thread
 from jinja2 import Environment, FileSystemLoader
 from mophidian.core.integration import Tailwindcss
 
 from mophidian.core.ppm import PPM
+from mophidian.moph_log import Logger, Log
 
 from .config import Config
 from .utils import build_template_dict
@@ -14,14 +17,15 @@ from .files import get_files
 from .navigation import get_navigation
 from .navigation import Nav
 from .files import Files
-from moph_log import Logger
 
 
 class Builder:
     """Builds files into pages. Compiles Sass and Tailwindcss. Static files are also copied to the destination."""
 
-    def __init__(self):
+    def __init__(self, logger: Log = Logger):
         self.cfg = Config()
+        self.logger = logger
+        self.pkg_mgr = PPM(self.cfg.integrations.package_manager, Logger)
 
     def delete_old(self):
         """If the path to the site already exists delete it."""
@@ -49,16 +53,22 @@ class Builder:
         """
         return get_files(self.cfg)
 
-    def copy_all_static_dir(self):
+    def copy_all_static_dir(self, dirty: bool = False):
         """If `static/` exists then copy it's contents to the site directory."""
         # Copy all static files from the static/ directory
         static_path = Path("static/")
         if static_path.exists():
             for path in static_path.glob("./**/*.*"):
                 dest_path = Path(path.as_posix().replace("static", self.cfg.site.dest))
-                dest_path.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(path, dest_path)
-                # shutil.copytree("static/", self.cfg.site.dest)
+
+                if dest_path.exists():
+                    if dirty and not os.path.getmtime(path) < os.path.getmtime(dest_path):
+                        continue
+                    else:
+                        shutil.copyfile(path, dest_path)
+                else:
+                    dest_path.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copyfile(path, dest_path)
 
     def get_template_tree(self, template_dir: str) -> dict:
         """Retrieve all jinja2.Template's from the given directory.
@@ -131,11 +141,14 @@ class Builder:
             layouts (dict): Dictionary of all the layouts
         """
 
+        change_count = 0
+
         for page in nav.pages:
             if dirty and not page.file.is_modified():
                 continue
             else:
                 page.build_content(self.cfg, layouts)
+                change_count += 1
 
         for page in nav.pages:
             if dirty and not page.file.is_modified():
@@ -149,43 +162,31 @@ class Builder:
                 with open(dest.as_posix(), encoding="utf-8", mode="+w") as page_file:
                     page_file.write(page.content)  # type: ignore
 
+        return change_count
+
     def build_tailwind(self):
         """Build tailwind styles based on the compiled pages."""
 
         if self.cfg.integrations.tailwind:
-            pkg_mgr = PPM(self.cfg.integrations.package_manager, Logger)
-            if pkg_mgr.ppm.has_node:
-                TAILWIND = Tailwindcss(Logger, pkg_mgr)
+            if self.pkg_mgr.ppm.has_node:
+                TAILWIND = Tailwindcss(Logger, self.pkg_mgr)
 
                 with contextlib.redirect_stdout(None):
                     with contextlib.redirect_stderr(None):
                         TAILWIND.install(self.cfg)
                         Path(self.cfg.site.dest).joinpath("css/").mkdir(parents=True, exist_ok=True)
-                        pkg_mgr.ppm.run("tailwind:mini")
+                        self.pkg_mgr.ppm.run("tailwind:mini")
 
-    def full(self, dirty: bool = False):
+    def rebuild(self, dirty: bool = False):
         """Execute a full site build."""
         if not dirty:
             self.delete_old()
-
-        if self.cfg.build.use_root:
-            self.cfg.site.dest = self.cfg.site.dest + self.cfg.site.root
 
         # Build and retrieve data
         Logger.Info("Finding files")
         files, content = self.get_files_and_content()
         Logger.Info("Constructing page data")
         nav = self.get_nav(files, content)
-        print(nav)
-
-        # Build and apply integrations
-        Logger.Info(f"Building all sass files in {self.cfg.site.source}")
-        files.build_all_sass(self.cfg, dirty)
-
-        # Copy static files to destination
-        Logger.Info("Copying static files")
-        self.copy_all_static_dir()
-        files.copy_all_static()
 
         # Retrieve components and layouts
         Logger.Info("Retreiving all templates from 'components/' and 'layouts/'")
@@ -194,9 +195,123 @@ class Builder:
         self.apply_default_layouts(layouts)
 
         Logger.Info("Building pages")
-        self.build_pages(nav, components, layouts, files, content, dirty=dirty)
+        changed = self.build_pages(nav, components, layouts, files, content, dirty=dirty)
+
+        Logger.Success("Pages built")
+
+        self.rebuild_frontend(dirty, changed, files)
+
+        # Copy static files to destination
+        Logger.Info("Copying static files")
+        self.copy_all_static_dir(dirty)
+        files.copy_all_static(dirty)
+
+    def rebuild_frontend(self, dirty: bool, changed: int, files):
+        from subprocess import Popen, PIPE
+        from shutil import which
+
+        threads = []
+        """Current threads that are active."""
+        if self.cfg.integrations.sass:
+            sass_file = list(
+                filter(
+                    lambda file: file.is_modified() if dirty else True,
+                    [file for file in files if file.is_type(["sass", "scss"])],
+                )
+            )
+            if len(sass_file) > 0:
+                self.logger.Custom("sass ...", label="compiling", clr="magenta")
+                threads.append(
+                    (
+                        "sass",
+                        Popen(
+                            f"{which(self.pkg_mgr.ppm.name())} css:compress",
+                            stdout=PIPE,
+                            stderr=PIPE,
+                        ),
+                    )
+                )
+
+        if self.cfg.integrations.tailwind and changed > 0:
+            self.logger.Custom("tailwind ...", label="compiling", clr="magenta")
+            threads.append(
+                (
+                    "tailwind",
+                    Popen(
+                        f"{which(self.pkg_mgr.ppm.name())} tailwind:mini", stdout=PIPE, stderr=PIPE
+                    ),
+                )
+            )
+
+        for thread in threads:
+            thread[1].wait()
+            Logger.Custom(f"{thread[0]}", label="compiled", clr="green")
+
+    def pages(self, dirty: bool = False):
+        if not dirty:
+            self.delete_old()
+
+        # Build and retrieve data
+        Logger.Info("Finding files")
+        files, content = self.get_files_and_content()
+        Logger.Info("Constructing page data")
+        nav = self.get_nav(files, content)
+
+        # Retrieve components and layouts
+        Logger.Info("Retreiving all templates from 'components/' and 'layouts/'")
+        components = self.get_template_tree("components/")
+        layouts = self.get_template_tree("layouts/")
+        self.apply_default_layouts(layouts)
+
+        Logger.Info("Building pages")
+        change_count = self.build_pages(nav, components, layouts, files, content, dirty=False)
+
+        # Build and apply integrations
+        Logger.Info(f"Building all sass files in {self.cfg.site.source}")
+        files.build_all_sass(self.cfg, dirty)
 
         # Build tailwind css
-        self.build_tailwind()
+        if change_count > 0:
+            self.build_tailwind()
 
-        Logger.Success("Congrats! Your site has been built")
+        # Copy static files to destination
+        Logger.Info("Copying static files")
+        self.copy_all_static_dir(dirty)
+        files.copy_all_static(dirty)
+
+        Logger.Success("Site built")
+
+    def full(self, dirty: bool = False):
+        """Execute a full site build."""
+        if not dirty:
+            self.delete_old()
+
+        # Build and retrieve data
+        Logger.Info("Finding files")
+        files, content = self.get_files_and_content()
+        Logger.Info("Constructing page data")
+        nav = self.get_nav(files, content)
+
+        # Retrieve components and layouts
+        Logger.Info("Retreiving all templates from 'components/' and 'layouts/'")
+        components = self.get_template_tree("components/")
+        layouts = self.get_template_tree("layouts/")
+        self.apply_default_layouts(layouts)
+
+        Logger.Info("Building pages")
+        change_count = self.build_pages(nav, components, layouts, files, content, dirty=dirty)
+
+        # Build and apply integrations
+        Logger.Info(f"Building all sass files in {self.cfg.site.source}")
+        files.build_all_sass(self.cfg, self.pkg_mgr, dirty)
+
+        # Build tailwind css
+        if change_count > 0:
+            self.build_tailwind()
+
+        # Copy static files to destination
+        Logger.Info("Copying static files")
+        self.copy_all_static_dir(dirty)
+        files.copy_all_static(dirty)
+
+        Logger.Success("Site built")

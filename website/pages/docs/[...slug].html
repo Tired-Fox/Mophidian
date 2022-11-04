@@ -1,33 +1,33 @@
 {% extends lyt.base %}
 
-{% block title %}
-<title>Docs | {{ page.title }}</title>
-{% endblock %}
+{%- block title %}
+        <title>Docs | {{ page.title }}</title>
+{%- endblock %}
 
-{% block links %}
+{%- block links %}
 {{ super() }}
-{% endblock %}
+{%- endblock %}
 
-{% block scripts %}
+{%- block scripts %}
 {{ super() }}
 {% include cmpt.docs.nav.nav_logic %}
-{% endblock %}
+{%- endblock %}
 
-{% block header %}
+{%- block header %}
 {% include cmpt.header %}
-{% endblock %}
+{%- endblock %}
 
-{% block body %}
-{% set nav_data = nav.get_dir("docs") %}
-{% set section_name = "Docs" %}
-<div class="article-container grid grid-cols-11">
-    {% include cmpt.docs.nav.nav %}
-    <article
-        class="prose prose-pre:shadow prose-pre:shadow-slate-700 w-full max-w-[50rem] mx-auto col-start-1 col-span-full md:mx-0 md:col-span-7 md:col-start-4 row-start-2 lg:col-start-3 lg:row-start-1">
-        {{ content }}
-    </article>
-    {% include cmpt.docs.toc.toc %}
-</div>
-<div class="flex-1"></div>
-{% include cmpt.next_prev %}
-{% endblock %}
+{%- block body %}
+        {% set nav_data = nav.get_dir("docs") %}
+        {% set section_name = "Docs" %}
+        <div class="article-container grid grid-cols-11">
+            {% include cmpt.docs.nav.nav %}
+            <article
+                class="prose prose-pre:shadow prose-pre:shadow-slate-700 w-full max-w-[50rem] mx-auto col-start-1 col-span-full md:mx-0 md:col-span-7 md:col-start-4 row-start-2 lg:col-start-3 lg:row-start-1">
+                {{ content }}
+            </article>
+            {% include cmpt.docs.toc.toc %}
+        </div>
+        <div class="flex-1"></div>
+        {%- include cmpt.next_prev %}
+{%- endblock %}

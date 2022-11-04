@@ -1,25 +1,25 @@
 {% extends lyt.base %}
 
-{% block title %}
+{%- block title %}
 <title>Docs | Mophidian</title>
-{% endblock %}
+{%- endblock %}
 
-{% block links %}
+{%- block links %}
 {{ super() }}
 {% include cmpt.favicon %}
 {% include cmpt.favicon %}
-{% endblock %}
+{%- endblock %}
 
-{% block scripts %}
+{%- block scripts %}
 {{ super() }}
 {% include cmpt.docs.nav.nav_logic %}
-{% endblock %}
+{%- endblock %}
 
-{% block header %}
+{%- block header %}
 {% include cmpt.header %}
-{% endblock %}
+{%- endblock %}
 
-{% block body %}
+{%- block body %}
 {% set nav_data = nav.get_dir("docs") %}
 <div class="grid grid-cols-10">
     {% include cmpt.docs.nav.nav %}
@@ -35,4 +35,4 @@
     </div>
 </div>
 <div class="flex-1"></div>
-{% endblock %}
+{%- endblock %}

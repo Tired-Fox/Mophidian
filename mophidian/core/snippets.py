@@ -61,16 +61,16 @@ module.exports = {{
 @tailwind utilities;\
 """,
     "tailwind_scripts": {
-        "tailwind": lambda dest: f"tailwindcss -i ./styles/tailwind.css -o ./{dest}/css/tailwind.min.css",
-        "tailwind:mini": lambda dest: f"tailwindcss -i ./styles/tailwind.css -o ./{dest}/css/tailwind.min.css --minify",
-        "tailwind:watch": lambda dest: f"tailwindcss -i ./styles/tailwind.css -o ./{dest}/css/tailwind.min.css --minify --watch",
+        "tailwind": "tailwindcss -i ./tailwind.css -o ./static/css/tailwind.min.css",
+        "tailwind:mini": "tailwindcss -i ./tailwind.css -o ./static/css/tailwind.min.css --minify",
+        "tailwind:watch": "tailwindcss -i ./tailwind.css -o ./static/css/tailwind.min.css --minify --watch",
+        "tailwind:watch:mini": "tailwindcss -i ./tailwind.css -o ./static/css/tailwind.min.css --minify --watch --minify",
     },
     "sass_scripts": {
-        "css": "sass styles/sass/:static/css --no-source-map",
-        "css:watch": "sass --watch styles/sass/:static/css --no-source-map",
-        "css:src:compress": lambda src: f"sass --style=compressed {src}:static/ --no-source-map",
-        "css:style:compress": "sass --style=compressed style/sass/:static/ --no-source-map",
-        "css:watch:compress": lambda src: f"sass --watch --style=compressed {src}:static/ --no-source-map",
+        "css": lambda src: f"sass {src}:static/ styles/:static/css/ --no-source-map",
+        "css:compress": lambda src: f"sass --style=compressed {src}:static/ styles/:static/css/ --no-source-map",
+        "css:watch": lambda src: f"sass --watch {src}:static/ styles/:static/css/ --no-source-map",
+        "css:watch:compress": lambda src: f"sass --watch --style=compressed {src}:static/ styles/:static/css/ --no-source-map",
     },
     "integration_file_structure": '''
 project

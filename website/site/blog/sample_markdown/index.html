@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="theme-color" content="#ffffff">
-<title>Sample markdown</title>
-
+        <title>Sample markdown</title>
         <link rel="shortcut icon" href="/Mophidian/favicon.svg"">
 <link rel=”mask-icon” href=" /Mophidian/favicon.svg” color=”#000000">
 <link rel="apple-touch-icon" href="/Mophidian/favicon.svg">
@@ -15,7 +13,6 @@
         <link rel="stylesheet" href="/Mophidian/css/tailwind.min.css">
         <link rel="stylesheet" href="/Mophidian/css/global.css">
         <link rel="stylesheet" href="/Mophidian/css/highlight.css">
-
 
         <script defer src="/Mophidian/js/brands.min.js"></script>
         <script defer src="/Mophidian/js/solid.min.js"></script>
@@ -27,42 +24,40 @@
         document.body.classList.toggle("hide-overflow");
     }
 </script>
-
     </head>
 
     <body class="">
-<div id="header lg:hidden"
-    class="bg-white/95 shadow-sm border-b-2 border-solid border white sticky top-0 z-10 w-full py-4 px-8 h-[4.5rem]">
-    <div class="flex justify-between items-center max-w-[80rem] mx-auto">
-        <div class="flex-1 flex justify-start">
-            <button
-                class="md:hidden bg-transparent border-none w-10 h-10 flex justify-center itemscenter cursor-pointer focus:outline-none focus:border-none focus:bg-transparent text-lime-900 hover:text-gray-500"
-                onclick="toggleMenu()">
-                <svg class="w-8 h-8 transition-transform ease-in-out delay-100" xmlns="http://www.w3.org/2000/svg"
-                    fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
-                </svg>
-            </button>
-        </div>
-        <div class="flex-1 flex justify-center">
-            <a class="w-fit tracking-wide no-underline" href="/Mophidian/">
-                <h3 class="text-lime-900 text-2xl font-bold">Mophidian</h3>
-            </a>
-        </div>
-        <div class="flex-1 flex justify-end">
-            <nav class="flex items-center gap-8 w-fit">
-                <a class="hidden md:block w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
-                    href="/Mophidian/blog/">Blog</a>
-                <a class="hidden md:block w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
-                    href="/Mophidian/docs/">Docs</a>
-            </nav>
+    <div id="header lg:hidden"
+        class="bg-white/95 shadow-sm border-b-2 border-solid border white sticky top-0 z-10 w-full py-4 px-8 h-[4.5rem]">
+        <div class="flex justify-between items-center max-w-[80rem] mx-auto">
+            <div class="flex-1 flex justify-start">
+                <button
+                    class="md:hidden bg-transparent border-none w-10 h-10 flex justify-center itemscenter cursor-pointer focus:outline-none focus:border-none focus:bg-transparent text-lime-900 hover:text-gray-500"
+                    onclick="toggleMenu()">
+                    <svg class="w-8 h-8 transition-transform ease-in-out delay-100" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex-1 flex justify-center">
+                <a class="w-fit tracking-wide no-underline" href="/Mophidian/">
+                    <h3 class="text-lime-900 text-2xl font-bold">Mophidian</h3>
+                </a>
+            </div>
+            <div class="flex-1 flex justify-end">
+                <nav class="flex items-center gap-8 w-fit">
+                    <a class="hidden md:block w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
+                        href="/Mophidian/blog/">Blog</a>
+                    <a class="hidden md:block w-fit underline-offset-2 text-lime-900 tracking-wide hover:underline"
+                        href="/Mophidian/docs/">Docs</a>
+                </nav>
+            </div>
         </div>
     </div>
-</div>
-
-<div class="grid grid-cols-11 grid-rows-1">
-    <aside id="nav-aside"
+        <div class="grid grid-cols-11 grid-rows-1">
+            <aside id="nav-aside"
     class="w-full text-black flex justify-center col-span-1 col-start-1 row-span-1 hide-aside md:hidden">
     <div class="fixed w-screen h-screen z-10 bg-zinc-50 flex flex-col justify-center items-center md:hidden">
         <div class="absolute top-4 w-full flex justify-between px-8 md:hidden">
@@ -80,9 +75,9 @@
         </ul>
     </div>
 </aside>
-    <article
-        class="prose prose-pre:shadow prose-pre:shadow-slate-700 w-full max-w-[50rem] mx-auto col-start-1 col-span-full md:mx-0 md:col-span-7 md:col-start-2 row-start-2 md:row-start-1">
-        <h1 id="an-h1-header">An h1 header</h1>
+            <article
+                class="prose prose-pre:shadow prose-pre:shadow-slate-700 w-full max-w-[50rem] mx-auto col-start-1 col-span-full md:mx-0 md:col-span-7 md:col-start-2 row-start-2 md:row-start-1">
+                <h1 id="an-h1-header">An h1 header</h1>
 <p>Paragraphs are separated by a blank line.</p>
 <p>2<sup>nd</sup> paragraph. <em>Italic</em>, <strong>bold</strong>, and <code>monospace</code>. Itemized lists
 look like:</p>
@@ -238,70 +233,57 @@ which you wish to be displayed literally, ex.: `foo`, *bar*, etc.</p>
 </li>
 </ol>
 </div>
-    </article>
-    
+            </article>
+            
 <aside id="toc-aside"
     class="text-black w-[95%] mx-auto flex justify-center col-span-full col-start-1 row-start-1 md:col-span-3 md:col-start-9">
     <div
         class="w-full h-fit relative mt-2 py-4 px-8 bg-slate-100 rounded-md shadow shadow-slate-300 md:mr-5 md:mt-0 md:w-fit md:sticky md:top-[7rem]">
         <p class="font-bold mb-2">Table of Contents</p>
         <ul class="list-none">
-            
             <li>
                 <a class="text-black no-underline hover:underline hover:text-lime-900" href="#an-h1-header"
                     aria-label="Jump to An H1 Header">
                     An H1 Header
                 </a>
             </li>
-            
             <ul class="list-disc">
-    
     <li>
         <a class="text-black no-underline hover:underline hover:text-lime-900" href="#an-h2-header"
             aria-label="Jump to An H2 Header">
             An H2 Header
         </a>
     </li>
-    
     <ul class="list-disc">
-    
     <li>
         <a class="text-black no-underline hover:underline hover:text-lime-900" href="#an-h3-header"
             aria-label="Jump to An H3 Header">
             An H3 Header
         </a>
     </li>
-    
-    
 </ul>
-    
-    
 </ul>
-            
-            
         </ul>
     </div>
 </aside>
-
-</div>
-<div class="flex-1"></div>
-
-        <footer class="flex justify-center w-full px-8 py-3 h-16">
-    <div id="footlinks" class="flex-[4] flex justify-start">
-        <a class="text-[1.1rem] text-black hover:text-gray-500" href="https://github.com/Tired-Fox/Mophidian"
-            target="_blank">
-            <i class="fa-brands fa-github"></i>
-        </a>
-    </div>
-    <div id="info" class="flex-[5] flex justify-center flex-col">
-        <small>&copy; 2022 Zachary Boehm. All Rights Reserved.</small>
-
-        <div id="credits">
-            <small class="text-[.7rem] opacity-50 text-gray-500">Illustrations by Icons 8 from <a
-                    class="text-blue-400/80" href="https://icons8.com/illustrations" target="_blank">Ouch!</a></small>
         </div>
-    </div>
-</footer>
+        <div class="flex-1"></div>
+            <footer class="flex justify-center w-full px-8 py-3 h-16">
+        <div id="footlinks" class="flex-[4] flex justify-start">
+            <a class="text-[1.1rem] text-black hover:text-gray-500" href="https://github.com/Tired-Fox/Mophidian"
+                target="_blank">
+                <i class="fa-brands fa-github"></i>
+            </a>
+        </div>
+        <div id="info" class="flex-[5] flex justify-center flex-col">
+            <small>&copy; 2022 Zachary Boehm. All Rights Reserved.</small>
+
+            <div id="credits">
+                <small class="text-[.7rem] opacity-50 text-gray-500">Illustrations by Icons 8 from <a
+                        class="text-blue-400/80" href="https://icons8.com/illustrations" target="_blank">Ouch!</a></small>
+            </div>
+        </div>
+    </footer>
     </body>
 
 </html>

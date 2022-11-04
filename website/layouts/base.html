@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
     <head>
         {%- block meta %}
         <meta charset="UTF-8">
@@ -24,7 +23,7 @@
         {%- endblock %}
     </head>
 
-    <body class="{% block body_style %}{% endblock %}">
+    <body class="{%- block body_style %}{%- endblock %}">
         {%- block header %}
         {%- endblock %}
         {%- block body %}

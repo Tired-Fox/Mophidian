@@ -9,6 +9,8 @@
     </head>
 
     <style>
+        @import url('https://fonts.googleapis.com/css?family=Poppins:400');
+
         .flex {
             display: flex
         }
@@ -31,23 +33,35 @@
             border-style: solid;
             border-color: black;
         }
+
+        article {
+            padding: 2rem;
+            width: 95%;
+            max-width: 50rem;
+
+            font-family: 'Poppins', sans-serif;
+        }
     </style>
 
     <body class="flex flex-col">
-        {% block content %}
-        {{ content }}
-        {% endblock %}
+        {%- block content %}
+        <article>
+            {{ content }}
+        </article>
+        {%- endblock %}
 
-        {% block moph_info %}
+        {%- block moph_info %}
         <div class="auto-expand"></div>
         <footer class="footer">
             <p>Thank you for using Mophidian to generate your website!</p>
 
             <p>Make sure to check out the <a href="https://github.com/Tired-Fox/Mophidian" target="_blank"
-                    title="Mophidian Github">documentation</a> to find out how to write your own layouts and components
+                    title="Mophidian Github">documentation</a> to find out how to use Mophidian to it's full potential.
+                Also, check out the <a href="https://tired-fox.github.io/Mophidian/blog/" target="_blank">blog</a> to
+                see examples.
             </p>
         </footer>
-        {% endblock %}
+        {%- endblock %}
     </body>
 
 </html>

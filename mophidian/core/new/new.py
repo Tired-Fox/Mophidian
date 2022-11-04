@@ -1,9 +1,10 @@
 import os
+import shutil
 import sys
 import contextlib
 from json import dumps
 from pathlib import Path
-from typing import TextIO
+from typing import Optional, TextIO
 
 from mophidian.core.integration import Tailwindcss, Sass
 from moph_log import Logger, color, FColor, Style
@@ -25,19 +26,26 @@ def setup(
     sass: bool,
     tailwind: bool,
     no_defaults: bool,
+    config: dict,
     ostdo: TextIO,
     ostde: TextIO,
     **kwargs,
 ):
-    config = {
-        "site": {"name": name, "version": version},
-        "build": {"refresh_delay": 0.3},
-        "markdown": {"append": no_defaults, "extensions": [], "extension_configs": {}},
-        "integration": {
-            "sass": sass,
-            "tailwind": tailwind,
-        },
-    }
+    if config is None:
+        config = {
+            "site": {"name": name, "version": version},
+            "build": {"refresh_delay": 0.3},
+            "markdown": {"append": no_defaults, "extensions": [], "extension_configs": {}},
+            "integration": {
+                "sass": sass,
+                "tailwind": tailwind,
+            },
+        }
+    else:
+        config["site"]["name"] = name
+        config["site"]["version"] = version
+        config["integration"]["sass"] = sass
+        config["integration"]["tailwind"] = tailwind
 
     package_manager = PPM(logger=Logger)
 
@@ -82,9 +90,6 @@ def setup(
     for dir in dirs:
         dir.mkdir(parents=True, exist_ok=True)
 
-    with open("pages/index.html", "+w", encoding="utf-8") as starter_index:
-        starter_index.write(snippets["starter_index"])
-
 
 def generate(**kwargs):
     name = input("Site Name: ")
@@ -103,7 +108,26 @@ def generate(**kwargs):
                 Logger.Error(f"{name} already exists!")
                 exit(2)
 
-            new_project.mkdir(parents=True, exist_ok=True)
+            if kwargs["template"] not in ["blank"]:
+                kwargs["template"] = "blank"
+
+            template_path = Path(__file__).parent.parent.parent.joinpath(
+                f"templates/{kwargs['template']}"
+            )
+
+            if template_path.joinpath("moph.json").exists():
+                with open(template_path.joinpath("moph.json", "r")) as cfg:
+                    from json import load
+
+                    config = load(cfg)
+            else:
+                config = None
+
+            shutil.copytree(
+                template_path,
+                new_project,
+            )
+
             os.chdir(name)
 
             setup(
@@ -112,6 +136,7 @@ def generate(**kwargs):
                 logger=Logger,
                 ostdo=old_stdout,
                 ostde=old_stderr,
+                config=config,
                 **kwargs,
             )
             Logger.Success(

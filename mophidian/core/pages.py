@@ -150,7 +150,6 @@ class Page:
             root = root.replace("\\", "/").lstrip("/").rstrip("/")
             self.full_url = PurePosixPath("/" + root + self.file.url).as_posix()
         else:
-            print("NO ROOT")
             self.full_url = None
 
     def build_template(self, file: File):
