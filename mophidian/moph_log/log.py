@@ -2,7 +2,7 @@ from __future__ import annotations
 from io import TextIOWrapper
 import sys
 
-from typing import Callable, TextIO
+from typing import Any, Callable, TextIO
 from .encoding import encodings
 from .LL import LL
 from teddecor import TED
@@ -119,47 +119,71 @@ class Log:
 
         if len(gaps) == 2 and gaps[0]:
             self._output.write("\n")
-            
-        self._output.write(TED.parse(f"*\[[@F{clr}]{label}[@F]\]* ") + " ".join(args) + "\n")
-    
+
+        message = []
+        for arg in args:
+            if isinstance(arg, list):
+                message.extend([str(a) for a in arg])
+            else:
+                message.append(str(arg))
+
+        message = " ".join(message)
+        message += "\n" if not message.endswith("\n") else ""
+
+        self._output.write(TED.parse(f"*\[[@F{clr}]{label}[@F]\]* ") + message)
+
         if len(gaps) == 2 and gaps[1]:
             self._output.write("\n")
 
         self._output.flush()
-        
-    def Debug(self, *args: str):
+
+    def Debug(self, *args: Any):
         if self._compare(LL.DEBUG, self._level):
             self.Out(*args, label="Debug", clr="white")
 
-    def Info(self, *args: str):
+    def Info(self, *args: Any):
         if self._compare(LL.INFO, self._level):
             self.Out(*args, label="Info", clr="cyan")
 
-    def Warning(self, *args: str):
+    def Warning(self, *args: Any):
         if self._compare(LL.WARNING, self._level):
             self.Out(*args, label="Warning", clr="yellow")
 
-    def Important(self, *args: str):
+    def Important(self, *args: Any):
         if self._compare(LL.IMPORTANT, self._level):
             self.Out(*args, label="Important", clr="magenta")
 
-    def Success(self, *args: str):
+    def Success(self, *args: Any):
         if self._compare(LL.SUCCESS, self._level):
             self.Out(*args, label="Success", clr="green")
 
-    def Error(self, *args: str):
+    def Error(self, *args: Any):
         if self._compare(LL.ERROR, self._level):
             self.Out(*args, label="Error", clr="red")
 
     def Custom(
         self,
-        *args: str,
+        *args: Any,
         clr: str = "blue",
         label: str = LL.CUSTOM,
         gaps: list[bool] = [False],
     ):
         if self._compare(LL.CUSTOM, self._level):
             self.Out(*args, label=label, clr=clr, gaps=gaps)
+
+    def Message(self, *args: Any):
+        message = []
+        for arg in args:
+            if isinstance(arg, list):
+                message.extend([str(a) for a in arg])
+            else:
+                message.append(str(arg))
+
+        message = " ".join(message)
+        message += "\n" if not message.endswith("\n") else ""
+
+        self._output.write(message)
+        self._output.flush()
 
 
 Logger = Log(level=LL.INFO)

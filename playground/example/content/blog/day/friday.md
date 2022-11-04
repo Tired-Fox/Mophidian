@@ -1,5 +1,0 @@
----
-title: Friday
----
-
-# ITS FRIDAY !!!

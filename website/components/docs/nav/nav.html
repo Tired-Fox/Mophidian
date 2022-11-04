@@ -15,11 +15,11 @@
             </nav>
         </div>
         <ul class="flex flex-col gap-4 p-4 md:p-0 md:gap-1 md:list-decimal">
-            {% for nav_item in nav_data.children %}
-            {% if nav_item.children %}
+            {%- for nav_item in nav_data.children %}
+            {%- if nav_item.children %}
             {% include cmpt.docs.nav.sub_nav %}
-            {% endif %}
-            {% endfor %}
+            {%- endif %}
+            {%- endfor %}
         </ul>
     </div>
 </aside>

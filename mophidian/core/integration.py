@@ -275,8 +275,8 @@ class Tailwindcss(Integration):
         """Add base tailwind.css file to project."""
 
         Path("styles").mkdir(parents=True, exist_ok=True)
-        if not Path("styles/tailwind.css").exists():
-            with open("styles/tailwind.css", "+w", encoding="utf-8") as tailwindcss:
+        if not Path("./tailwind.css").exists():
+            with open("./tailwind.css", "+w", encoding="utf-8") as tailwindcss:
                 tailwindcss.write(snippets["tailwind_css"])
 
     def add_tailwind_config_open(self, config: Config):
@@ -329,13 +329,10 @@ class Tailwindcss(Integration):
     def require_addons(self):
         """Ask user if they would like certain addons. Then install them and set them up."""
 
-        self.logger.Custom(
+        self.logger.Message(
             TED.parse(
                 "\[[@F green]*Y*[@F]\] yes, \[[@F blue]*A*[@F]\] all yes \[[@F red]*N*[@F]\] no \[[@F yellow]*D*[@F]\] all no"
-            ),
-            label="CMD",
-            clr="magenta",
-            gaps=[True, False],
+            )
         )
         all_yes = False
         all_no = False

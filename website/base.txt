@@ -1,17 +1,17 @@
 {% extends lyt.base %}
 
-{% block title %}
-{% endblock %}
+{%- block title %}
+{%- endblock %}
 
-{% block links %}
+{%- block links %}
 {{ super() }}
-{% endblock %}
+{%- endblock %}
 
-{% block scripts %}
-{% endblock %}
+{%- block scripts %}
+{%- endblock %}
 
-{% block header %}
-{% endblock %}
+{%- block header %}
+{%- endblock %}
 
-{% block body %}
-{% endblock %}
+{%- block body %}
+{%- endblock %}

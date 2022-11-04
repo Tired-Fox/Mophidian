@@ -1,6 +1,9 @@
 #!/usr/bin/env python
+import contextlib
+import posixpath
 from core.builder import Builder
 import click
+from mophidian.moph_log import Logger
 
 open_help = "If specified, then the live server will automatically open in the browser."
 tailwind_help = "Enable tailwind compiling"
@@ -20,14 +23,79 @@ def cli():
 def new_command(sass: bool, tailwind: bool, no_defaults: bool, template: str):
     from core.new import generate
 
-    print(template)
     generate(sass=sass, tailwind=tailwind, no_defaults=no_defaults, template=template)
 
 
 @cli.command(name="serve")
 @click.option("-o", "--open", flag_value=True, help=open_help, default=False)
-def serve_command(open: bool, debug: bool):
-    raise NotImplementedError("The live serve has not been implemented yet")
+def serve_command(open: bool):
+    import livereload
+    from mophidian.core.builder import Builder
+
+    # Init server and builder
+    server = livereload.Server()
+    builder = Builder(logger=Logger)
+
+    # Change source dir to be source + website root for proper links
+    old_dest = builder.cfg.site.dest
+    builder.cfg.site.dest = builder.cfg.site.dest + builder.cfg.site.root
+
+    # Full build before deploy
+    builder.full()
+
+    threads = []
+    try:
+        with contextlib.redirect_stdout(None):
+            with contextlib.redirect_stderr(None):
+
+                def rebuild(dirty: bool = False):
+                    builder.rebuild(dirty)
+
+                # Watch pages, content, and static
+                server.watch(
+                    filepath=builder.cfg.site.source,
+                    func=lambda: rebuild(True),
+                    delay="forever",
+                )
+                server.watch(
+                    filepath=builder.cfg.site.content,
+                    func=lambda: rebuild(True),
+                    delay="forever",
+                )
+
+                server.watch(
+                    filepath="components/",
+                    func=rebuild,
+                    delay="forever",
+                )
+
+                server.watch(
+                    filepath="layouts/",
+                    func=rebuild,
+                    delay="forever",
+                )
+
+                server.watch(
+                    filepath="static/",
+                    func=lambda: builder.copy_all_static_dir(dirty=True),
+                    delay="forever",
+                )
+
+                server.watch(filepath=builder.cfg.site.dest)
+
+                # TODO start sass and tailwind watch commands
+                Logger.Message("\n\n")
+
+                Logger.Custom(f"Serving to http://localhost:3000/", label="Serve", clr="yellow")
+                server.serve(
+                    port=3000,
+                    root=f"{old_dest}",
+                    open_url_delay=0.3 if open else None,
+                    live_css=True,
+                    restart_delay=2,
+                )
+    except KeyboardInterrupt:
+        Logger.Custom("Shutting down...", label="Shutdown")
 
 
 # @click.option("-o", "--open", flag_value=True, help=open_help, default=False)s

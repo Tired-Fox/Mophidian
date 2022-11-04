@@ -13,11 +13,11 @@ def check_nodejs(logger: Log = None) -> bool:
 
     if which("node") is not None:
         if logger is not None:
+            version = check_output(['node', '--version']).decode().strip('\n').strip()
             logger.Custom(
-                f"Node {check_output(['node', '--version']).decode()}",
-                clr="yellow",
+                f"Node {version}",
+                clr="magenta",
                 label="Version",
-                gaps=[True, False],
             )
         return True
     else:
@@ -66,7 +66,7 @@ class PPM:
 
 class NPM:
     def __init__(
-        self, logger: Log, init: str = "npm init", install: str = "npm i", run: str = "npm run"
+        self, logger: Log, init: str = "init", install: str = "npm i", run: str = "npm run"
     ):
         self._init = init
         self._install = install
@@ -95,10 +95,15 @@ class NPM:
         """Package manager name as upper case."""
         return cls.__name__.upper()
 
+    def __construct_parts(self, *parts) -> str:
+        return " ".join([str(part) for part in parts if part not in ["", " ", None]])
+
     def init(self):
         """Run the init command associated with the package manager."""
-        self._logger.Custom(self._init, label=self.name_upper())
-        system(self._init)
+
+        cmd = self.__construct_parts(self.name(), self._init)
+        self._logger.Custom(cmd, label=self.name_title(), clr="magenta")
+        system(cmd)
 
     def install(self, package: str, *args: str):
         """Builds the install/add command for a given package.
@@ -106,15 +111,27 @@ class NPM:
         Args:
             package (str): The package that will be installed
         """
-        cmd = f"{self._install} {' '.join(args)} {package}"
-        self._logger.Custom(cmd, label=self.name_upper())
+
+        cmd = self.__construct_parts(self.name(), self._install, " ".join(args), package)
+        self._logger.Custom(cmd, label=self.name_title(), clr="magenta")
         system(cmd)
 
     def run(self, command: str):
         """Run a command using the notation from the preferred package manager."""
-        cmd = f"{self._run} {command}"
-        self._logger.Custom(cmd, label=self.name_upper())
-        system(cmd)
+        from subprocess import Popen, PIPE
+        from shutil import which
+
+        self._logger.Custom(
+            self.__construct_parts(self.name(), self._run, command),
+            label=self.name_title(),
+            clr="magenta",
+        )
+        run_cmd = Popen(
+            self.__construct_parts(str(which(self.name())), self._run, command),
+            stdout=PIPE,
+            stderr=PIPE,
+        )
+        run_cmd.wait()
 
     def run_command(self, command: str) -> str:
         """Get the built run command for this node package manager"""
@@ -123,9 +140,9 @@ class NPM:
 
 class Yarn(NPM):
     def __init__(self, logger: Log):
-        super().__init__(logger=logger, init="yarn init", install="yarn add", run="yarn")
+        super().__init__(logger=logger, init="init", install="add", run="")
 
 
 class PNPM(NPM):
     def __init__(self, logger: Log):
-        super().__init__(logger=logger, init="pnpm init", install="pnpm add", run="pnpm")
+        super().__init__(logger=logger, init="init", install="add", run="")

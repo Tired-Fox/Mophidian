@@ -1,15 +1,15 @@
 # Todo
 
-- [ ] Relative links work with `/` paths
-- [ ] Custom wsgi_app server with live reloading including watchdog
 - [ ] Fontawesome integration
   - [ ] Javascript & Webfont variants
 - [ ] Math plugin/Integration
 - [ ] Add custom errors
 - [ ] Tool for Pygments themes
 - [ ] Tool for selecting presets
+- [ ] Tool for adding/removing integrations
 - [ ] Support for bootstrap??
 - [ ] Support for read time??
+- [ ] Custom wsgi_app server with live reloading including watchdog
 
 
 Inspirational Sources:

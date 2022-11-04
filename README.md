@@ -255,14 +255,14 @@ Say that you created a template/layout named base.html in the `layouts/` directo
 ```html[some_layout.html]
 {% extend lyt.base %}
 <head>
-    {% block header}
+    {%- block header}
     {{ super() }}
     <link rel="stylesheet" href="/css/header.css">
-    {% endblock %}
+    {%- endblock %}
 </head>
-{% block content %}
+{%- block content %}
     {{ content }}
-{% endblock %}
+{%- endblock %}
 ```
 
 Or if you implemented the `base.html` file somewhere else you can do something like this.
