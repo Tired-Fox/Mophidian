@@ -281,6 +281,12 @@ class Builder:
 
         Logger.Success("Site built")
 
+    def del_dest(self, dest: str):
+        """Delete a directory. Used to delete a temporary destination."""
+        from shutil import rmtree
+
+        rmtree(dest)
+
     def full(self, dirty: bool = False):
         """Execute a full site build."""
         if not dirty:

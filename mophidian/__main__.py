@@ -37,6 +37,7 @@ def serve_command(open: bool):
     builder = Builder(logger=Logger)
 
     # Change source dir to be source + website root for proper links
+    builder.cfg.site.dest = ".dist/"
     old_dest = builder.cfg.site.dest
     builder.cfg.site.dest = builder.cfg.site.dest + builder.cfg.site.root
 
@@ -44,49 +45,49 @@ def serve_command(open: bool):
     builder.full()
 
     threads = []
+
+    def rebuild(dirty: bool = False):
+        builder.rebuild(dirty)
+
+    # Watch pages, content, and static
+    server.watch(
+        filepath=builder.cfg.site.source,
+        func=lambda: rebuild(True),
+        delay="forever",
+    )
+    server.watch(
+        filepath=builder.cfg.site.content,
+        func=lambda: rebuild(True),
+        delay="forever",
+    )
+
+    server.watch(
+        filepath="components/",
+        func=rebuild,
+        delay="forever",
+    )
+
+    server.watch(
+        filepath="layouts/",
+        func=rebuild,
+        delay="forever",
+    )
+
+    server.watch(
+        filepath="static/",
+        func=lambda: builder.copy_all_static_dir(dirty=True),
+        delay="forever",
+    )
+
+    server.watch(filepath=builder.cfg.site.dest)
+
+    # TODO start sass and tailwind watch commands
+    Logger.Message("\n\n")
+
+    Logger.Custom(f"Serving to http://localhost:3000/", label="Serve", clr="yellow")
     try:
         with contextlib.redirect_stdout(None):
             with contextlib.redirect_stderr(None):
-
-                def rebuild(dirty: bool = False):
-                    builder.rebuild(dirty)
-
-                # Watch pages, content, and static
-                server.watch(
-                    filepath=builder.cfg.site.source,
-                    func=lambda: rebuild(True),
-                    delay="forever",
-                )
-                server.watch(
-                    filepath=builder.cfg.site.content,
-                    func=lambda: rebuild(True),
-                    delay="forever",
-                )
-
-                server.watch(
-                    filepath="components/",
-                    func=rebuild,
-                    delay="forever",
-                )
-
-                server.watch(
-                    filepath="layouts/",
-                    func=rebuild,
-                    delay="forever",
-                )
-
-                server.watch(
-                    filepath="static/",
-                    func=lambda: builder.copy_all_static_dir(dirty=True),
-                    delay="forever",
-                )
-
-                server.watch(filepath=builder.cfg.site.dest)
-
-                # TODO start sass and tailwind watch commands
-                Logger.Message("\n\n")
-
-                Logger.Custom(f"Serving to http://localhost:3000/", label="Serve", clr="yellow")
                 server.serve(
                     port=3000,
                     root=f"{old_dest}",
@@ -94,16 +95,15 @@ def serve_command(open: bool):
                     live_css=True,
                     restart_delay=2,
                 )
-    except KeyboardInterrupt:
+    finally:
         Logger.Custom("Shutting down...", label="Shutdown")
+        builder.del_dest(old_dest)
 
 
 # @click.option("-o", "--open", flag_value=True, help=open_help, default=False)s
 # @click.option("-d", "--debug", flag_value=True, help=debug_help, default=False)
 @cli.command(name="build")
 def build_command():
-    from core.builder import Builder
-
     Builder().full()
 
 

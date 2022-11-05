@@ -188,6 +188,8 @@ class File:
 
     name: str
     """Name of the file without a suffix/extension."""
+    dest_name: str
+    """Name of the destination file."""
     src_uri: str
     """Relative source path to the file, will always use `/` seperation."""
     abs_src_path: str
@@ -271,6 +273,7 @@ class File:
         self.abs_parent = os.path.normpath(PurePath(self.abs_src_path).parent.as_posix())
 
         self.name = self._build_stem()
+        self.dest_name = ""
         self._suffix = PurePath(path).suffix
 
         self.dest_path = self._build_dest_path(directory_url)
@@ -324,12 +327,14 @@ class File:
             if not directory_url or self.name == 'index':
                 # index.md, index.html, README.md => index.html
                 # foo.md, foo.html => foo.html
+                self.dest_name = self.name
                 return posixpath.join(parent, self.name + ".html")
             elif self.name in ['[slug]', '[...slug]']:
                 return parent.as_posix()
             else:
                 # Directory based routing
                 # bar.md or bar.html => bar/index.html
+                self.dest_name = "index"
                 return posixpath.join(parent, self.name, "index.html")
         elif self.is_type(FileExtension.SASS):
             return PurePath(self.src_path).with_suffix(".css").as_posix()

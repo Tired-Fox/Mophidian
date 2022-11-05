@@ -259,21 +259,23 @@ def _extract_links(links: list):
 def _sort_links(links: list):
     def sort_group(children: list) -> list:
         result = []
-        pages = list(filter(lambda item: item.is_page, children))
         groups = list(filter(lambda item: item.is_group, children))
 
         def sort_func(e):
-            if e.file.name == "index":
-                return e.file.name
+            # "!" tagged items are put to the front in sorting and "~" tagged items are put to the end.
+            # It is a easy way of using builtin sorting but also giving priorities.
+            if isinstance(e, Page) and e.file.dest_name == "index":
+                # Add ! to front as it will give it priority to be first
+                return f"!{e.file.dest_name}"
             else:
-                return f"_{e.file.name}"
+                # Add ~ to front as it will give it priority to be last
+                return f"~{e.title.lower()}"
 
-        pages.sort(key=sort_func)
-        result.extend(pages)
+        children.sort(key=sort_func)
+        result.extend(children)
 
         for item in groups:
             item.children = sort_group(item.children)
-            result.append(item)
 
         return result
 

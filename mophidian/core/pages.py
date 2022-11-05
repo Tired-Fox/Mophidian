@@ -70,7 +70,8 @@ class Page:
         next = self.next.url if self.next is not None else "(BLANK)"
         prev = self.previous.url if self.previous is not None else "(BLANK)"
         parent = self.parent.title if self.parent is not None else "(BLANK)"
-        return f"{'  '*depth}Page(title={title}, url='{url}', next: {next}, prev: {prev}, parent: {parent})"
+        file_name = self.file.name if self.file is not None else "(BLANK)"
+        return f"{'  '*depth}Page(title={title}, url='{url}', next: {next}, prev: {prev}, file_name={file_name})"
 
     @property
     def breadcrumbs(self):
@@ -124,7 +125,8 @@ class Page:
         next = self.next.url if self.next is not None else "(BLANK)"
         prev = self.previous.url if self.previous is not None else "(BLANK)"
         parent = self.parent.is_group if self.parent is not None else "(BLANK)"
-        return f"Page(title={title}, url='{url}', next: {next}, prev: {prev}, parent: {parent})"
+        file_name = self.file.name if self.file is not None else "(BLANK)"
+        return f"Page(title={title}, url='{url}', next: {next}, prev: {prev}, parent: {parent}, file_name={file_name})"
 
     @property
     def url(self) -> str:
