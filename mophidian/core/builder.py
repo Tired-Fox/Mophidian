@@ -204,6 +204,7 @@ class Builder:
         Logger.Info("Copying static files")
         self.copy_all_static_dir(dirty)
         files.copy_all_static(dirty)
+        Logger.Success("Finished website rebuild")
 
     def rebuild_frontend(self, dirty: bool, changed: int, files):
         from subprocess import Popen, PIPE
@@ -255,6 +256,7 @@ class Builder:
         files, content = self.get_files_and_content()
         Logger.Info("Constructing page data")
         nav = self.get_nav(files, content)
+        print(nav)
 
         # Retrieve components and layouts
         Logger.Info("Retreiving all templates from 'components/' and 'layouts/'")

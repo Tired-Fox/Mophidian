@@ -35,7 +35,7 @@ def setup(
         config = {
             "site": {"name": name, "version": version},
             "build": {"refresh_delay": 0.3},
-            "markdown": {"append": no_defaults, "extensions": [], "extension_configs": {}},
+            "markdown": {"append": not no_defaults, "extensions": [], "extension_configs": {}},
             "integration": {
                 "sass": sass,
                 "tailwind": tailwind,
@@ -116,7 +116,7 @@ def generate(**kwargs):
             )
 
             if template_path.joinpath("moph.json").exists():
-                with open(template_path.joinpath("moph.json", "r")) as cfg:
+                with open(template_path.joinpath("moph.json"), "r", encoding="utf-8") as cfg:
                     from json import load
 
                     config = load(cfg)

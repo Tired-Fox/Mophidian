@@ -30,8 +30,8 @@ You can specify a template to use with `mophidian new --template <template name>
 
 The includes templates include:
 
+* `Blank` - The minimal default template (Currently the only option)
 * `Docs` - A documentation centric template
 * `Blog` - A blogging centric template
-* `Blank` - The minimal default template
 
 Don't forget to check out the website [**blog/snippets/**](/Mophidian/blog/snippets/) page to see code snippets of common things such as navigation, table of contents, styling for markdown, etc.

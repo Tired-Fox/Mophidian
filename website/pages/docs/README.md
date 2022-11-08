@@ -3,25 +3,21 @@ layout: docs
 title: Overview
 ---
 
-# Getting Started
-
-This [SSG](./Terms/ssg.md) is not meant to replace any other SSG already out there. It is purely to
-experiment with what is possible. This python package is heavily inspired by [mkDocs](https://www.mkdocs.org/), but strives to add a lot more functionality. 
-
-This project has a few main goals:
-
-* Be easy to use
-* Implement modern web framework ideas such as:
-  * components
-  * layouts
-  * tooling
-  * integrations
-  * etc...
-* And most importantly, fun to use.
+Mophidian is a simple static site generator (SSG) that strives to be simple, easy, and powerful. Mophidian is heavily inspired by [mkDocs](https://www.mkdocs.org/), but strives to add a lot more functionality and be closer to most modern Javascript frameworks.
 
 ## Installation
 
 There are a few dependencies for this project and they include:
+
+**Install**
+```bash
+python3 -m pip install --upgrade mophidian
+# or
+pip3 install --upgrade mophidian
+# or any other tool that installs pypi packages
+```
+
+***Note:** Here is the list of dependencies* 
 
 * `teddecor` (Also made by me) for terminal formatting.
 * `markdown` for markdown parsing
@@ -31,13 +27,3 @@ There are a few dependencies for this project and they include:
 * `watchdog` to watch files for changes and execute actions upon those changes
 * `click` for CLI
 * `Pygments` for code highlighting
-
-You don't have to install these manually as these are automatically installed with the projects package.
-
-**Install**
-```bash
-python3 -m pip install --upgrade mophidian
-# or
-pip3 install --upgrade mophidian
-# or any other tool that installs pypi packages
-```
