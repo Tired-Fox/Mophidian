@@ -1,7 +1,7 @@
 from abc import abstractmethod
-from distutils.log import error
 from typing import MutableMapping
-from moph_log import FColor, color, Style, RESET
+
+from mophidian.moph_log import FColor, color, Style, RESET
 
 
 class BaseType:

@@ -1,18 +1,18 @@
 from __future__ import annotations
-import contextlib
 
+import contextlib
+import sys
 from functools import cached_property
 from json import load
 from pathlib import Path
-import sys
 from typing import Callable, Optional, TextIO
+
 from teddecor import TED
 
 from mophidian.core.config.config import Config
-from .ppm import PPM
-from moph_log import Log
-from .snippets import snippets
-
+from mophidian.core.ppm import PPM
+from mophidian.moph_log import Log
+from mophidian.core.snippets import snippets
 
 __all__ = [
     "Tailwindcss",

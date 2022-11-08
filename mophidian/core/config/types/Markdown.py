@@ -1,5 +1,5 @@
 from .Base import BaseType
-from moph_log import color, FColor, Style, RESET
+from teddecor import TED
 
 _defualts = {
     "defaults": True,
@@ -64,13 +64,11 @@ class Markdown(BaseType):
                 self.defaults = defaults
             else:
                 self.errors["general"].append(
-                    '  "append": was of type <'
-                    + color(type(defaults).__name__, prefix=[FColor.RED])
-                    + "> but was expecting <"
-                    + color("bool", prefix=[FColor.YELLOW])
-                    + ">"
+                    TED.parse(
+                        f'  "defaults": was of type <[@F red]{type(defaults).__name__}[@F]>\
+but was expecting <[@F yellow]bool[@F]>'
+                    )
                 )
-
         if self.defaults:
             self.extensions = _defualts["extensions"]
             self.extension_configs = _defualts["extension_configs"]
@@ -86,20 +84,14 @@ class Markdown(BaseType):
                             self.extensions.append(extension)
                     else:
                         self.errors["e_errors"].append(
-                            color(f'    {extensions[i]}', prefix=[FColor.RED])
-                            + ":  was of type <"
-                            + color(type(extension).__name__, prefix=[FColor.RED])
-                            + "> but was expecting <"
-                            + color("str", prefix=[FColor.YELLOW])
-                            + ">"
+                            TED.parse(
+                                f"    {extension[i]}: was of type <[@F red]{type(extension).__name__}[@F]> but was\
+expecting <[@F yellow]str[@F]>"
+                            )
                         )
             else:
-                self.errors["e_error"] = (
-                    "was of type <"
-                    + color(type(extensions).__name__, prefix=[FColor.RED])
-                    + "> but was expecting <"
-                    + color("list", prefix=[FColor.YELLOW])
-                    + ">"
+                self.errors["e_error"] = TED.parse(
+                    f"was of type <[@F red]{type(extensions).__name__}[@F]> but was expecting <[@F yellow]list[@F]>"
                 )
 
         if "extension_configs" in kwargs:
@@ -113,33 +105,21 @@ class Markdown(BaseType):
                             self.extension_configs.update({key: extension_configs[key]})
                         else:
                             self.errors["ec_errors"].append(
-                                f'    "{key}": '
-                                + color("value ", prefix=[FColor.RED])
-                                + "was of type <"
-                                + color(
-                                    type(extension_configs[key]).__name__,
-                                    prefix=[FColor.RED],
-                                    suffix=[FColor.RESET],
+                                TED.parse(
+                                    f'    "{key}": [@F red]value[@F] was of type <[@F red]{type(extension_configs[key]).__name__}[@F]> but was expecting <[@F yellow]dict[@F]>'
                                 )
-                                + "> but was expecting <"
-                                + color("dict", prefix=[FColor.YELLOW])
-                                + ">"
                             )
                     else:
                         self.errors["ec_errors"].append(
-                            f'    "{color(key, prefix=[FColor.RED])}": '
-                            + "is not a know plugin. Make sure it is installed and declared in "
-                            + color("markdown", prefix=[FColor.YELLOW])
-                            + " > "
-                            + color("extensions", prefix=[FColor.YELLOW])
+                            TED.parse(
+                                f'    "[@F red]{key}[@F]": is not a known plugin. Make sure it is installed and declared in [@F yellow]markdown[@F] > [@F yellow]extensions[@F]'
+                            )
                         )
             else:
-                self.errors["ec_error"] = (
-                    "was of type <"
-                    + color(type(kwargs["extension_configs"]).__name__, prefix=[FColor.RED])
-                    + "> but was expecting <"
-                    + color("dict", prefix=[FColor.YELLOW])
-                    + ">"
+                self.errors["ec_error"].append(
+                    TED.parse(
+                        f'was of type <[@F red]{type(kwargs["extension_configs"]).__name__}[@F]> but was expecting <[@F yellow]dict[@F]>'
+                    )
                 )
 
     def has_ext_errors(self) -> bool:
@@ -169,16 +149,12 @@ class Markdown(BaseType):
     def ext_errors(self) -> str:
         if self.has_ext_errors():
             if self.errors['e_error']:
-                return (
-                    '  "extensions": '
-                    + color('value ', prefix=[FColor.RED])
-                    + self.errors['e_error']
-                )
+                return TED.parse(f'  "extensions": [@F red]value[@F] {self.errors["e_error"]}')
             elif len(self.errors['e_errors']) > 0:
                 output = ['  "extensions": [']
-                output.append(color("    ...", prefix=[FColor.BLUE]))
+                output.append(TED.parse("    [@F blue]..."))
                 output.extend(self.errors["e_errors"])
-                return "\n".join(output) + color("\n    ...", prefix=[FColor.BLUE]) + "\n  ]"
+                return "\n".join(output) + TED.parse("\n    [@F blue]...") + "\n  ]"
         return ""
 
     def ext_config_errors(self) -> str:
@@ -192,14 +168,13 @@ class Markdown(BaseType):
         return ""
 
     def format_errors(self) -> str:
-        return color(
-            '"markdown": {\n',
-            self.ext_errors(),
-            ",\n" if self.has_ext_errors() else "",
-            self.ext_config_errors(),
-            "\n}",
-            prefix=[Style.BOLD],
-            suffix=[Style.NOBOLD, FColor.RESET],
+        newline = "\n"
+        return TED.parse(
+            f'''*"markdown": {{
+{self.ext_errors()}{"," if self.has_ext_errors() else ""}\
+{newline if self.has_ext_errors() else "" + self.ext_config_errors()}\
+{newline if self.has_ext_config_errors() else ""}}}
+'''
         )
 
     def __str__(self) -> str:

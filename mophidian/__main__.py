@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import contextlib
-import posixpath
-from core.builder import Builder
 import click
+
+from mophidian.core.builder import Builder
 from mophidian.moph_log import Logger
 
 open_help = "If specified, then the live server will automatically open in the browser."
@@ -21,7 +21,15 @@ def cli():
 @click.option("--no_defaults", flag_value=True, help=tailwind_help, default=False)
 @click.option("--template", type=str, show_default=True, help=template_help, default="blank")
 def new_command(sass: bool, tailwind: bool, no_defaults: bool, template: str):
-    from core.new import generate
+    """Create a new mophidian project.
+
+    Args:
+        sass (bool): Whether to use sass integration.
+        tailwind (bool): Whether to use tailwindcss integration
+        no_defaults (bool): Don't use default values. Includes markdown extensions.
+        template (str): Which template to use. Defaults to "blank".
+    """
+    from mophidian.core.new import generate
 
     generate(sass=sass, tailwind=tailwind, no_defaults=no_defaults, template=template)
 
@@ -29,8 +37,12 @@ def new_command(sass: bool, tailwind: bool, no_defaults: bool, template: str):
 @cli.command(name="serve")
 @click.option("-o", "--open", flag_value=True, help=open_help, default=False)
 def serve_command(open: bool):
+    """Start a live reload server that auto builds and reloads on file changes.
+
+    Args:
+        open (bool): Whether to open in the default browser automatically.
+    """
     import livereload
-    from mophidian.core.builder import Builder
 
     # Init server and builder
     server = livereload.Server()
@@ -43,8 +55,6 @@ def serve_command(open: bool):
 
     # Full build before deploy
     builder.full()
-
-    threads = []
 
     def rebuild(dirty: bool = False):
         builder.rebuild(dirty)
@@ -104,6 +114,7 @@ def serve_command(open: bool):
 # @click.option("-d", "--debug", flag_value=True, help=debug_help, default=False)
 @cli.command(name="build")
 def build_command():
+    """Build the website in the specified dest directory."""
     Builder().full()
 
 

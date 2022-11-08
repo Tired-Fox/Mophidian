@@ -40,7 +40,7 @@ class Config:
         self.print_errors()
 
     def print_errors(self):
-        from moph_log import Logger
+        from mophidian.moph_log import Logger
 
         if len(self.errors) > 0:
             Logger.Error("Errors were found in the config:")

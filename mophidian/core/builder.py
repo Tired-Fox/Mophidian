@@ -4,19 +4,18 @@ import contextlib
 import os
 import shutil
 from pathlib import Path
-from threading import Thread
 from jinja2 import Environment, FileSystemLoader
-from mophidian.core.integration import Tailwindcss
 
+from mophidian.core.integration import Tailwindcss
 from mophidian.core.ppm import PPM
 from mophidian.moph_log import Logger, Log
 
-from .config import Config
-from .utils import build_template_dict
-from .files import get_files
-from .navigation import get_navigation
-from .navigation import Nav
-from .files import Files
+from mophidian.core.config import Config
+from mophidian.core.utils import build_template_dict
+from mophidian.core.files import get_files
+from mophidian.core.navigation import get_navigation
+from mophidian.core.navigation import Nav
+from mophidian.core.files import Files
 
 
 class Builder:
@@ -268,7 +267,7 @@ class Builder:
 
         # Build and apply integrations
         Logger.Info(f"Building all sass files in {self.cfg.site.source}")
-        files.build_all_sass(self.cfg, dirty)
+        files.build_all_sass(config=self.cfg, pkg_mgr=self.pkg_mgr, dirty=dirty)
 
         # Build tailwind css
         if change_count > 0:

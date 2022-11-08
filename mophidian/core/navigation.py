@@ -1,10 +1,10 @@
 from __future__ import annotations
-import os
-from tokenize import group
 
+import os
 from typing import TYPE_CHECKING, Optional, Union
-from .files import Files, File, FileExtension
-from .pages import Page
+
+from mophidian.core.files import Files, File, FileExtension
+from mophidian.core.pages import Page
 
 
 if TYPE_CHECKING:

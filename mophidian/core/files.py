@@ -15,15 +15,16 @@ from shutil import SameFileError
 import sys
 from typing import TYPE_CHECKING, Iterator, Optional, Tuple
 from urllib.parse import quote
-from moph_log import Logger, Log, LL
-from . import utils
-from .ppm import PPM
-from .integration import Sass
+
+from mophidian.moph_log import Logger
+from mophidian.core import utils
+from mophidian.core.ppm import PPM
+from mophidian.core.integration import Sass
 
 
 if TYPE_CHECKING:
-    from .pages import Page
-    from .config import Config
+    from mophidian.core.pages import Page
+    from mophidian.core.config import Config
 
 
 class FileExtension:

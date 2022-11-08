@@ -1,13 +1,15 @@
 import functools
 import os
-from pathlib import Path, PurePath
+import posixpath
 import re
 import shutil
+from jinja2 import Environment, Template
+from pathlib import Path, PurePath
 from typing import TYPE_CHECKING, Any, Optional
 
-from jinja2 import Environment, Template
-from .config.config import Config
-from .toc import TOC
+from mophidian.core.config.config import Config
+from mophidian.core.toc import TOC
+from mophidian.moph_log import Logger
 
 
 from markdown import Markdown
@@ -16,8 +18,6 @@ from markdown.treeprocessors import Treeprocessor
 from markdown.util import AMP_SUBSTITUTE
 from xml.etree.ElementTree import Element
 from urllib.parse import urlsplit, urlunsplit, unquote
-import posixpath
-from moph_log import Logger
 
 if TYPE_CHECKING:
     from .navigation import Nav

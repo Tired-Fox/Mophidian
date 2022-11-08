@@ -4,12 +4,12 @@ import sys
 import contextlib
 from json import dumps
 from pathlib import Path
-from typing import Optional, TextIO
+from typing import TextIO
 
 from mophidian.core.integration import Tailwindcss, Sass
-from moph_log import Logger, color, FColor, Style
+from mophidian.moph_log import Logger, color, FColor, Style
 
-from .snippets import snippets
+from mophidian.core.snippets import snippets
 from mophidian.core.ppm import PPM
 
 
