@@ -1,4 +1,5 @@
 from __future__ import annotations
+from dataclasses import dataclass
 
 from teddecor.decorators import config, TypesDefault
 
@@ -58,4 +59,8 @@ https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, I
         endo = 1000
 
     cfg = Config()
-    print(Config.init().save())
+    
+    from teddecor import pprint
+    # print(Config.init().save())
+    
+    pprint(Config.defaults(), depth=2)
