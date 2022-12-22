@@ -1,7 +1,5 @@
 from __future__ import annotations
-
-from typing import Any, Optional
-import inspect
+from dataclasses import dataclass
 
 from teddecor.decorators import config, TypesDefault
 
@@ -51,8 +49,7 @@ https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, I
             },
             "codehilite": {"css_class": "highlight"},
         }
-
-    """The configurations for each markdown extension."""
+        """The configurations for each markdown extension."""
 
     @config(save="./config.json")
     class Config:
