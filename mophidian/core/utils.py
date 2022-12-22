@@ -7,7 +7,7 @@ from jinja2 import Environment, Template
 from pathlib import Path, PurePath
 from typing import TYPE_CHECKING, Any, Optional
 
-from mophidian.core.config.config import Config
+from mophidian.core.config import CONFIG
 from mophidian.core.toc import TOC
 from mophidian.moph_log import Logger
 
@@ -67,7 +67,6 @@ HTML = str
 def renderTemplate(
     page,
     nav,
-    config: Config,
     components: dict[str, dict | Template],
     layouts: dict[str, dict | Template],
 ) -> HTML:
@@ -76,7 +75,6 @@ def renderTemplate(
     Args:
         page (Page): HTML page that is being rendered
         nav (Nav): Iterable navigation object
-        config (Config): Config object for extra logic and data
         components (dict[str, dict | Template]): Dict of jinja2.Template componenets
         layouts (dict[str, dict | Template]): Dict of jinja2.Template layouts
 
@@ -91,7 +89,7 @@ def renderTemplate(
             "lyt": layouts,
             "meta": page.meta,
             "nav": nav,
-            "site": config.site,
+            "site": CONFIG.site,
         }
         return layout.render(**params, page=page)
 
@@ -126,14 +124,12 @@ class MophidianMarkdown:
 
     @classmethod
     def parse(
-        cls, file: str, config: Config, layouts: dict[str, dict | Template], template=None
+        cls, file: str, layouts: dict[str, dict | Template], template=None
     ) -> tuple[Meta, Content, Template]:
         """Parse the metadata from the markdown content.
 
         Args:
             file (str): The file content as a string.
-            config (Config): Mophidian config for extra logic.
-
         Returns:
             tuple[Meta, Content]: Returns the meta data as a dict and the content as a string.
         """
@@ -167,7 +163,7 @@ class MophidianMarkdown:
 
             # If no layout then attempt to retrive config default
             if template is None:
-                template = get_layout(config.build.default_layout)
+                template = get_layout(CONFIG.build.default_layout)
                 # If config default is invalid then use the provided default layout
                 if template is None:
                     template = layouts["moph_base"]
@@ -179,7 +175,6 @@ class MophidianMarkdown:
         cls,
         page,
         nav,
-        config: Config,
         components: dict[str, dict | Template],
         layouts: dict[str, dict | Template],
         files,
@@ -190,7 +185,6 @@ class MophidianMarkdown:
         Args:
             page (Page): The page that is being rendered
             nav (Nav): The navigation data
-            config (Config): The config data that influences logic
             components (dict[str, Template]): Dict of jinja2.Template components
             layouts (dict[str, Template]): Dict of jinja2.Template layouts
 
@@ -207,16 +201,16 @@ class MophidianMarkdown:
                 "lyt": layouts,
                 "meta": page.meta,
                 "nav": nav,
-                "site": config.site,
+                "site": CONFIG.site,
             }
 
             # convert markdown content to html content
             md = Markdown(
                 extensions=[
                     _RelativePathExtension(page.file, files, contents),
-                    *config.markdown.extensions,
+                    *CONFIG.markdown.extensions,
                 ],
-                extension_configs=config.markdown.extension_configs,
+                extension_configs=CONFIG.markdown.extension_configs,
             )
             content = md.reset().convert(page.markdown)
 

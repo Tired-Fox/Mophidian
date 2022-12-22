@@ -5,10 +5,7 @@ from typing import TYPE_CHECKING, Optional, Union
 
 from mophidian.core.files import Files, File, FileExtension
 from mophidian.core.pages import Page
-
-
-if TYPE_CHECKING:
-    from .config.config import Config
+from mophidian.core.config import CONFIG
 
 
 class Nav:
@@ -110,18 +107,18 @@ class Group:
         return "\n".join(output)
 
 
-def get_navigation(pages: Files, content: Files, config: Config) -> Nav:
+def get_navigation(pages: Files, content: Files) -> Nav:
     """Build navigation from files."""
     # TODO Read in additional links from config
-    tokens = _get_tokens(pages, content, config)
+    tokens = _get_tokens(pages, content)
 
     nav = []
     for token in tokens:
         if isinstance(tokens[token], dict):
-            children = _get_children(tokens[token], config)
+            children = _get_children(tokens[token])
             nav.append(Group(token, children))
         elif isinstance(tokens[token], File):
-            new_page = Page(tokens[token], config)
+            new_page = Page(tokens[token])
             nav.append(new_page)
 
     _sort_links(nav)
@@ -155,27 +152,27 @@ def _build_np_links(nav: list[Page]):
         cur.previous, cur.next = prev, next
 
 
-def _get_children(tokens: dict, config: Config) -> list[Page | Group]:
+def _get_children(tokens: dict) -> list[Page | Group]:
     nav = []
     for token in tokens:
         if isinstance(tokens[token], dict):
-            children = _get_children(tokens[token], config)
+            children = _get_children(tokens[token])
             nav.append(Group(token, children))
         elif isinstance(tokens[token], tuple):
-            page = Page(tokens[token][0], config)
+            page = Page(tokens[token][0])
             page.build_template(tokens[token][1])
             nav.append(page)
         elif isinstance(tokens[token], File):
-            page = Page(tokens[token], config)
+            page = Page(tokens[token], CONFIG)
             nav.append(page)
 
     return nav
 
 
-def _get_tokens(pages: Files, content: Files, config: Config) -> dict:
+def _get_tokens(pages: Files, content: Files) -> dict:
     tokenized = {}
 
-    if config.nav.directory_url:
+    if CONFIG.nav.directory_url:
         tokenized = _build_directory_url(tokenized, pages, content)
     else:
         tokenized = _build_non_directory_url(tokenized, pages, content)

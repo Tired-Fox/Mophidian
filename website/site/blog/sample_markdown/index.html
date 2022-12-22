@@ -77,9 +77,9 @@
 </aside>
             <article
                 class="prose prose-pre:shadow prose-pre:shadow-slate-700 w-full max-w-[50rem] mx-auto col-start-1 col-span-full md:mx-0 md:col-span-7 md:col-start-2 row-start-2 md:row-start-1">
-                <h1>An h1 header</h1>
+                <h1 id="an-h1-header">An h1 header</h1>
 <p>Paragraphs are separated by a blank line.</p>
-<p>2nd paragraph. <em>Italic</em>, <strong>bold</strong>, and <code>monospace</code>. Itemized lists
+<p>2<sup>nd</sup> paragraph. <em>Italic</em>, <strong>bold</strong>, and <code>monospace</code>. Itemized lists
 look like:</p>
 <ul>
 <li>this one</li>
@@ -97,7 +97,7 @@ if you like.</p>
 <p>Use 3 dashes for an em-dash. Use 2 dashes for ranges (ex., "it's all
 in chapters 12--14"). Three dots ... will be converted to an ellipsis.
 Unicode is supported. ☺</p>
-<h2>An h2 header</h2>
+<h2 id="an-h2-header">An h2 header</h2>
 <p>Here's a numbered list:</p>
 <ol>
 <li>first item</li>
@@ -106,25 +106,26 @@ Unicode is supported. ☺</p>
 </ol>
 <p>Note again how the actual text starts at 4 columns in (4 characters
 from the left side). Here's a code sample:</p>
-<pre><code># Let me re-iterate ...
-for i in 1 .. 10 { do-something(i) }
-</code></pre>
+<div class="highlight"><pre><span></span><code># <span class="nv">Let</span> <span class="nv">me</span> <span class="nv">re</span><span class="o">-</span><span class="nv">iterate</span> ...
+<span class="k">for</span> <span class="nv">i</span> <span class="nv">in</span> <span class="mi">1</span> .. <span class="mi">10</span> { <span class="k">do</span><span class="o">-</span><span class="nv">something</span><span class="ss">(</span><span class="nv">i</span><span class="ss">)</span> }
+</code></pre></div>
+
 <p>As you probably guessed, indented 4 spaces. By the way, instead of
 indenting the block, you can use delimited blocks, if you like:</p>
-<p><code>define foobar() {
-    print "Welcome to flavor country!";
-}</code></p>
+<div class="highlight"><pre><span></span><code>define foobar() {
+    print &quot;Welcome to flavor country!&quot;;
+}
+</code></pre></div>
 <p>(which makes copying &amp; pasting easier). You can optionally mark the
 delimited block for Pandoc to syntax highlight it:</p>
-<p>```python
-import time</p>
-<h1>Quick, count to ten!</h1>
-<p>for i in range(10):
-    # (but not <em>too</em> quick)
-    time.sleep(0.5)
-    print(i)
-```</p>
-<h3>An h3 header</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">time</span>
+<span class="c1"># Quick, count to ten!</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="c1"># (but not *too* quick)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="an-h3-header">An h3 header</h3>
 <p>Now a nested list:</p>
 <ol>
 <li>
@@ -141,14 +142,15 @@ import time</p>
 <li>
 <p>Dump everything in the pot and follow
     this algorithm:</p>
-<pre><code>find wooden spoon
-uncover pot
-stir
-cover pot
-balance wooden spoon precariously on pot handle
-wait 10 minutes
-goto first step (or shut off burner when done)
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nv">find</span> <span class="nv">wooden</span> <span class="nv">spoon</span>
+<span class="nv">uncover</span> <span class="nv">pot</span>
+<span class="nv">stir</span>
+<span class="nv">cover</span> <span class="nv">pot</span>
+<span class="nv">balance</span> <span class="nv">wooden</span> <span class="nv">spoon</span> <span class="nv">precariously</span> <span class="nv">on</span> <span class="nv">pot</span> <span class="nv">handle</span>
+<span class="k">wait</span> <span class="mi">10</span> <span class="nv">minutes</span>
+<span class="k">goto</span> <span class="nl">first</span> <span class="nv">step</span> <span class="ss">(</span><span class="nv">or</span> <span class="nv">shut</span> <span class="nv">off</span> <span class="nv">burner</span> <span class="nv">when</span> <span class="nv">done</span><span class="ss">)</span>
+</code></pre></div>
+
 <p>Do not bump wooden spoon or it will fall.</p>
 </li>
 </ol>
@@ -156,35 +158,114 @@ goto first step (or shut off burner when done)
 that last line which continues item 3 above).</p>
 <p>Here's a link to <a href="https://www.example.com">a website</a>, to a <a href="/Mophidian/docs/">local
 doc</a>, and to a <a href="#an-h2-header">section heading in the current
-doc</a>. Here's a footnote [^1].</p>
-<p>[^1]: Some footnote text.</p>
+doc</a>. Here's a footnote <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.</p>
 <p>Tables can look like this:</p>
-<p>| Name         | Size | Material    | Color       |
-|--------------|------|-------------|-------------|
-| All Business | 9    | leather     | brown       |
-| Roundabout   | 10   | hemp canvas | natural     |
-| Cinderella   | 11   | glass       | transparent |</p>
-<p>| Keyword  | Text                                                       |
-|----------|------------------------------------------------------------|
-| red      | Sunsets, apples, and other red or reddish things.          |
-| green    | Leaves, grass, frogs and other things it's not easy being. |</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Size</th>
+<th>Material</th>
+<th>Color</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All Business</td>
+<td>9</td>
+<td>leather</td>
+<td>brown</td>
+</tr>
+<tr>
+<td>Roundabout</td>
+<td>10</td>
+<td>hemp canvas</td>
+<td>natural</td>
+</tr>
+<tr>
+<td>Cinderella</td>
+<td>11</td>
+<td>glass</td>
+<td>transparent</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Keyword</th>
+<th>Text</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>red</td>
+<td>Sunsets, apples, and other red or reddish things.</td>
+</tr>
+<tr>
+<td>green</td>
+<td>Leaves, grass, frogs and other things it's not easy being.</td>
+</tr>
+</tbody>
+</table>
 <p>A horizontal rule follows.</p>
 <hr />
 <p>Here's a definition list:</p>
-<p>apples
-  : Good for making applesauce.</p>
-<p>oranges
-  : Citrus!</p>
-<p>tomatoes
-  : There's no "e" in tomatoe.</p>
+<dl>
+<dt>apples</dt>
+<dd>Good for making applesauce.</dd>
+<dt>oranges</dt>
+<dd>Citrus!</dd>
+<dt>tomatoes</dt>
+<dd>There's no "e" in tomatoe.</dd>
+</dl>
 <p>Again, text is indented 4 spaces. (Put a blank line between each
 term and  its definition to spread things out more.)</p>
 <p>and images can be specified like so:</p>
 <p><img alt="example image" src="/Mophidian/img/casual-life-3d-green-notebook-with-orange-bookmark.png" title="An exemplary image" /></p>
 <p>And note that you can backslash-escape any punctuation characters
 which you wish to be displayed literally, ex.: `foo`, *bar*, etc.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Some footnote text.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="fn-backlink" style="width: .75rem; height: .75rem;" fill="currentColor"><!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M32 448c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c53 0 96-43 96-96l0-306.7 73.4 73.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 109.3 160 416c0 17.7-14.3 32-32 32l-96 0z"/></svg></a></p>
+</li>
+</ol>
+</div>
             </article>
             
+<aside id="toc-aside"
+    class="text-black w-[95%] mx-auto flex justify-center col-span-full col-start-1 row-start-1 md:col-span-3 md:col-start-9">
+    <div
+        class="w-full h-fit relative mt-2 py-4 px-8 bg-slate-100 rounded-md shadow shadow-slate-300 md:mr-5 md:mt-0 md:w-fit md:sticky md:top-[7rem]">
+        <p class="font-bold mb-2">Table of Contents</p>
+        <ul class="list-none">
+            <li>
+                <a class="text-black no-underline hover:underline hover:text-lime-900" href="#an-h1-header"
+                    aria-label="Jump to An H1 Header">
+                    An H1 Header
+                </a>
+            </li>
+            <ul class="list-disc">
+    <li>
+        <a class="text-black no-underline hover:underline hover:text-lime-900" href="#an-h2-header"
+            aria-label="Jump to An H2 Header">
+            An H2 Header
+        </a>
+    </li>
+    <ul class="list-disc">
+    <li>
+        <a class="text-black no-underline hover:underline hover:text-lime-900" href="#an-h3-header"
+            aria-label="Jump to An H3 Header">
+            An H3 Header
+        </a>
+    </li>
+</ul>
+</ul>
+        </ul>
+    </div>
+</aside>
         </div>
         <div class="flex-1"></div>
             <footer class="flex justify-center w-full px-8 py-3 h-16">

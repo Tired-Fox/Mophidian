@@ -1,37 +1,41 @@
 from __future__ import annotations
+from dataclasses import dataclass
 
-from teddecor.decorators import config, TypesDefault
+from teddecor.decorators import config, TypesDefault, Options
 
 
-@config
+@dataclass
+class PackageManagers:
+    NPM: str = "npm"
+    YARN: str = "yarn"
+    PNPM: str = "pnpm"
+
+
+@config.yaml
 class Markdown:
     """Mophidian.markdown configuration."""
 
-    extensions = TypesDefault(
-        list,
-        nested_types=[str],
-        default=[
-            "abbr",
-            "admonition",
-            "attr_list",
-            "def_list",
-            "footnotes",
-            "md_in_html",
-            "tables",
-            "toc",
-            "wikilinks",
-            "codehilite",
-            "pymdownx.betterem",
-            "pymdownx.caret",
-            "pymdownx.details",
-            "pymdownx.mark",
-            "pymdownx.smartsymbols",
-            "pymdownx.superfences",
-            "pymdownx.tabbed",
-            "pymdownx.tasklist",
-            "pymdownx.tilde",
-        ],
-    )
+    extensions = [
+        "abbr",
+        "admonition",
+        "attr_list",
+        "def_list",
+        "footnotes",
+        "md_in_html",
+        "tables",
+        "toc",
+        "wikilinks",
+        "codehilite",
+        "pymdownx.betterem",
+        "pymdownx.caret",
+        "pymdownx.details",
+        "pymdownx.mark",
+        "pymdownx.smartsymbols",
+        "pymdownx.superfences",
+        "pymdownx.tabbed",
+        "pymdownx.tasklist",
+        "pymdownx.tilde",
+    ]
     """The markdown extensions that are to be used for every markdown file."""
 
     extension_configs = {
@@ -49,7 +53,7 @@ https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, I
     """The configurations for each markdown extension."""
 
 
-@config
+@config.yaml
 class Site:
     """Mophidian.site configuration."""
 
@@ -78,7 +82,7 @@ class Site:
     """
 
 
-@config
+@config.yaml
 class Build:
     """Mohpidian.build configuration."""
 
@@ -97,7 +101,7 @@ class Build:
     """Temporary"""
 
 
-@config
+@config.yaml
 class Integrations:
     tailwind = False
     """Auto use and setup tailwind css with node. Defaults to `False`"""
@@ -105,11 +109,11 @@ class Integrations:
     sass = False
     """Auto use and setup sass with node. Defaults to `False`"""
 
-    package_manager = "npm"
+    package_manager = Options(PackageManagers, default="npm")
     """The users prefered package manager. Defaults to `npm`"""
 
 
-@config
+@config.yaml
 class Nav:
     """Mophidian.nav configuration."""
 
@@ -119,7 +123,7 @@ class Nav:
     """
 
 
-@config(load="./moph.json", save="./moph.json")
+@config.yaml(load_save="./moph.yaml")
 class Config:
     """Mophidian configuration."""
 
@@ -137,3 +141,6 @@ class Config:
 
     nav = Nav
     """Navigation configuration."""
+
+
+CONFIG = Config()

@@ -9,7 +9,7 @@ from typing import Callable, Optional, TextIO
 
 from teddecor import TED
 
-from mophidian.core.config.config import Config
+from mophidian.core.config import CONFIG
 from mophidian.core.ppm import PPM
 from mophidian.moph_log import Log
 from mophidian.core.snippets import snippets
@@ -114,7 +114,7 @@ class Integration:
             self.pkgm.ppm.init()
             return False
 
-    def install(self, config: Config):
+    def install(self):
         """Install the integration and plugins/addons if applicable."""
 
         if self.pkgm.ppm.has_node:
@@ -128,7 +128,7 @@ class Integration:
             if not self.installed(self.name):
                 self.pkgm.ppm.install(self.name, "-D")
 
-            self.setup(config)
+            self.setup()
 
             if self.has_addons:
                 self.require_addons()
@@ -139,7 +139,7 @@ class Integration:
                 "integrations will be skipped.",
             )
 
-    def setup(self, config: Config):
+    def setup(self):
         """Setup any additional requirements for this package."""
 
     def require_addons(self):
@@ -179,7 +179,7 @@ class Sass(Integration):
         super().__init__(logger, pkgm, ostdo, ostde)
         self.link = "https://sass-lang.com/"
 
-    def setup(self, config: Config):
+    def setup(self):
         """Setup any additional requirements for this package."""
 
         self.logger.Debug("Adding sass scripts to package.json")
@@ -197,7 +197,7 @@ class Sass(Integration):
                     pj["scripts"].update({script: snippets["sass_scripts"][script]})
                 else:
                     pj["scripts"].update(
-                        {script: snippets["sass_scripts"][script](config.site.source)}
+                        {script: snippets["sass_scripts"][script](CONFIG.site.source)}
                     )
 
         with open("./package.json", "w", encoding="utf-8") as package_json:
@@ -250,7 +250,7 @@ class Tailwindcss(Integration):
             ),
         ]
 
-    def add_tailwind_scripts(self, config: Config):
+    def add_tailwind_scripts(self):
         """Adds compilations scripts to `package.json`."""
 
         with open("./package.json", "r", encoding="utf-8") as package_json:
@@ -265,7 +265,7 @@ class Tailwindcss(Integration):
                     pj["scripts"].update({script: snippets["tailwind_scripts"][script]})
                 else:
                     pj["scripts"].update(
-                        {script: snippets["tailwind_scripts"][script](config.site.dest)}
+                        {script: snippets["tailwind_scripts"][script](CONFIG.site.dest)}
                     )
 
         with open("./package.json", "w", encoding="utf-8") as package_json:
@@ -279,13 +279,13 @@ class Tailwindcss(Integration):
             with open("./tailwind.css", "+w", encoding="utf-8") as tailwindcss:
                 tailwindcss.write(snippets["tailwind_css"])
 
-    def add_tailwind_config_open(self, config: Config):
+    def add_tailwind_config_open(self):
         """Write out the first part of the `tailwind.config.js` file up to plugins section."""
 
         with open("tailwind.config.js", "+w", encoding="utf-8") as tcss_cfg:
             tcss_cfg.write(
                 snippets["tailwind_config_open"](
-                    config.site.dest.replace("\\", "/").lstrip("/").rstrip("/")
+                    CONFIG.site.dest.replace("\\", "/").lstrip("/").rstrip("/")
                 )
             )
 
@@ -318,13 +318,13 @@ class Tailwindcss(Integration):
 
                 moph_config.write(dumps(cfg, indent=2))
 
-    def setup(self, config: Config):
+    def setup(self):
         """Setup any additional requirements for this package."""
 
-        self.add_tailwind_scripts(config)
+        self.add_tailwind_scripts()
         self.add_tailwind_css()
         self.update_refresh_delay()
-        self.add_tailwind_config_open(config)
+        self.add_tailwind_config_open()
 
     def require_addons(self):
         """Ask user if they would like certain addons. Then install them and set them up."""

@@ -20,11 +20,11 @@ from mophidian.moph_log import Logger
 from mophidian.core import utils
 from mophidian.core.ppm import PPM
 from mophidian.core.integration import Sass
+from mophidian.core.config import CONFIG
 
 
 if TYPE_CHECKING:
     from mophidian.core.pages import Page
-    from mophidian.core.config import Config
 
 
 class FileExtension:
@@ -103,10 +103,10 @@ class Files:
             if file.is_static:
                 file.copy_file(dirty)
 
-    def build_all_sass(self, config: Config, pkg_mgr: PPM, dirty: bool = False):
+    def build_all_sass(self, pkg_mgr: PPM, dirty: bool = False):
         """Compile all the sass files into their corresponding css files."""
 
-        if config.integrations.sass:
+        if CONFIG.integrations.sass:
             sass_file = list(
                 filter(
                     lambda file: file.is_modified() if dirty else True,
@@ -122,8 +122,8 @@ class Files:
 
                 with contextlib.redirect_stdout(None):
                     with contextlib.redirect_stderr(None):
-                        SASS.install(config)
-                        Path(config.site.dest).joinpath("css/").mkdir(parents=True, exist_ok=True)
+                        SASS.install()
+                        Path(CONFIG.site.dest).joinpath("css/").mkdir(parents=True, exist_ok=True)
                         if dirty and not len(sass_file) > 0:
                             pass
                         else:
@@ -398,35 +398,35 @@ class File:
         return f"File (name: {self.name}, suffix: {self._suffix}, src_path: {self.src_path}, url: {self.url})"
 
 
-def get_files(config: Config) -> Tuple[Files, Files]:
+def get_files() -> Tuple[Files, Files]:
     """Glob the `source` and return a Files collection. Also, glob the `content` and return a File collection.
 
     Returns:
         Tuple[Files, Files]: File collection for both pages an content.
     """
     pages = []
-    src_path = Path(config.site.source)
+    src_path = Path(CONFIG.site.source)
     if src_path.exists():
         for path in src_path.glob("./**/*.*"):
             pages.append(
                 File(
                     path.as_posix(),
-                    config.site.source,
-                    config.site.dest,
-                    config.nav.directory_url,
+                    CONFIG.site.source,
+                    CONFIG.site.dest,
+                    CONFIG.nav.directory_url,
                 )
             )
 
     content = []
-    content_path = Path(config.site.content)
+    content_path = Path(CONFIG.site.content)
     if content_path.exists():
         for path in content_path.glob("./**/*.*"):
             if path.suffix == ".md":
                 content.append(
                     File(
                         path.as_posix(),
-                        config.site.content,
-                        config.site.dest,
+                        CONFIG.site.content,
+                        CONFIG.site.dest,
                         directory_url=True,
                     )
                 )
