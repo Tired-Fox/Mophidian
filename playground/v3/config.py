@@ -8,7 +8,7 @@ from teddecor.decorators import config, TypesDefault
 
 if __name__ == "__main__":
 
-    @config("./markdown.json")
+    @config(load="./markdown.json", save="markdown.json")
     class Markdown:
         """Mophidian.markdown configuration."""
 
@@ -54,12 +54,12 @@ https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, I
 
     """The configurations for each markdown extension."""
 
-    @config("./config.json")
+    @config(save="./config.json")
     class Config:
         """Some docstring"""
 
-        markdown = Markdown()
+        markdown = Markdown
         endo = 1000
 
-    cfg = Config()
-    print(Config.init("./config.json"))
+    cfg = Config.init()
+    print(cfg)

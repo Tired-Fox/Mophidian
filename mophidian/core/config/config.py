@@ -3,7 +3,7 @@ from __future__ import annotations
 from teddecor.decorators import config, TypesDefault
 
 
-@config()
+@config
 class Markdown:
     """Mophidian.markdown configuration."""
 
@@ -49,7 +49,7 @@ https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, I
     """The configurations for each markdown extension."""
 
 
-@config()
+@config
 class Site:
     """Mophidian.site configuration."""
 
@@ -78,7 +78,7 @@ class Site:
     """
 
 
-@config()
+@config
 class Build:
     """Mohpidian.build configuration."""
 
@@ -97,7 +97,7 @@ class Build:
     """Temporary"""
 
 
-@config()
+@config
 class Integrations:
     tailwind = False
     """Auto use and setup tailwind css with node. Defaults to `False`"""
@@ -109,7 +109,7 @@ class Integrations:
     """The users prefered package manager. Defaults to `npm`"""
 
 
-@config()
+@config
 class Nav:
     """Mophidian.nav configuration."""
 
@@ -119,21 +119,21 @@ class Nav:
     """
 
 
-@config("./moph.json")
+@config(load="./moph.json", save="./moph.json")
 class Config:
     """Mophidian configuration."""
 
-    markdown = Markdown()
+    markdown = Markdown
     """Markdown configuration."""
 
-    site = Site()
+    site = Site
     """Site configuration."""
 
-    build = Build()
+    build = Build
     """Build configuration."""
 
-    integrations = Integrations()
+    integrations = Integrations
     """Integrations configuration."""
 
-    nav = Nav()
+    nav = Nav
     """Navigation configuration."""
