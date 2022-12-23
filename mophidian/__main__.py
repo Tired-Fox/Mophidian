@@ -4,6 +4,7 @@ import click
 
 from mophidian.core.builder import Builder
 from mophidian.moph_log import Logger
+from mophidian.core.config import CONFIG
 
 open_help = "If specified, then the live server will automatically open in the browser."
 tailwind_help = "Enable tailwind compiling"
@@ -49,9 +50,9 @@ def serve_command(open: bool):
     builder = Builder(logger=Logger)
 
     # Change source dir to be source + website root for proper links
-    builder.cfg.site.dest = ".dist/"
-    old_dest = builder.cfg.site.dest
-    builder.cfg.site.dest = builder.cfg.site.dest + builder.cfg.site.root
+    CONFIG.site.dest = ".dist/"
+    old_dest = CONFIG.site.dest
+    CONFIG.site.dest = CONFIG.site.dest + CONFIG.site.root
 
     # Full build before deploy
     builder.full()
@@ -61,12 +62,12 @@ def serve_command(open: bool):
 
     # Watch pages, content, and static
     server.watch(
-        filepath=builder.cfg.site.source,
+        filepath=CONFIG.site.source,
         func=lambda: rebuild(True),
         delay="forever",
     )
     server.watch(
-        filepath=builder.cfg.site.content,
+        filepath=CONFIG.site.content,
         func=lambda: rebuild(True),
         delay="forever",
     )
@@ -89,7 +90,7 @@ def serve_command(open: bool):
         delay="forever",
     )
 
-    server.watch(filepath=builder.cfg.site.dest)
+    server.watch(filepath=CONFIG.site.dest)
 
     # TODO start sass and tailwind watch commands
     Logger.Message("\n\n")

@@ -159,12 +159,17 @@ code {
 }
 
 .hide-overflow {
-    overflow: hidden;
+    overflow: auto;
 }
+
 
 @media only screen and (max-width: 768px) {
     .hide-aside {
       display: none !important;
+    }
+
+    .hide-overflow {
+        overflow: hidden;
     }
 
     #nav-aside {
