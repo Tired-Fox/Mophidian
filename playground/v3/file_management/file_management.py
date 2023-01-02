@@ -52,9 +52,8 @@ class Directory(printable):
         super().__init__(path)
         self.children = []
 
-root = Directory("")
-current = root
-
+layout_root = Directory("")
+page_root = Directory("")
 
 def add_file(file, path: list[str], root):
     current = root
@@ -94,10 +93,11 @@ if __name__ == "__main__":
     for phml_page in Path("files").glob("**/*.phml"):
         if layout_re.match(phml_page.name) is not None:
             path = phml_page.as_posix().split('/')
-            add_file(Layout('/'.join(path[1:])), path, root)
+            add_file(Layout('/'.join(path[1:])), path, layout_root)
 
         elif page_re.match(phml_page.name) is not None:
             path = phml_page.as_posix().split('/')
-            add_file(Page('/'.join(path[1:])), path, root)
+            add_file(Page('/'.join(path[1:])), path, page_root)
                     
-    print(root)
+    print(layout_root, end="\n\n\n")
+    print(page_root)
