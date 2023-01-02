@@ -20,3 +20,14 @@ Order:
 - read files in directory
 - build paths and urls
 - link components to pages
+
+**Reference Svelte**
+- layouts per directory
+  - `~` == root layout/default
+  - `~lyt-name` == Certain layout based on it's name
+  - `<slot />` element to specify location of content
+  - Inherit from parent unless `~` is used on layout
+  - `@lyt-name` to specify the layout name.
+- Grouping directory `(dir_name)`
+  - layouts in this dir inherit the layout name == to the dir_name
+
