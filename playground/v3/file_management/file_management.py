@@ -1,7 +1,8 @@
-from pathlib import Path
+from pathlib import Path, PurePath
 from phml import PHML
 import re
-import posixpath
+
+from util import get_group_name, first
 
 layout_re = re.compile(r"layout(@[a-zA-Z0-9]+)?\.phml")
 page_re = re.compile(r"page(@[a-zA-Z0-9()]+)?\.phml")
@@ -62,31 +63,73 @@ class File(Node):
         self.file_name, self.inherits, self.extension = (
             file_info.groups() if file_info is not None else ("", None, "")
         )
-
+        input(f"{self.path} | {self.inherits}")
         # self.file_name = Path(path).name.replace(Path(path).suffix, "")
-        self.inherits = None
 
         # url
 
 
 class Layout(File):
-    pass
+    def __init__(self, path: str) -> None:
+        self.parent = None
+        super().__init__(path)
+        
+    def __str__(self) -> str:
+        return f"Layout({self.path!r}, parent={self.parent}, inherits={self.inherits!r})"
+    def __repr__(self) -> str:
+        return f"Layout({self.path!r}, parent={self.parent}, inherits={self.inherits!r})"
 
 
 class Page(File):
     pass
 
 
-class Group(Node):
-    def __init__(self, path: str) -> None:
+class Container(Node):
+    def __init__(self, path: str, name: str) -> None:
         super().__init__(path)
         self.children = []
+        self.name = name
+
+    def find_layout_by_name(self, name: str) -> Layout | None:
+        """Name of the layout, either by layout name or group name.
+
+        Example:
+            layout name: layout@account.phml
+            group name: (account)/layout.phml
+
+        Args:
+            name (str): Name of the layout to find. Either name of the layout or the group name
+                where the layout is located.
+
+        Returns:
+            Layout | None: A layout if found otherwise None.
+        """
+        for child in self.children:
+            if isinstance(child, Group) and child.name == name:
+                result = first(
+                    lambda l: isinstance(l, Layout) and l.inherits is None, child.children
+                )
+                if result is not None:
+                    return result
+
+            if isinstance(child, Layout):
+                if child.inherits == name:
+                    return child
+        return None
+
+    def find_page(self) -> Layout:
+        """Find page by destination path or url which are the same +/- index.html."""
+        return Layout("")
 
 
-class Directory(Node):
+class Group(Container):
     def __init__(self, path: str) -> None:
-        super().__init__(path)
-        self.children = []
+        super().__init__(path, get_group_name(path.split("/")[-1]))
+
+
+class Directory(Container):
+    def __init__(self, path: str) -> None:
+        super().__init__(path, path.split("/")[-1])
 
 
 layout_root = Directory("")
@@ -128,6 +171,25 @@ def add_file(file, path: list[str], root):
 
     return current
 
+def add_layout_parents(layout_root: Directory):
+    def iterate_children(current: Directory | Group, parent: Layout | None = None):
+        layouts = [layout for layout in current.children if isinstance(layout, Layout) and layout.inherits is None]
+        input(layouts)
+        containers = [cont for cont in current.children if isinstance(cont, (Directory, Group))]
+        if len(layouts) > 1:
+            raise Exception(f"More than one layout for directory or group: {current.path}")
+        
+        layout = parent
+        if len(layouts) == 1:
+            layout = layouts[0]
+            layout.parent = parent
+            
+        
+        for container in containers:
+            iterate_children(container, layout)
+    
+    iterate_children(layout_root)
+
 
 if __name__ == "__main__":
     for phml_page in Path("files").glob("**/*.phml"):
@@ -139,5 +201,6 @@ if __name__ == "__main__":
             path = phml_page.as_posix().split('/')
             add_file(Page('/'.join(path[1:])), path, page_root)
 
+    add_layout_parents(layout_root)
     print(layout_root, end="\n\n\n")
-    print(page_root)
+    print(layout_root.find_layout_by_name("blog"))
