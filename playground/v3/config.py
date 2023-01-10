@@ -1,5 +1,4 @@
 from __future__ import annotations
-from dataclasses import dataclass
 
 from teddecor.decorators import config, TypesDefault
 

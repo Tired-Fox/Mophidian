@@ -1,0 +1,10 @@
+integrations:
+  package_manager: yarn
+  sass: true
+  tailwind: true
+site:
+  root: Mophidian
+markdown:
+  wrapper:
+    classes:
+      - pros

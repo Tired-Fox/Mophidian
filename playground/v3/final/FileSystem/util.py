@@ -28,7 +28,7 @@ REGEX = {
         "name": re.compile(r"(layout)(@)?([a-zA-Z]+)?(.phml)")
     },
     "file": {
-        "name": re.compile(r"(layout|page)(@)?([a-zA-Z]+)?(.phml)")
+        "name": re.compile(r"([a-zA-Z_0-9]+)(@)?([a-zA-Z]+)?(\.[a-z]{,4})")
     },
     "group": {
         "name": re.compile(r"\(([a-zA-Z0-9]+)\)"),

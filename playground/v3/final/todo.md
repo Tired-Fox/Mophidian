@@ -1,0 +1,19 @@
+- [ ] Global function for constructing url with website root
+- [ ] Automatically rip `head` element from `pages`, `layouts`, and `components` and append there children to root templates `head`
+- [ ] Generate page title from file name
+  - [ ] `tokanize_name` from phml
+  - [ ] Title case the title
+- [ ] Generate site nav
+  - [ ] Full nav tree
+  - [ ] Each page's next and previous
+- [ ] Generate TOC from markdown file
+- [ ] Dynamic routes
+  - [ ] dynamic route generation through python element
+  - [ ] Generates from `content/` directory
+  - [ ] `...dir` recursive catch all
+  - [ ] `dir` catch all
+  - [ ] `slug` file used for desired output else relevant `layout.phml` will be used.
+  - [ ] `page.phml` and `layout.phml` will be given data about all the pages found for the catch all
+- [ ] Integrations
+  - [ ] Tailwind
+  - [ ] Sass
