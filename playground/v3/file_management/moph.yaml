@@ -1,10 +1,6 @@
-integrations:
-  package_manager: yarn
-  sass: true
-  tailwind: true
 site:
   root: Mophidian
-markdown:
-  wrapper:
-    classes:
-      - pros
+  meta_tags:
+    - charset
+    - http_equiv
+    - viewport

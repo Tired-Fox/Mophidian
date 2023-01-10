@@ -1,16 +1,27 @@
 import re
 from typing import Any, Callable
+from functools import cache
 
+META = {
+    "charset": '<meta charset="UTF-8">',
+    "http_equiv": '<meta http-equiv="X-UA-Compatible" content="IE=edge">',
+    "viewport": '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+}
 
-html = """\
+@cache
+def html(*meta: str) -> str:
+    """Construct the base html string based on additional tags and flags."""
+
+    new_line = '\n        '
+    meta = [META[tag] for tag in meta if tag in META]
+
+    return f"""\
 <!DOCTYPE html>
 <html lang="en">
 
     <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{title}</title>
+        {new_line.join(meta)}
+        <title>{{title or ''}}</title>
     </head>
 
     <body>

@@ -1,4 +1,7 @@
 <phml>
     <header />
+    <head>
+        <script>alert('page load');</script>
+    </head>
     <slot />
 </phml>

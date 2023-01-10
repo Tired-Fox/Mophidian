@@ -1,8 +1,9 @@
-- [ ] Global function for constructing url with website root
-- [ ] Automatically rip `head` element from `pages`, `layouts`, and `components` and append there children to root templates `head`
+- [x] global variable for creating url with website root inserted to beginning.
+- [x] Automatically rip `head` element from `pages`, `layouts`, and `components` and append there children to root templates `head`
 - [ ] Generate page title from file name
   - [ ] `tokanize_name` from phml
   - [ ] Title case the title
+- [ ] Get page by path
 - [ ] Generate site nav
   - [ ] Full nav tree
   - [ ] Each page's next and previous
@@ -14,6 +15,7 @@
   - [ ] `dir` catch all
   - [ ] `slug` file used for desired output else relevant `layout.phml` will be used.
   - [ ] `page.phml` and `layout.phml` will be given data about all the pages found for the catch all
+- [ ] Auto add website root to urls
 - [ ] Integrations
   - [ ] Tailwind
   - [ ] Sass

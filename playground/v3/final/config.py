@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from teddecor.decorators import config, Options
+from teddecor import Logger
 
 
 @dataclass
@@ -95,6 +96,15 @@ class Site:
     `project/` is the directory of the website. Defaults to ``
     """
 
+    meta_tags = ["charset", "http_equiv", "viewport"]
+    """Which default meta tags should mophidian include in the base page head tag.
+
+    Tags:
+        'charset': `<meta charset="UTF-8">`
+        'http_equiv': `<meta http-equiv="X-UA-Compatible" content="IE=edge">`
+        'viewport': `<meta name="viewport" content="width=device-width, initial-scale=1.0">`
+    """
+
 
 @config.yaml
 class Build:
@@ -156,5 +166,9 @@ class Config:
     nav = Nav
     """Navigation configuration."""
 
-
-CONFIG = Config()
+try:
+    CONFIG = Config()
+except FileNotFoundError:
+    Logger.warning("No save file found, generating defaults").flush()
+    CONFIG = Config({})
+    CONFIG.save()

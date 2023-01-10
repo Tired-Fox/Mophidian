@@ -5,7 +5,15 @@ from shutil import copyfile, SameFileError
 from typing import Any
 import frontmatter
 
-from phml import AST, PHML, parse_component, substitute_component, query, replace_node
+from phml import (
+    AST,
+    PHML,
+    parse_component, substitute_component,
+    query,
+    replace_node,
+    query_all,
+    remove_nodes
+)
 from phml.core import VirtualPython
 from phml.builder import p
 
@@ -220,14 +228,31 @@ class Markdown(Renderable):
 
         kwargs.update(self.locals)
 
-        ast = phml.parse(html).ast
+        ast = phml.parse(html(*CONFIG.site.meta_tags)).ast
 
         # meta data layout name? then grab layout
         if self.layout is not None:
-            replace_node(ast.tree, {"tag": "slot"}, self.layout.render(self.ast).children)
+            page_ast = self.layout.render(self.ast)
         else:
-            replace_node(ast.tree, {"tag": "slot"}, self.ast.children)
+            page_ast = self.ast
 
+        headers = query_all(page_ast, "head")
+
+        remove_nodes(page_ast, {"tag": "head"}, strict=False)
+
+        head_children = []
+        for head in headers:
+            head_children.extend(head.children)
+
+        head = query(ast, "head")
+        
+        if head is not None:
+            for header in head_children:
+                header.parent = head
+                head.children.append(header)
+            replace_node(ast.tree, {"tag": "head"}, head)
+        replace_node(ast.tree, {"tag": "slot"}, page_ast.children)
+        
         phml.ast = ast
         return phml.render(**kwargs)
 
@@ -297,10 +322,7 @@ class Layout(File):
                 layout_ast = phml.load(Path(self.root).joinpath(layout.path)).ast
 
                 # If it quacks like a full page, then it's a full page
-                if (
-                    query(layout_ast, "html") or query(layout_ast, "head")
-                    or query(layout_ast, "body")
-                ):
+                if query(layout_ast, "html") or query(layout_ast, "body"):
                     raise Exception("Layout must be components not full pages")
 
                 component: dict = parse_component(layout_ast)
@@ -346,16 +368,33 @@ class Page(Renderable):
         phml = PHML()
         page_ast = phml.load(Path(self.root).joinpath(self.path)).ast
 
-        if query(page_ast, "html") or query(page_ast, "head") or query(page_ast, "body"):
+        if query(page_ast, "html") or query(page_ast, "body"):
             raise Exception("Layout must be components not full pages")
         return page_ast
 
     def render(self, phml: PHML, **kwargs) -> str:
-        ast = phml.parse(html).ast
+        ast = phml.parse(html(*CONFIG.site.meta_tags)).ast
         if self.layout is not None:
-            replace_node(ast.tree, {"tag": "slot"}, self.layout.render(self.ast).children)
+            page_ast = self.layout.render(self.ast)
         else:
-            replace_node(ast.tree, {"tag": "slot"}, self.ast.children)
+            page_ast = self.ast
+
+        headers = query_all(page_ast, "head")
+
+        remove_nodes(page_ast, {"tag": "head"}, strict=False)
+
+        head_children = []
+        for head in headers:
+            head_children.extend(head.children)
+
+        head = query(ast, "head")
+        
+        if head is not None:
+            for header in head_children:
+                header.parent = head
+                head.children.append(header)
+            replace_node(ast.tree, {"tag": "head"}, head)
+        replace_node(ast.tree, {"tag": "slot"}, page_ast.children)
 
         phml.ast = ast
         return phml.render(**kwargs)
@@ -632,10 +671,24 @@ class Container(Node):
             return results
 
         return recurse_find(self)
-    
+
+    def renderable(self) -> list[Renderable]:
+        """List of only renderable files in the file system."""
+
+        def recurse_find(current: Container) -> list[Renderable]:
+            results = []
+            for child in current.children:
+                if isinstance(child, Renderable):
+                    results.append(child)
+                elif isinstance(child, Container):
+                    results.extend(recurse_find(child))
+            return results
+
+        return recurse_find(self)
+
     def markdown(self) -> list[Markdown]:
         """List of only markdown files in the file system."""
-        
+
         def recurse_find(current: Container) -> list[Markdown]:
             results = []
             for child in current.children:

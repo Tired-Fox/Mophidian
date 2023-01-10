@@ -1,11 +1,13 @@
 from pathlib import Path
 
 from phml import PHML
+from teddecor import Logger
 
 if True:
     import sys
     sys.path.append("../")
     from config import CONFIG
+    from utils import url
 
 from .nodes import (
     Directory,
@@ -51,21 +53,18 @@ def build_files(path: str) -> Directory:
 def render_pages(root: Directory, out: str, phml: PHML):
     """Render all the pages with their layouts to their destination file."""
 
+    global_vars = {
+        "url": url
+    }
+
     # Render pages
-    for page in root.pages():
+    for page in root.renderable():
         # Ensure path to file
         page.dest(out).parent.mkdir(parents=True, exist_ok=True)
 
         # Write file
         with open(page.dest(out), "+w", encoding="utf-8") as file:
-            file.write(page.render(phml, title="Sample"))
-
-    # Render markdown
-    for md_file in root.markdown():
-        md_file.dest(out).parent.mkdir(parents=True, exist_ok=True)
-
-        with open(md_file.dest(out), "+w", encoding="utf-8") as file:
-            file.write(md_file.render(phml))
+            file.write(page.render(phml, **global_vars))
 
 def write_static_files(root: Directory, out: str):
     """Write static files to their destination."""
@@ -73,12 +72,14 @@ def write_static_files(root: Directory, out: str):
     for static in root.static():
         static.write(out)
 
-def build(file_dir: str = "pages/", out_dir: str = "out/"):
+def build():
     """Take the components and files and render and write them to the given output directory."""
 
+    Logger.info("Building pages").flush()
     phml = PHML()
 
     # Build components and files
+    Logger.debug("Discovering files and components").flush()
     components = build_components("components/")
     root = build_files(CONFIG.site.source)
 
@@ -86,7 +87,9 @@ def build(file_dir: str = "pages/", out_dir: str = "out/"):
     phml.add(components.full_paths(), strip_root=True) # type: ignore
 
     # Render all the pages
+    Logger.debug("Rendering pages").flush()
     render_pages(root, out=CONFIG.site.dest, phml=phml)
     write_static_files(root, out=CONFIG.site.dest)
 
+    Logger.info("Finished building pages").flush()
     return root, components, phml
