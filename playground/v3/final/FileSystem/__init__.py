@@ -1,13 +1,14 @@
 from pathlib import Path
 
 from phml import PHML
-from teddecor import Logger
+from teddecor import Logger, LL, TED
 
 if True:
     import sys
     sys.path.append("../")
     from config import CONFIG
     from utils import url
+    from core import Mophidian
 
 from .nodes import (
     Directory,
@@ -16,10 +17,15 @@ from .nodes import (
     REGEX,
     Component,
     Static,
-    Markdown
+    Markdown,
+    Nav,
+    File,
+    Renderable,
+    Group,
+    Container
 )
 
-from .util import PAGE_IGNORE
+from .util import PAGE_IGNORE, title
 
 def build_components(path: str) -> Directory:
     """Find all the components in the given path and construct a file structure."""
@@ -29,7 +35,7 @@ def build_components(path: str) -> Directory:
         components.add(Component(file.as_posix()))
     return components
 
-def build_files(path: str) -> Directory:
+def build_files(path: str) -> tuple[Directory, Directory]:
     """Find all the files in the given path and construct a file structure."""
 
     root = Directory(path)
@@ -57,23 +63,31 @@ def build_files(path: str) -> Directory:
             root.add(Static(_file.as_posix()))
 
     root.build_hierarchy()
-    return root
+    nav = root.build_nav()
+    return root, nav
 
-def render_pages(root: Directory, out: str, phml: PHML):
+def render_pages(root: Directory, out: str, phml: PHML, nav: Directory = Directory("")):
     """Render all the pages with their layouts to their destination file."""
 
     global_vars = {
-        "url": url
+        "url": url,
+        "title_case": title,
+        "nav": nav,
+        "mophidian": Mophidian()
     }
 
     # Render pages
     for page in root.renderable():
+        page_vars = {
+            "title": page.title
+        }
+
         # Ensure path to file
         page.dest(out).parent.mkdir(parents=True, exist_ok=True)
 
         # Write file
         with open(page.dest(out), "+w", encoding="utf-8") as file:
-            file.write(page.render(phml, **global_vars))
+            file.write(page.render(phml, **page_vars, **global_vars))
 
 def write_static_files(root: Directory, out: str):
     """Write static files to their destination."""
@@ -81,7 +95,7 @@ def write_static_files(root: Directory, out: str):
     for static in root.static():
         static.write(out)
 
-def build():
+def build(display_files: bool = False):
     """Take the components and files and render and write them to the given output directory."""
 
     Logger.info("Building pages").flush()
@@ -90,15 +104,20 @@ def build():
     # Build components and files
     Logger.debug("Discovering files and components").flush()
     components = build_components("components/")
-    root = build_files(CONFIG.site.source)
+    root, nav = build_files(CONFIG.site.source)
 
     # Add components to phml compiler
     phml.add(components.full_paths(), strip_root=True) # type: ignore
 
+    if display_files:
+        Logger.custom(f"({len(root)}) files found", label="File System", clr="178")
+        Logger.message(root).flush()
+
     # Render all the pages
-    Logger.debug("Rendering pages").flush()
-    render_pages(root, out=CONFIG.site.dest, phml=phml)
+    Logger.debug(f"Rendering pages to {TED.parse(f'[@F yellow $]{CONFIG.site.dest}')}").flush()
+    render_pages(root, nav=nav, out=CONFIG.site.dest, phml=phml)
     write_static_files(root, out=CONFIG.site.dest)
 
+    input(root.find_page_by_path("blog")._url)
     Logger.info("Finished building pages").flush()
     return root, components, phml

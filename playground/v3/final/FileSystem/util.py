@@ -76,3 +76,10 @@ def first(condition: Callable, collection: list | dict | tuple) -> Any:
             if condition(value):
                 return value
     return None
+
+def title(text: str | list[str]) -> str:
+    """Generate the title case version of the passed in text."""
+    tokens = text
+    if isinstance(text, str):
+        tokens = text.split(" ")
+    return " ".join([token[0].upper() + token[1:] for token in tokens])

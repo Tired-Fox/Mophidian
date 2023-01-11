@@ -1,5 +1,5 @@
 site:
-  root: Mophidian
+  root: playground/v3/file_management/out/
   meta_tags:
     - charset
     - http_equiv

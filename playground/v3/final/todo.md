@@ -1,14 +1,16 @@
 - [x] global variable for creating url with website root inserted to beginning.
 - [x] Automatically rip `head` element from `pages`, `layouts`, and `components` and append there children to root templates `head`
-- [ ] Route all files as any file name -> index.html or have special file names that stay as is in their current directory
-- [ ] Generate page title from file name
-  - [ ] `tokanize_name` from phml
-  - [ ] Title case the title
-- [ ] Get page by path
+- [x] Route all files as any file name -> index.html or have special file names that stay as is in their current directory
+- [x] Generate page title from file name
+  - [x] `tokanize_name` from phml
+  - [x] Title case the title
+- [x] Get page by path
 - [ ] Generate site nav
   - [ ] Full nav tree
   - [ ] Each page's next and previous
 - [ ] Generate TOC from markdown file
+- [ ] favicon through config and head link tag
+- [ ] when copying elements from page head to base head, don't duplicate tags
 - [ ] Dynamic routes
   - [ ] dynamic route generation through python element
   - [ ] Generates from `content/` directory

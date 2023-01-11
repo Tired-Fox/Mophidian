@@ -1,6 +1,8 @@
 <phml>
     <h1>Home</h1>
     <a :href="url('/')">Home</a>
+    <nav @if="not blank(nav)" :nav="nav" />
+    <p @else>No Nav</p>
 </phml>
 
 <python>
