@@ -1,15 +1,14 @@
 from __future__ import annotations
+
+import posixpath
 from pathlib import Path, PurePosixPath
-import posixpath
-import posixpath
-
-
 from typing import TYPE_CHECKING, Any, MutableMapping, Optional
-from .config.config import Config
-from .files import File, FileExtension
-from moph_log import Logger
-from .utils import MophidianMarkdown, renderTemplate
 from jinja2 import Environment
+
+from mophidian.moph_log import Logger
+from mophidian.core.config import CONFIG
+from mophidian.core.files import File, FileExtension
+from mophidian.core.utils import MophidianMarkdown, renderTemplate
 
 if TYPE_CHECKING:
     from .navigation import Group
@@ -70,7 +69,8 @@ class Page:
         next = self.next.url if self.next is not None else "(BLANK)"
         prev = self.previous.url if self.previous is not None else "(BLANK)"
         parent = self.parent.title if self.parent is not None else "(BLANK)"
-        return f"{'  '*depth}Page(title={title}, url='{url}', next: {next}, prev: {prev}, parent: {parent})"
+        file_name = self.file.name if self.file is not None else "(BLANK)"
+        return f"{'  '*depth}Page(title={title}, url='{url}', next: {next}, prev: {prev}, file_name={file_name})"
 
     @property
     def breadcrumbs(self):
@@ -90,7 +90,7 @@ class Page:
     def is_homepage(self) -> bool:
         return self.is_root_level and self.is_index and self.file.url in [".", "index.html"]
 
-    def __init__(self, file: File, config: Config, title: Optional[str] = None):
+    def __init__(self, file: File, title: Optional[str] = None):
         file.page = self
         self.file = file
         self.title = title
@@ -108,7 +108,7 @@ class Page:
         self.meta = {}
         self.full_url = None
 
-        self._build_urls(config.site.root)
+        self._build_urls(CONFIG.site.root)
         self.is_page = True
 
     def __eq__(self, other: Page) -> bool:
@@ -124,7 +124,8 @@ class Page:
         next = self.next.url if self.next is not None else "(BLANK)"
         prev = self.previous.url if self.previous is not None else "(BLANK)"
         parent = self.parent.is_group if self.parent is not None else "(BLANK)"
-        return f"Page(title={title}, url='{url}', next: {next}, prev: {prev}, parent: {parent})"
+        file_name = self.file.name if self.file is not None else "(BLANK)"
+        return f"Page(title={title}, url='{url}', next: {next}, prev: {prev}, parent: {parent}, file_name={file_name})"
 
     @property
     def url(self) -> str:
@@ -163,7 +164,7 @@ class Page:
             with open(template_path, "r", encoding="utf-8-sig") as template_file:
                 self.template = Environment().from_string(template_file.read())
 
-    def build_content(self, config: Config, layouts: dict[str, dict | Template]):
+    def build_content(self, layouts: dict[str, dict | Template]):
         """Build the pages content. Parse the meta data from a markdown file everything else is the content."""
         try:
             # Use utf-8-sig to more reliably ensure utf-8 encoding. utf-8 with BOM
@@ -178,7 +179,7 @@ class Page:
 
         if self.file.is_type(FileExtension.Markdown):
             self.meta, self.markdown, self.template = MophidianMarkdown.parse(
-                content, config, layouts, self.template
+                content, layouts, self.template
             )
         elif self.file.is_type(FileExtension.Template) and self.template is None:
             self.content = content
@@ -187,7 +188,6 @@ class Page:
 
     def render(
         self,
-        config: Config,
         components: dict[str, dict | Template],
         layouts: dict[str, dict | Template],
         nav: Nav,
@@ -204,10 +204,10 @@ class Page:
         """
         if self.file.is_type(FileExtension.Markdown):
             self.content, self.toc = MophidianMarkdown.render(
-                self, nav, config, components, layouts, files, contents
+                self, nav, components, layouts, files, contents
             )
         else:
-            self.content = renderTemplate(self, nav, config, components, layouts)
+            self.content = renderTemplate(self, nav, components, layouts)
 
     def _build_title(self):
         """Build the title based on the parsed content."""

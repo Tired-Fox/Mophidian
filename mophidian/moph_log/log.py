@@ -3,9 +3,9 @@ from io import TextIOWrapper
 import sys
 
 from typing import Any, Callable, TextIO
+from teddecor import TED
 from .encoding import encodings
 from .LL import LL
-from teddecor import TED
 
 
 class Log:

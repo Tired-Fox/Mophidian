@@ -1,0 +1,6 @@
+site:
+  root: Mophidian
+  meta_tags:
+    - charset
+    - http_equiv
+    - viewport

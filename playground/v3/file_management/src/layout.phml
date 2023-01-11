@@ -1,0 +1,4 @@
+<phml>
+    <header @if="blank(no_header)" />
+    <slot />
+</phml>

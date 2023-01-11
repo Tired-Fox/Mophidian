@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 import contextlib
-import posixpath
-from core.builder import Builder
 import click
+
+from mophidian.core.builder import Builder
 from mophidian.moph_log import Logger
+from mophidian.core.config import CONFIG
 
 open_help = "If specified, then the live server will automatically open in the browser."
 tailwind_help = "Enable tailwind compiling"
@@ -21,7 +22,15 @@ def cli():
 @click.option("--no_defaults", flag_value=True, help=tailwind_help, default=False)
 @click.option("--template", type=str, show_default=True, help=template_help, default="blank")
 def new_command(sass: bool, tailwind: bool, no_defaults: bool, template: str):
-    from core.new import generate
+    """Create a new mophidian project.
+
+    Args:
+        sass (bool): Whether to use sass integration.
+        tailwind (bool): Whether to use tailwindcss integration
+        no_defaults (bool): Don't use default values. Includes markdown extensions.
+        template (str): Which template to use. Defaults to "blank".
+    """
+    from mophidian.core.new import generate
 
     generate(sass=sass, tailwind=tailwind, no_defaults=no_defaults, template=template)
 
@@ -29,64 +38,67 @@ def new_command(sass: bool, tailwind: bool, no_defaults: bool, template: str):
 @cli.command(name="serve")
 @click.option("-o", "--open", flag_value=True, help=open_help, default=False)
 def serve_command(open: bool):
+    """Start a live reload server that auto builds and reloads on file changes.
+
+    Args:
+        open (bool): Whether to open in the default browser automatically.
+    """
     import livereload
-    from mophidian.core.builder import Builder
 
     # Init server and builder
     server = livereload.Server()
     builder = Builder(logger=Logger)
 
     # Change source dir to be source + website root for proper links
-    old_dest = builder.cfg.site.dest
-    builder.cfg.site.dest = builder.cfg.site.dest + builder.cfg.site.root
+    CONFIG.site.dest = ".dist/"
+    old_dest = CONFIG.site.dest
+    CONFIG.site.dest = CONFIG.site.dest + CONFIG.site.root
 
     # Full build before deploy
     builder.full()
 
-    threads = []
+    def rebuild(dirty: bool = False):
+        builder.rebuild(dirty)
+
+    # Watch pages, content, and static
+    server.watch(
+        filepath=CONFIG.site.source,
+        func=lambda: rebuild(True),
+        delay="forever",
+    )
+    server.watch(
+        filepath=CONFIG.site.content,
+        func=lambda: rebuild(True),
+        delay="forever",
+    )
+
+    server.watch(
+        filepath="components/",
+        func=rebuild,
+        delay="forever",
+    )
+
+    server.watch(
+        filepath="layouts/",
+        func=rebuild,
+        delay="forever",
+    )
+
+    server.watch(
+        filepath="static/",
+        func=lambda: builder.copy_all_static_dir(dirty=True),
+        delay="forever",
+    )
+
+    server.watch(filepath=CONFIG.site.dest)
+
+    # TODO start sass and tailwind watch commands
+    Logger.Message("\n\n")
+
+    Logger.Custom(f"Serving to http://localhost:3000/", label="Serve", clr="yellow")
     try:
         with contextlib.redirect_stdout(None):
             with contextlib.redirect_stderr(None):
-
-                def rebuild(dirty: bool = False):
-                    builder.rebuild(dirty)
-
-                # Watch pages, content, and static
-                server.watch(
-                    filepath=builder.cfg.site.source,
-                    func=lambda: rebuild(True),
-                    delay="forever",
-                )
-                server.watch(
-                    filepath=builder.cfg.site.content,
-                    func=lambda: rebuild(True),
-                    delay="forever",
-                )
-
-                server.watch(
-                    filepath="components/",
-                    func=rebuild,
-                    delay="forever",
-                )
-
-                server.watch(
-                    filepath="layouts/",
-                    func=rebuild,
-                    delay="forever",
-                )
-
-                server.watch(
-                    filepath="static/",
-                    func=lambda: builder.copy_all_static_dir(dirty=True),
-                    delay="forever",
-                )
-
-                server.watch(filepath=builder.cfg.site.dest)
-
-                # TODO start sass and tailwind watch commands
-                Logger.Message("\n\n")
-
-                Logger.Custom(f"Serving to http://localhost:3000/", label="Serve", clr="yellow")
                 server.serve(
                     port=3000,
                     root=f"{old_dest}",
@@ -94,16 +106,16 @@ def serve_command(open: bool):
                     live_css=True,
                     restart_delay=2,
                 )
-    except KeyboardInterrupt:
+    finally:
         Logger.Custom("Shutting down...", label="Shutdown")
+        builder.del_dest(old_dest)
 
 
 # @click.option("-o", "--open", flag_value=True, help=open_help, default=False)s
 # @click.option("-d", "--debug", flag_value=True, help=debug_help, default=False)
 @cli.command(name="build")
 def build_command():
-    from core.builder import Builder
-
+    """Build the website in the specified dest directory."""
     Builder().full()
 
 

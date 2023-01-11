@@ -15,15 +15,16 @@ from shutil import SameFileError
 import sys
 from typing import TYPE_CHECKING, Iterator, Optional, Tuple
 from urllib.parse import quote
-from moph_log import Logger, Log, LL
-from . import utils
-from .ppm import PPM
-from .integration import Sass
+
+from mophidian.moph_log import Logger
+from mophidian.core import utils
+from mophidian.core.ppm import PPM
+from mophidian.core.integration import Sass
+from mophidian.core.config import CONFIG
 
 
 if TYPE_CHECKING:
-    from .pages import Page
-    from .config import Config
+    from mophidian.core.pages import Page
 
 
 class FileExtension:
@@ -102,10 +103,10 @@ class Files:
             if file.is_static:
                 file.copy_file(dirty)
 
-    def build_all_sass(self, config: Config, pkg_mgr: PPM, dirty: bool = False):
+    def build_all_sass(self, pkg_mgr: PPM, dirty: bool = False):
         """Compile all the sass files into their corresponding css files."""
 
-        if config.integrations.sass:
+        if CONFIG.integrations.sass:
             sass_file = list(
                 filter(
                     lambda file: file.is_modified() if dirty else True,
@@ -121,8 +122,8 @@ class Files:
 
                 with contextlib.redirect_stdout(None):
                     with contextlib.redirect_stderr(None):
-                        SASS.install(config)
-                        Path(config.site.dest).joinpath("css/").mkdir(parents=True, exist_ok=True)
+                        SASS.install()
+                        Path(CONFIG.site.dest).joinpath("css/").mkdir(parents=True, exist_ok=True)
                         if dirty and not len(sass_file) > 0:
                             pass
                         else:
@@ -188,6 +189,8 @@ class File:
 
     name: str
     """Name of the file without a suffix/extension."""
+    dest_name: str
+    """Name of the destination file."""
     src_uri: str
     """Relative source path to the file, will always use `/` seperation."""
     abs_src_path: str
@@ -271,6 +274,7 @@ class File:
         self.abs_parent = os.path.normpath(PurePath(self.abs_src_path).parent.as_posix())
 
         self.name = self._build_stem()
+        self.dest_name = ""
         self._suffix = PurePath(path).suffix
 
         self.dest_path = self._build_dest_path(directory_url)
@@ -324,12 +328,14 @@ class File:
             if not directory_url or self.name == 'index':
                 # index.md, index.html, README.md => index.html
                 # foo.md, foo.html => foo.html
+                self.dest_name = self.name
                 return posixpath.join(parent, self.name + ".html")
             elif self.name in ['[slug]', '[...slug]']:
                 return parent.as_posix()
             else:
                 # Directory based routing
                 # bar.md or bar.html => bar/index.html
+                self.dest_name = "index"
                 return posixpath.join(parent, self.name, "index.html")
         elif self.is_type(FileExtension.SASS):
             return PurePath(self.src_path).with_suffix(".css").as_posix()
@@ -392,35 +398,35 @@ class File:
         return f"File (name: {self.name}, suffix: {self._suffix}, src_path: {self.src_path}, url: {self.url})"
 
 
-def get_files(config: Config) -> Tuple[Files, Files]:
+def get_files() -> Tuple[Files, Files]:
     """Glob the `source` and return a Files collection. Also, glob the `content` and return a File collection.
 
     Returns:
         Tuple[Files, Files]: File collection for both pages an content.
     """
     pages = []
-    src_path = Path(config.site.source)
+    src_path = Path(CONFIG.site.source)
     if src_path.exists():
         for path in src_path.glob("./**/*.*"):
             pages.append(
                 File(
                     path.as_posix(),
-                    config.site.source,
-                    config.site.dest,
-                    config.nav.directory_url,
+                    CONFIG.site.source,
+                    CONFIG.site.dest,
+                    CONFIG.nav.directory_url,
                 )
             )
 
     content = []
-    content_path = Path(config.site.content)
+    content_path = Path(CONFIG.site.content)
     if content_path.exists():
         for path in content_path.glob("./**/*.*"):
             if path.suffix == ".md":
                 content.append(
                     File(
                         path.as_posix(),
-                        config.site.content,
-                        config.site.dest,
+                        CONFIG.site.content,
+                        CONFIG.site.dest,
                         directory_url=True,
                     )
                 )

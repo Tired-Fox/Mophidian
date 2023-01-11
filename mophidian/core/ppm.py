@@ -4,7 +4,7 @@ from __future__ import annotations
 from os import system
 from shutil import which
 
-from moph_log import Log
+from mophidian.moph_log import Log
 
 
 def check_nodejs(logger: Log = None) -> bool:
