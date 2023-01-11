@@ -1,7 +1,4 @@
 <phml>
-    <header />
-    <head>
-        <script>alert('page load');</script>
-    </head>
+    <header @if="blank(no_header)" />
     <slot />
 </phml>

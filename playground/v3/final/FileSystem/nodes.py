@@ -12,7 +12,7 @@ from phml import (
     query,
     replace_node,
     query_all,
-    remove_nodes
+    remove_nodes,
 )
 from phml.core import VirtualPython
 from phml.builder import p
@@ -20,7 +20,7 @@ from phml.builder import p
 from markdown import Markdown as MarkdownParse
 
 from config import CONFIG
-from .util import REGEX, get_group_name, first, html
+from .util import REGEX, PAGE_IGNORE, get_group_name, first, html
 
 class Node:
     """Base file system node."""
@@ -105,7 +105,10 @@ class File(Node):
                 break
 
         # Replace the file name with index.html
-        self._dest = Path("/".join(self._dest.split("/")[:-1])).joinpath("index.html").as_posix()
+        if self.file_name not in PAGE_IGNORE:
+            self._dest = Path("/".join(self._dest.split("/")[:-1])).joinpath("index.html").as_posix()
+        else:
+            self._dest = Path(self._dest).with_name(self.file_name + ".html").as_posix()
 
     @property
     def ast(self) -> AST:
@@ -382,7 +385,6 @@ class Page(Renderable):
         headers = query_all(page_ast, "head")
 
         remove_nodes(page_ast, {"tag": "head"}, strict=False)
-
         head_children = []
         for head in headers:
             head_children.extend(head.children)

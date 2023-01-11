@@ -19,6 +19,8 @@ from .nodes import (
     Markdown
 )
 
+from .util import PAGE_IGNORE
+
 def build_components(path: str) -> Directory:
     """Find all the components in the given path and construct a file structure."""
 
@@ -38,6 +40,13 @@ def build_files(path: str) -> Directory:
                 root.add(Layout(_file.as_posix()))
             elif REGEX["page"]["name"].match(_file.name) is not None:
                 root.add(Page(_file.as_posix()))
+            else:
+                file_info = REGEX["file"]["name"].search(_file.name)
+                file_name, _, _, _ = (
+                    file_info.groups() if file_info is not None else ("", None, None, "")
+                )
+                if file_name in PAGE_IGNORE:
+                    root.add(Page(_file.as_posix()))
 
         # Markdown files
         elif _file.suffix == ".md":

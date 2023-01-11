@@ -8,6 +8,10 @@ META = {
     "viewport": '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
 }
 
+PAGE_IGNORE = {
+    "404"
+}
+
 @cache
 def html(*meta: str) -> str:
     """Construct the base html string based on additional tags and flags."""
