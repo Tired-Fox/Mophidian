@@ -1,8 +1,6 @@
-<ul @if="not blank(nav)">
-    <span>{nav.name}</span>
-    <li @for="item in nav">
-        <a @if="isinstance(item, mophidian.Page)" :href="item.url">{item.title}</a>
+<ul @if="not blank(nav)" #nav :id="'nav-'+nav.name">
+    <li @for="item in nav" :class="'li-indent' if isinstance(item, mophidian.Nav) else ''">
+        <a @if="isinstance(item, mophidian.Renderable) and item.url != url('')" :href="item.url">{item.title}</a>
         <nav @elif="isinstance(item, mophidian.Nav)" :nav="item" />
-        <span @else>Unkown nav item</span>
     </li>
 </ul>

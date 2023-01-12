@@ -173,16 +173,17 @@ class Renderable(File):
         """Url of the page with the website root."""
         url = Path(CONFIG.site.root).joinpath(self._url.lstrip("/")).as_posix()
 
-        input(url)
         if url != ".":
-            url = "/" + url
+            if self.unique:
+                url = "/" + url
+            else:
+                url = "/" + url + "/"
         else:
             url = "/"
-        input(url)
         return url
 
     def _make_title(self) -> str:
-        name = Path().parent.as_posix().split("/")[-1]
+        name = Path(self._dest).parent.as_posix().split("/")[-1]
         if name.strip() in ["", "."]:
             name = self.file_name
 
@@ -445,8 +446,6 @@ class Page(Renderable):
             replace_node(ast.tree, {"tag": "head"}, head)
         replace_node(ast.tree, {"tag": "slot"}, page_ast.children)
 
-        from phml import inspect
-        input(inspect(ast))
         phml.ast = ast
         return phml.render(**kwargs)
 
@@ -485,7 +484,7 @@ class Nav:
         """Colored terminal representation of the file."""
         out = (
             f"{' ' * depth}\x1b[34m{self.__class__.__name__}\x1b[0m \
-(\x1b[34m{len(self.children)}\x1b[0m)"
+(\x1b[34m{self.name}\x1b[0m)"
         )
         if isinstance(self.children, list):
             for child in list(self.children):

@@ -35,7 +35,7 @@ def build_components(path: str) -> Directory:
         components.add(Component(file.as_posix()))
     return components
 
-def build_files(path: str) -> tuple[Directory, Directory]:
+def build_files(path: str) -> tuple[Directory, Nav]:
     """Find all the files in the given path and construct a file structure."""
 
     root = Directory(path)
@@ -118,6 +118,6 @@ def build(display_files: bool = False):
     render_pages(root, nav=nav, out=CONFIG.site.dest, phml=phml)
     write_static_files(root, out=CONFIG.site.dest)
 
-    input(root.find_page_by_path("blog")._url)
+    print(url(''), "|||", url('/'))
     Logger.info("Finished building pages").flush()
     return root, components, phml

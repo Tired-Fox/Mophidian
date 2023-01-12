@@ -1,4 +1,4 @@
-<div id="header">
+<div id="header" #is-colored>
     <h3>Component</h3>
 </div>
 <style>

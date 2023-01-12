@@ -1,4 +1,7 @@
 <phml>
-    <header @if="blank(no_header)" />
+    <head>
+        <link rel="stylesheet" :href="url('/style.css')">
+    </head>
+    <header @if="blank(no_header)" id="dog" is-colored="true"/>
     <slot />
 </phml>

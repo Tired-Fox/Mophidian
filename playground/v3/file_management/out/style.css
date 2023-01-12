@@ -3,3 +3,12 @@
     padding: 0;
     margin: 0;
 }
+
+ul {
+    list-style: none;    
+}
+
+[id^=nav-]:not([id=nav-home]) ul {
+    padding-left: 1rem;
+}
+
