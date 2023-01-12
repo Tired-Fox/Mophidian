@@ -113,9 +113,6 @@ class Build:
     version_format = "v{}"
     """How the generator should format the version. Defaults to `v{}`"""
 
-    default_layout = "moph_base"
-    """The name of the default template to use for markdown files. Defaults to `moph_base`"""
-
     refresh_delay = 2.0
     """The delay until the live server reloads the browser after a file change is detected.
     Defaults to `2.0`.
@@ -123,6 +120,9 @@ class Build:
 
     use_root = False
     """Temporary"""
+    
+    favicon = "/favicon.ico"
+    """Path to the favicon from website root."""
 
 
 @config.yaml
@@ -135,16 +135,6 @@ class Integrations:
 
     package_manager = Options(PackageManagers, default="npm")
     """The users prefered package manager. Defaults to `npm`"""
-
-
-@config.yaml
-class Nav:
-    """Mophidian.nav configuration."""
-
-    directory_url = True
-    """Whether to use directory urls. If true then files like `foo.md` will translate to
-    `foo/index.html`.
-    """
 
 
 @config.yaml(load_save="./moph.yaml")
@@ -162,9 +152,6 @@ class Config:
 
     integrations = Integrations
     """Integrations configuration."""
-
-    nav = Nav
-    """Navigation configuration."""
 
 try:
     CONFIG = Config()

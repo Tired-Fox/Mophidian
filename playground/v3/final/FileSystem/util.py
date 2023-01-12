@@ -2,6 +2,9 @@ import re
 from typing import Any, Callable
 from functools import cache
 
+from config import CONFIG
+from utils import url
+
 META = {
     "charset": '<meta charset="UTF-8">',
     "http_equiv": '<meta http-equiv="X-UA-Compatible" content="IE=edge">',
@@ -19,12 +22,15 @@ def html(*meta: str) -> str:
     new_line = '\n        '
     meta = [META[tag] for tag in meta if tag in META]
 
+    new_line = "\n"
+    addons = f'{new_line + new_line.join(meta) if len(meta) > 0 else ""}'
+    addons += "\n" + f'<link rel="shortcut icon" href="{url(CONFIG.build.favicon)}" type="image/x-icon">'
+
     return f"""\
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        {new_line.join(meta)}
+    <head>{addons}
         <title>{{title or ''}}</title>
     </head>
 
