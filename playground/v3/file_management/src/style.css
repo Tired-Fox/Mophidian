@@ -12,3 +12,27 @@ ul {
     padding-left: 1rem;
 }
 
+.toc-1 {
+    margin-left: .25rem;
+}
+
+.toc-2 {
+    margin-left: .50rem;
+}
+
+.toc-3 {
+    margin-left: .75rem;
+}
+
+.toc-4 {
+    margin-left: 1rem;
+}
+
+.toc-5 {
+    margin-left: 1.25rem;
+}
+
+.toc-6 {
+    margin-left: 1.5rem;
+}
+

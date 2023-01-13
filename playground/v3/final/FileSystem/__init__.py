@@ -118,6 +118,5 @@ def build(display_files: bool = False):
     render_pages(root, nav=nav, out=CONFIG.site.dest, phml=phml)
     write_static_files(root, out=CONFIG.site.dest)
 
-    print(url(''), "|||", url('/'))
     Logger.info("Finished building pages").flush()
     return root, components, phml

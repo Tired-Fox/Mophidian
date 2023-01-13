@@ -5,16 +5,33 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="shortcut icon" href="/playground/v3/file_management/out/favicon.ico" type="image/x-icon" />
-        <title>January</title>
+        <title>Sample Markdown</title>
         <link rel="stylesheet" href="/playground/v3/file_management/out/style.css" />
     </head>
     <body>
-        <div id="dog">
+        <div id="header">
+            <div></div>
             <h3>Component</h3>
+            <nav>
+                <a href="/playground/v3/file_management/out/">Home</a>
+            </nav>
         </div>
         <div>
             <h1>Blog Layout</h1>
         </div>
+        <aside>
+            <ul>
+                <li class="toc-1">
+                    <a href="#an-h1-header">An h1 header</a>
+                </li>
+                <li class="toc-2">
+                    <a href="#an-h2-header">An h2 header</a>
+                </li>
+                <li class="toc-3">
+                    <a href="#an-h3-header">An h3 header</a>
+                </li>
+            </ul>
+        </aside>
         <article>
             <h1 id="an-h1-header">An h1 header</h1>
             <p>Paragraphs are separated by a blank line.</p>
@@ -66,7 +83,7 @@
                 from the left side). Here's a code sample:
             </p>
             <div class="highlight">
-<pre><span/><code># <span class="nv">Let</span> <span class="nv">me</span> <span class="nv">re</span><span class="o">-</span><span class="nv">iterate</span> ...
+<pre><span></span><code># <span class="nv">Let</span> <span class="nv">me</span> <span class="nv">re</span><span class="o">-</span><span class="nv">iterate</span> ...
 <span class="k">for</span> <span class="nv">i</span> <span class="nv">in</span> <span class="mi">1</span> .. <span class="mi">10</span> { <span class="k">do</span><span class="o">-</span><span class="nv">something</span><span class="ss">(</span><span class="nv">i</span><span class="ss">)</span> }
 </code></pre>
             </div>
@@ -75,7 +92,7 @@
                 indenting the block, you can use delimited blocks, if you like:
             </p>
             <div class="highlight">
-<pre><span/><code>define foobar() {
+<pre><span></span><code>define foobar() {
     print "Welcome to flavor country!";
 }
 </code></pre>
@@ -85,7 +102,7 @@
                 delimited block for Pandoc to syntax highlight it:
             </p>
             <div class="highlight">
-<pre><span/><code><span class="kn">import</span> <span class="nn">time</span>
+<pre><span></span><code><span class="kn">import</span> <span class="nn">time</span>
 <span class="c1"># Quick, count to ten!</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
     <span class="c1"># (but not *too* quick)</span>
@@ -113,7 +130,7 @@
                             this algorithm:
                     </p>
                     <div class="highlight">
-<pre><span/><code><span class="nv">find</span> <span class="nv">wooden</span> <span class="nv">spoon</span>
+<pre><span></span><code><span class="nv">find</span> <span class="nv">wooden</span> <span class="nv">spoon</span>
 <span class="nv">uncover</span> <span class="nv">pot</span>
 <span class="nv">stir</span>
 <span class="nv">cover</span> <span class="nv">pot</span>
@@ -243,8 +260,9 @@
                 width: 100%;
                 height: 5rem;
                 display: flex;
-                justify-content: center;
+                justify-content: space-between;
                 align-items: center;
+                padding: .5rem;
             }
 
             #header h3 {

@@ -1,6 +1,6 @@
 <phml>
     <h1>Home</h1>
-    <nav @if="not blank(nav)" :nav="nav" />
+    <navigation @if="not blank(nav)" :nav="nav" />
     <p @else>No Nav</p>
 </phml>
 

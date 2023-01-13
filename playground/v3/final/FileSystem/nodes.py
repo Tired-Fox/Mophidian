@@ -201,6 +201,70 @@ class Renderable(File):
         prev = self.prev._url if self.prev is not None else "None"
         return f"{self.__class__.__name__}(path={self.path!r}, url={self._url!r}, prev={prev!r}, next={next!r})"
 
+class TOC:
+    """Contains a list of links. Each anchor has a level representing the header level."""
+
+    def __init__(self) -> None:
+        self._children = []
+    
+    @property
+    def links(self) -> list[Anchor]:
+        """All the anchor links as a flat list."""
+        return self._children
+    
+    def __iter__(self):
+        for anchor in self._children:
+            yield anchor
+    
+    def append(self, link: Anchor):
+        """Add an anchor object to the toc."""
+        self._children.append(link)
+        
+    def extend(self, links: list[Anchor]):
+        """Extend the anchors in the toc."""
+        self._children.extend(links)
+        
+    def remove(self, link: Anchor):
+        """Remove a specific anchor from the toc."""
+        self._children.remove(link)
+        
+    def __repr__(self) -> str:
+        return f"[{', '.join([repr(child) for child in self._children])}]"
+
+class Anchor:
+    """Link representation of a header tag."""
+
+    def __init__(self, name: str, link: str, level: int) -> None:
+        self._name = name
+        self._level = level
+        self._id = link.strip().lstrip("#")
+
+    @cached_property
+    def link(self) -> str:
+        """Link/href of the anchor."""
+        return "#" + self._id
+
+    @property
+    def name(self) -> str:
+        """Name of the anchor."""
+        return self._name
+
+    @property
+    def level(self) -> int:
+        """Anchor/header level."""
+        return self._level
+    
+    def __eq__(self, __o: object) -> bool:
+        return bool(
+            isinstance(__o, self.__class__) 
+            and self.name == __o.name 
+            and self.link == __o.link 
+            and self.level == __o.level
+        )
+
+    def __repr__(self) -> str:
+        return f"{self.name}({self.link!r}, {self.level})"
+
 class Markdown(Renderable):
     """Markdown file representation. These files are rendered with the markdown module
     with the plugins from the config.
@@ -208,10 +272,14 @@ class Markdown(Renderable):
 
     locals: dict[str, Any]
     """Local values from the markdown meta data. Used in rendering the file."""
+    
+    toc: TOC
+    """Table of contents for the markdown page."""
 
     def __init__(self, path: str) -> None:
         super().__init__(path)
         self.locals = {}
+        self.toc = TOC()
 
     def build_dest(self):
         while True:
@@ -233,6 +301,23 @@ class Markdown(Renderable):
         else:
             # Add file name as a directory and make the file index.html in that dir
             self._dest = Path(self._dest).parent.joinpath(self.file_name, "index.html").as_posix()
+            
+    def parse_toc(self, toc: list):
+        """Parse the toc structure from the markdown parser and construct a toc object."""
+        result = TOC()
+        
+        def flat_chilren(children: list):
+            for child in children:
+                result.append(Anchor(child["name"], child["id"], child["level"]))
+                if "children" in child and len(child["children"]) > 0:
+                    flat_chilren(child["children"])
+
+        for link in toc:
+            result.append(Anchor(link["name"], link["id"], link["level"]))
+            if "children" in link and len(link["children"]) > 0:
+                flat_chilren(link["children"])
+
+        self.toc = result
 
     @property
     def ast(self) -> AST:
@@ -250,6 +335,8 @@ class Markdown(Renderable):
         # save meta data as locals for later
         self.locals = meta or {}
         content = md.reset().convert(content)
+
+        self.parse_toc(getattr(md, 'toc_tokens', []))
 
         # parse resulting html into phml parser
         ast = PHML().parse(content).ast
@@ -276,8 +363,6 @@ class Markdown(Renderable):
             **kwargs: Additional variables to expose to the phml compiler.
         """
 
-        kwargs.update(self.locals)
-
         ast = phml.parse(html(*CONFIG.site.meta_tags)).ast
 
         # meta data layout name? then grab layout
@@ -285,6 +370,13 @@ class Markdown(Renderable):
             page_ast = self.layout.render(self.ast)
         else:
             page_ast = self.ast
+
+        addons = {
+            **self.locals,
+            "toc": self.toc
+        }
+
+        kwargs.update(addons)
 
         headers = query_all(page_ast, "head")
 
@@ -295,14 +387,14 @@ class Markdown(Renderable):
             head_children.extend(head.children)
 
         head = query(ast, "head")
-        
+
         if head is not None:
             for header in head_children:
                 header.parent = head
                 head.children.append(header)
             replace_node(ast.tree, {"tag": "head"}, head)
         replace_node(ast.tree, {"tag": "slot"}, page_ast.children)
-        
+
         phml.ast = ast
         return phml.render(**kwargs)
 

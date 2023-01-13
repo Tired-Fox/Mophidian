@@ -8,7 +8,9 @@ from FileSystem.nodes import (
     Group,
     Renderable,
     File,
-    Container
+    Container,
+    TOC,
+    Anchor
 )
 
 class Mophidian:
@@ -23,3 +25,5 @@ class Mophidian:
     Renderable = Renderable
     File = File
     Container = Container
+    TOC = TOC
+    Anchor = Anchor

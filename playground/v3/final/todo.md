@@ -8,9 +8,12 @@
 - [x] Generate site nav
   - [x] Full nav tree
   - [x] Each page's next and previous
-- [ ] Generate TOC from markdown file
-- [ ] favicon through config and head link tag
+- [x] Generate TOC from markdown file
+- [x] favicon through config and head link tag
 - [ ] when copying elements from page head to base head, don't duplicate tags
+- [ ] Markdown styling
+  - [ ] Command for generating colored code highlights
+  - [ ] Add script for math styling
 - [ ] Auto add website root to urls
 - [ ] Custom relative path plugin for markdown
 - [ ] Dynamic routes
