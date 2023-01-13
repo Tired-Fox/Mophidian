@@ -1,0 +1,16 @@
+<phml>
+    <head>
+        <title>Blog Post</title>
+    </head>
+    <div>
+        <h1>Blog Layout</h1>
+    </div>
+    <aside @if="not blank(toc)">
+        <ul>
+            <li @for="anchor in toc" :class="f'toc-{anchor.level}'">
+                <a :href="anchor.link">{anchor.name}</a>
+            </li>
+        </ul>
+    </aside>
+    <slot />
+</phml>

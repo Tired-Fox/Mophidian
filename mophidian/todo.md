@@ -1,0 +1,45 @@
+- [x] global variable for creating url with website root inserted to beginning.
+- [x] Automatically rip `head` element from `pages`, `layouts`, and `components` and append there children to root templates `head`
+- [x] Route all files as any file name -> index.html or have special file names that stay as is in their current directory
+- [x] Generate page title from file name
+  - [x] `tokanize_name` from phml
+  - [x] Title case the title
+- [x] Get page by path
+- [x] Generate site nav
+  - [x] Full nav tree
+  - [x] Each page's next and previous
+- [x] Generate TOC from markdown file
+- [x] favicon through config and head link tag
+- [x] when copying elements from page head to base head, don't duplicate tags, and replace meta/title tags
+- [x] Dirty/Non dirty file saving
+- [ ] Markdown styling
+  - [x] Command for generating colored code highlights
+  - [x] Add css link for code highlights
+  - [ ] Add script for math styling
+- [ ] Auto add website root to urls
+- [ ] Custom relative path plugin for markdown
+- [ ] Dynamic routes
+  - [ ] dynamic route generation through python element
+  - [ ] Generates from `content/` directory
+  - [ ] `...dir` recursive catch all
+  - [ ] `dir` catch all
+  - [ ] `slug` file used for desired output else relevant `layout.phml` will be used.
+  - [ ] `page.phml` and `layout.phml` will be given data about all the pages found for the catch all
+- [ ] Live Reload Server
+  - [ ] Page and Component linking on render
+  - [ ] Pages have all layout ancestors linked
+  - [ ] Update/Render individual Component/Page/Layout
+    - [ ] Any update in dynamic route
+      - [ ] Add or remove of page == full site reload
+      - [ ] Edit a file
+        - [ ] root page gets updated
+        - [ ] updated page gets updated
+    - [ ] Adding and removing pages/layout from path == Full Reload
+    - [ ] Adding and removing component files adds to compiler but updates nothing
+    - [ ] Edit a page/component/layout and only have individual items that are linked Update
+      - [ ] layout edit means page updates
+      - [ ] page edit only gets page update
+      - [ ] component update = page update
+- [ ] Integrations
+  - [ ] Tailwind
+  - [ ] Sass

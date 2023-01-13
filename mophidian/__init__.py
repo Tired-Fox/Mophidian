@@ -1,1 +1,3 @@
-__version__ = "0.1.0"
+__version__ = "1.0.0"
+
+markdown_code_highlight_warned = False
