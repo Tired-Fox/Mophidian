@@ -527,6 +527,7 @@ class Layout(File):
                 if query(layout_ast, "html") or query(layout_ast, "body"):
                     raise Exception("Layout must be components not full pages")
 
+                input(layout)
                 component: dict = parse_component(layout_ast)
             except Exception as error:
                 raise Exception("Layout must be a valid phml component") from error
@@ -552,6 +553,7 @@ class Layout(File):
         """
         ast = self.ast
         try:
+            input(f"{self} | page")
             component: dict = parse_component(page)
         except Exception as error:
             raise Exception("Page must be a valid phml component") from error
@@ -641,7 +643,6 @@ class Nav:
 
     def get(self, url: str) -> Renderable | Nav | None:
         segments = [segment for segment in url.strip("/").split("/") if segment != ""]
-        input(segments)
 
         def recurse_get(segments: list[str], context: Nav, url: str) -> Renderable | Nav | None:
 

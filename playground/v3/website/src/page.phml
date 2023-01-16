@@ -1,4 +1,9 @@
 <PHML>
+    <div id="Header">
+        <a href="/blog/">Blog</a>
+        <h3>Mophidian</h3>
+        <a href="/docs/">Docs</a>
+    </div>
     <h1>Home</h1>
     <Navigation @if="not blank(nav)" :nav="nav" />
     <p @else>No Nav</p>
@@ -6,4 +11,21 @@
 
 <python>
     title = "Home"
+    no_header = True
 </python>
+
+<style>
+    body {
+        color: #365314;
+        background-color: #F4F6F3;
+    }
+    
+    #header {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+
+        width: 100%;
+        padding: .5rem;
+    }
+</style>
