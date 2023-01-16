@@ -1,4 +1,4 @@
-<PHML>
+<>
     <div id="Header">
         <a href="/blog/">Blog</a>
         <h3>Mophidian</h3>
@@ -7,7 +7,7 @@
     <h1>Home</h1>
     <Navigation @if="not blank(nav)" :nav="nav" />
     <p @else>No Nav</p>
-</PHML>
+</>
 
 <python>
     title = "Home"
