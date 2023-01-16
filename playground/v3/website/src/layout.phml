@@ -1,7 +1,7 @@
-<phml>
+<PHML>
     <head>
         <link rel="stylesheet" :href="url('/style.css')">
     </head>
-    <header @if="blank(no_header)" />
+    <Header @if="blank(no_header)" />
     <slot />
-</phml>
+</PHML>

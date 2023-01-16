@@ -1,5 +1,6 @@
-<phml>
+<PHML>
     <head>
+        <link rel="stylesheet" href="/playground/v3/website/out/style.css" />
         <title>Blog Post</title>
     </head>
     <div>
@@ -13,4 +14,4 @@
         </ul>
     </aside>
     <slot />
-</phml>
+</PHML>

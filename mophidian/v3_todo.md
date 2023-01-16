@@ -12,19 +12,11 @@
 - [x] favicon through config and head link tag
 - [x] when copying elements from page head to base head, don't duplicate tags, and replace meta/title tags
 - [x] Dirty/Non dirty file saving
-- [ ] Markdown styling
+- [x] Markdown styling
   - [x] Command for generating colored code highlights
   - [x] Add css link for code highlights
-  - [ ] Add script for math styling
-- [ ] Auto add website root to urls
-- [ ] Custom relative path plugin for markdown
-- [ ] Dynamic routes
-  - [ ] dynamic route generation through python element
-  - [ ] Generates from `content/` directory
-  - [ ] `...dir` recursive catch all
-  - [ ] `dir` catch all
-  - [ ] `slug` file used for desired output else relevant `layout.phml` will be used.
-  - [ ] `page.phml` and `layout.phml` will be given data about all the pages found for the catch all
+- [x] Auto add website root to href's starting with `/`. Only if they don't already start with the root.
+- [x] Custom relative path plugin for markdown
 - [ ] Live Reload Server
   - [ ] Page and Component linking on render
   - [ ] Pages have all layout ancestors linked
@@ -40,6 +32,13 @@
       - [ ] layout edit means page updates
       - [ ] page edit only gets page update
       - [ ] component update = page update
+- [ ] Dynamic routes
+  - [ ] dynamic route generation through python element
+  - [ ] Generates from `content/` directory
+  - [ ] `...dir` recursive catch all
+  - [ ] `dir` catch all
+  - [ ] `slug` file used for desired output else relevant `layout.phml` will be used.
+  - [ ] `page.phml` and `layout.phml` will be given data about all the pages found for the catch all
 - [ ] Integrations
   - [ ] Tailwind
   - [ ] Sass

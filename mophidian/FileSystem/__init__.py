@@ -58,7 +58,7 @@ def build_files(path: str) -> tuple[Directory, Nav]:
     nav = root.build_nav()
     return root, nav
 
-def render_pages(root: Directory, out: str, phml: PHML, nav: Directory = Directory(""), dirty: bool = False):
+def render_pages(root: Directory, out: str, phml: PHML, nav: Nav = Nav(""), dirty: bool = False):
     """Render all the pages with their layouts to their destination file."""
 
     global_vars = {
@@ -79,16 +79,15 @@ def render_pages(root: Directory, out: str, phml: PHML, nav: Directory = Directo
 
         # Write file
         dest = Path(page.dest(out))
-        output = page.render(phml, **page_vars, **global_vars)
+        output = page.render(phml, files=root, **page_vars, **global_vars)
         
         old_content = ""
         if dest.is_file():
             with open(dest, "r", encoding="utf-8") as old_file:
                 old_content = old_file.read()
         
-        if old_content !=  output or dirty:
-            with open(dest, "+w", encoding="utf-8") as file:
-                file.write(output)
+        with open(dest, "+w", encoding="utf-8") as file:
+            file.write(output)
 
 def write_static_files(root: Directory, out: str):
     """Write static files to their destination."""

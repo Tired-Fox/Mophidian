@@ -1,5 +1,6 @@
 import functools
 import os
+from pathlib import Path
 import posixpath
 from urllib.parse import urlsplit, urlunsplit, unquote
 
@@ -8,6 +9,8 @@ from markdown.extensions import Extension
 from markdown.treeprocessors import Treeprocessor
 from markdown.util import AMP_SUBSTITUTE
 from xml.etree.ElementTree import Element
+
+from teddecor import Logger
 
 @functools.lru_cache(maxsize=None)
 def _norm_parts(path: str) -> list[str]:
@@ -47,10 +50,9 @@ def url_relative_to(current: str, other: str) -> str:
     return get_relative_url(current, other)
 
 class _RelativePathTreeprocessor(Treeprocessor):
-    def __init__(self, file, files, contents) -> None:
+    def __init__(self, file, files) -> None:
         self.file = file
         self.files = files
-        self.contents = contents
 
     def run(self, root: Element) -> Element:
         """
@@ -91,26 +93,23 @@ class _RelativePathTreeprocessor(Treeprocessor):
             return url
 
         # Determine the filepath of the target.
-        target_uri = posixpath.join(posixpath.dirname(self.file.src_uri), unquote(path))
+        target_uri = posixpath.join(posixpath.dirname(self.file.src), unquote(path))
         target_uri = posixpath.normpath(target_uri).lstrip('/')
 
         # Validate that the target exists.
-        target_file = self.files.contains_src(target_uri)
-        if target_file is None:
-            target_file = self.contents.contains_src(target_uri)
-        
-        # TODO:
-        # if not Path(target_uri).exists() and target_file is None:
-        #     Logger.Warning(
-        #         f"Page '{self.file.src_uri}' contains a link to "
-        #         f"'{target_uri}' which is not found in the files."
-        #     )
-        #     return url
+        target_file = self.files.find(target_uri)
+
+        if not Path(target_uri).exists() and target_file is None:
+            Logger.warning(
+                f"Page '{self.file.relative_url}' contains a link to "
+                f"'{target_uri}' which is not found in the files."
+            ).flush()
+            return url
 
         if target_file is not None:
-            path = url_relative_to(target_file.url, self.file.url)
+            path = url_relative_to(target_file.relative_url, self.file.relative_url)
         else:
-            path = url_relative_to(target_uri, self.file.url)
+            path = url_relative_to(target_uri, self.file.relative_url)
 
         components = (scheme, netloc, path, query, fragment)
         return urlunsplit(components)
@@ -121,11 +120,10 @@ class _RelativePathExtension(Extension):
     registers the Treeprocessor.
     """
 
-    def __init__(self, file, files, contents) -> None:
+    def __init__(self, file, files) -> None:
         self.file = file
         self.files = files
-        self.contents = contents
 
     def extendMarkdown(self, md: Markdown) -> None:
-        relpath = _RelativePathTreeprocessor(self.file, self.files, self.contents)
+        relpath = _RelativePathTreeprocessor(self.file, self.files)
         md.treeprocessors.register(relpath, "relpath", 0)

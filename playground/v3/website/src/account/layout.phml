@@ -1,6 +1,6 @@
-<phml>
+<PHML>
     <div>
         <h1>Account Layout</h1>
     </div>
     <slot />
-</phml>
+</PHML>

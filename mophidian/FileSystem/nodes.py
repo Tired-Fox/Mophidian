@@ -9,12 +9,13 @@ import frontmatter
 from phml import (
     AST,
     PHML,
-    parse_component, substitute_component,
+    parse_component,
+    substitute_component,
     query,
     replace_node,
     query_all,
     remove_nodes,
-    tokanize_name
+    tokanize_name,
 )
 from phml.core import VirtualPython
 from phml.builder import p
@@ -24,7 +25,9 @@ from markdown import Markdown as MarkdownParse
 
 from mophidian.config import CONFIG
 import mophidian
+from .markdown_extensions import _RelativePathExtension
 from .util import REGEX, PAGE_IGNORE, get_group_name, first, html, title, url
+
 
 class Node:
     """Base file system node."""
@@ -40,6 +43,15 @@ class Node:
         self.root, self.path = "", ""
         if len(splitter) > 0:
             self.root, self.path = splitter if len(splitter) > 1 else (splitter[0], splitter[0])
+        self.src = self.path
+        while True:
+            # Remove group directories from path
+            if REGEX["group"]["path"]["middle"].match(self.src) is not None:
+                self.src = REGEX["group"]["path"]["middle"].sub("/", self.src)
+            elif REGEX["group"]["path"]["start"].match(self.src) is not None:
+                self.src = REGEX["group"]["path"]["start"].sub("", self.src)
+            else:
+                break
         self.full_path = path
         self.children = None
 
@@ -77,9 +89,9 @@ class File(Node):
     relative_url: str
     """Relative url from website root. Does not include website root."""
 
-    def __init__(self, path: str) -> None:
+    def __init__(self, path: str, unique: bool = False) -> None:
         super().__init__(path)
-        self.unique = False
+        self.unique = unique
 
         # file name
         file_info = REGEX["file"]["name"].search(path)
@@ -93,73 +105,10 @@ class File(Node):
         self.inherits = inherits is not None
 
         # Dest path
-        self._dest = self.path
+        self._dest = self.src
         self.build_dest()
 
-    def build_dest(self):
-        while True:
-            # Remove group directories from path
-            if REGEX["group"]["path"]["middle"].match(self._dest) is not None:
-                self._dest = REGEX["group"]["path"]["middle"].sub("/", self._dest)
-            elif REGEX["group"]["path"]["start"].match(self._dest) is not None:
-                self._dest = REGEX["group"]["path"]["start"].sub("", self._dest)
-            else:
-                break
-
-        # Replace the file name with index.html
-        if self.file_name not in PAGE_IGNORE:
-            self._dest = Path("/".join(self._dest.split("/")[:-1])).joinpath("index.html").as_posix()
-        else:
-            self._dest = Path(self._dest).with_name(self.file_name + ".html").as_posix()
-            self.unique = True
-
-    @property
-    def ast(self) -> AST:
-        """Parsed phml ast of the file."""
-        raise Exception("Do not use base File class's ast property")
-    
-    def dest(self, dest_dir: str) -> Path:
-        """Destination path of the file given a destination directory."""
-        return Path(dest_dir).joinpath(self._dest)
-
-    def print(self, depth: int = 0) -> str:
-        """Colored terminal representation of the file."""
-        out = (
-            f"{' ' * depth}\x1b[34m{self.__class__.__name__}\x1b[0m > \
-\x1b[32m{self.file_name+self.extension!r}\x1b[0m"
-        )
-        if isinstance(self.children, list):
-            for child in list(self.children):
-                out += "\n" + child.print(depth + 4)
-        return out
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.path!r}, inherits={self.inherits!r}, \
-inherit_from={self.inherit_from!r})"
-
-class Renderable(File):
-    """Renderable file."""
-
-    layout: Layout | None
-    """The layout to apply while rendering a file."""
-
-    next: Renderable | None
-    """The next page."""
-
-    prev: Renderable | None
-    """The previous page."""
-
-    title: str
-    """Title of the page based on the file name."""
-
-    def __init__(self, path: str) -> None:
-        super().__init__(path)
-        self.layout = None
-        self.title = self._make_title()
-        self.next = None
-        self.prev = None
-
-        # Page url
+         # Page url
         if not self.unique:
             self.relative_url = Path(self._dest).parent.as_posix() + "/"
         else:
@@ -184,6 +133,61 @@ class Renderable(File):
             url = "/"
         return url
 
+    def build_dest(self):
+        # Replace the file name with index.html
+        if self.file_name not in PAGE_IGNORE:
+            self._dest = (
+                Path("/".join(self._dest.split("/")[:-1])).joinpath("index.html").as_posix()
+            )
+        else:
+            self._dest = Path(self._dest).with_name(self.file_name + ".html").as_posix()
+            self.unique = True
+
+    @property
+    def ast(self) -> AST:
+        """Parsed phml ast of the file."""
+        raise Exception("Do not use base File class's ast property")
+
+    def dest(self, dest_dir: str) -> Path:
+        """Destination path of the file given a destination directory."""
+        return Path(dest_dir).joinpath(self._dest)
+
+    def print(self, depth: int = 0) -> str:
+        """Colored terminal representation of the file."""
+        out = f"{' ' * depth}\x1b[34m{self.__class__.__name__}\x1b[0m > \
+\x1b[32m{self.file_name+self.extension!r}\x1b[0m"
+        if isinstance(self.children, list):
+            for child in list(self.children):
+                out += "\n" + child.print(depth + 4)
+        return out
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.path!r}, url={self.relative_url!r}, inherits={self.inherits!r}, \
+inherit_from={self.inherit_from!r})"
+
+
+class Renderable(File):
+    """Renderable file."""
+
+    layout: Layout | None
+    """The layout to apply while rendering a file."""
+
+    next: Renderable | None
+    """The next page."""
+
+    prev: Renderable | None
+    """The previous page."""
+
+    title: str
+    """Title of the page based on the file name."""
+
+    def __init__(self, path: str) -> None:
+        super().__init__(path)
+        self.layout = None
+        self.title = self._make_title()
+        self.next = None
+        self.prev = None
+
     def _make_title(self) -> str:
         name = Path(self._dest).parent.as_posix().split("/")[-1]
         if name.strip() in ["", "."]:
@@ -197,41 +201,43 @@ class Renderable(File):
     def render(self, phml: PHML, **kwargs) -> str:
         """Render the given file to it's appropriate html."""
         raise Exception("Do not use base class Renderable's render function")
-    
+
     def __repr__(self) -> str:
         next = self.next.relative_url if self.next is not None else "None"
         prev = self.prev.relative_url if self.prev is not None else "None"
         return f"{self.__class__.__name__}(path={self.path!r}, url={self.relative_url!r}, prev={prev!r}, next={next!r})"
+
 
 class TOC:
     """Contains a list of links. Each anchor has a level representing the header level."""
 
     def __init__(self) -> None:
         self._children = []
-    
+
     @property
     def links(self) -> list[Anchor]:
         """All the anchor links as a flat list."""
         return self._children
-    
+
     def __iter__(self):
         for anchor in self._children:
             yield anchor
-    
+
     def append(self, link: Anchor):
         """Add an anchor object to the toc."""
         self._children.append(link)
-        
+
     def extend(self, links: list[Anchor]):
         """Extend the anchors in the toc."""
         self._children.extend(links)
-        
+
     def remove(self, link: Anchor):
         """Remove a specific anchor from the toc."""
         self._children.remove(link)
-        
+
     def __repr__(self) -> str:
         return f"[{', '.join([repr(child) for child in self._children])}]"
+
 
 class Anchor:
     """Link representation of a header tag."""
@@ -255,17 +261,18 @@ class Anchor:
     def level(self) -> int:
         """Anchor/header level."""
         return self._level
-    
+
     def __eq__(self, __o: object) -> bool:
         return bool(
-            isinstance(__o, self.__class__) 
-            and self.name == __o.name 
-            and self.link == __o.link 
+            isinstance(__o, self.__class__)
+            and self.name == __o.name
+            and self.link == __o.link
             and self.level == __o.level
         )
 
     def __repr__(self) -> str:
         return f"{self.name}({self.link!r}, {self.level})"
+
 
 class Markdown(Renderable):
     """Markdown file representation. These files are rendered with the markdown module
@@ -274,7 +281,7 @@ class Markdown(Renderable):
 
     locals: dict[str, Any]
     """Local values from the markdown meta data. Used in rendering the file."""
-    
+
     toc: TOC
     """Table of contents for the markdown page."""
 
@@ -282,32 +289,22 @@ class Markdown(Renderable):
         super().__init__(path)
         self.locals = {}
         self.toc = TOC()
+        self.relative_path_extension = None
 
     def build_dest(self):
-        while True:
-            # Remove group directories from path
-            if REGEX["group"]["path"]["middle"].match(self._dest) is not None:
-                self._dest = REGEX["group"]["path"]["middle"].sub("/", self._dest)
-            elif REGEX["group"]["path"]["start"].match(self._dest) is not None:
-                self._dest = REGEX["group"]["path"]["start"].sub("", self._dest)
-            else:
-                break
-
         if "readme" in Path(self._dest).name.lower():
             # Replace the file name with index.html
             self._dest = (
-                Path("/".join(self._dest.split("/")[:-1]))
-                    .joinpath("index.html")
-                    .as_posix()
+                Path("/".join(self._dest.split("/")[:-1])).joinpath("index.html").as_posix()
             )
         else:
             # Add file name as a directory and make the file index.html in that dir
             self._dest = Path(self._dest).parent.joinpath(self.file_name, "index.html").as_posix()
-            
+
     def parse_toc(self, toc: list):
         """Parse the toc structure from the markdown parser and construct a toc object."""
         result = TOC()
-        
+
         def flat_chilren(children: list):
             for child in children:
                 result.append(Anchor(child["name"], child["id"], child["level"]))
@@ -330,12 +327,17 @@ class Markdown(Renderable):
 
         # convert markdown content to html content
         try:
+            if self.relative_path_extension is None:
+                extensions = CONFIG.markdown.extensions
+            else:
+                extensions = [self.relative_path_extension, *CONFIG.markdown.extensions]
             md = MarkdownParse(
-                extensions=CONFIG.markdown.extensions,
+                extensions=extensions,
                 extension_configs=CONFIG.markdown.extension_configs,
             )
         except KeyError as key_error:
             from traceback import print_exc
+
             print_exc()
             TED.print(
                 f"*[@Fred]KeyError[@F]:[] invalid variable in extension configs [$@Fgreen]{key_error}"
@@ -362,8 +364,7 @@ class Markdown(Renderable):
         ast.tree = p(None, p(CONFIG.markdown.wrapper.tag, props, *ast.tree.children))
         return ast
 
-
-    def render(self, phml: PHML, **kwargs):
+    def render(self, phml: PHML, files: Directory, **kwargs):
         """Render the markdown file into a full html page. Apply the plugins
         and configurations from the config. All markdown file meta data is exposed
         to the compiler.
@@ -375,16 +376,15 @@ class Markdown(Renderable):
 
         ast = phml.parse(html(*CONFIG.site.meta_tags)).ast
 
+        self.relative_path_extension = _RelativePathExtension(self, files)
+
         # meta data layout name? then grab layout
         if self.layout is not None:
             page_ast = self.layout.render(self.ast)
         else:
             page_ast = self.ast
 
-        addons = {
-            **self.locals,
-            "toc": self.toc
-        }
+        addons = {**self.locals, "toc": self.toc}
 
         kwargs.update(addons)
 
@@ -401,11 +401,19 @@ class Markdown(Renderable):
             if CONFIG.markdown.pygmentize.highlight:
                 if not Path(CONFIG.site.source).joinpath(CONFIG.markdown.pygmentize.path).is_file():
                     if not mophidian.markdown_code_highlight_warned:
-                        Logger.warning("Markdown code highlighting requires a pygmentize css file. \
-Use `moph highlight` to create that file.").flush()
+                        Logger.warning(
+                            "Markdown code highlighting requires a pygmentize css file. \
+Use `moph highlight` to create that file."
+                        ).flush()
                         mophidian.markdown_code_highlight_warned = True
                 else:
-                    head.insert(-1, p("link", {"rel": "stylesheet", "href": url(CONFIG.markdown.pygmentize.path)}))
+                    head.insert(
+                        -1,
+                        p(
+                            "link",
+                            {"rel": "stylesheet", "href": url(CONFIG.markdown.pygmentize.path)},
+                        ),
+                    )
             for node in head_children:
                 node.parent = head
                 exist = '[{}]'
@@ -413,18 +421,21 @@ Use `moph highlight` to create that file.").flush()
                 if node.tag in ["meta", "title"]:
                     old_tag = query(
                         head,
-                        f"{node.tag}{''.join(exist.format(key) for key in node.properties.keys())}"
+                        f"{node.tag}{''.join(exist.format(key) for key in node.properties.keys())}",
                     )
                     if node is not None:
                         replace_node(head, lambda n, i, p: n == old_tag, node)
                     else:
                         head.children.append(node)
                 elif node.tag not in ["style", "script"]:
-                    if query(
-                        head, 
-                        f"{node.tag}\
-{''.join(exist_equal.format(key, value) for key, value in node.properties.items())}"
-                    ) is None:
+                    if (
+                        query(
+                            head,
+                            f"{node.tag}\
+{''.join(exist_equal.format(key, value) for key, value in node.properties.items())}",
+                        )
+                        is None
+                    ):
                         head.children.append(node)
                 else:
                     # replace or append
@@ -434,12 +445,22 @@ Use `moph highlight` to create that file.").flush()
         replace_node(ast.tree, {"tag": "slot"}, page_ast.children)
 
         phml.ast = ast
+
+        # Get all tags with an href that starts with `/`
+        for node in query_all(phml.ast, "[href^=/]"):
+            # If it doesn't start with the website root prepend it to the href
+            if not node["href"].startswith("/" + CONFIG.site.root.strip("/")):
+                node["href"] = url(node["href"])
+
         return phml.render(**kwargs)
+
 
 class Static(File):
     """Static file representation. These files are not rendered but are still moved to the
     appropriate directory.
     """
+    def __init__(self, path: str) -> None:
+        super().__init__(path, True)
 
     def build_dest(self):
         while True:
@@ -471,6 +492,7 @@ class Static(File):
             copyfile(original, dest)
         except SameFileError:
             pass
+
 
 class Layout(File):
     """Layout representation of a file."""
@@ -537,8 +559,10 @@ class Layout(File):
         substitute_component(ast.tree, ("slot", component), VirtualPython())
         return ast
 
+
 class Component(File):
     pass
+
 
 class Page(Renderable):
     """Page representation of a File."""
@@ -550,7 +574,7 @@ class Page(Renderable):
 
         if query(page_ast, "html") or query(page_ast, "body"):
             raise Exception("Layout must be components not full pages")
-    
+
         return page_ast
 
     def render(self, phml: PHML, **kwargs) -> str:
@@ -568,7 +592,7 @@ class Page(Renderable):
             head_children.extend(head.children)
 
         head = query(ast, "head")
-        
+
         if head is not None:
             for node in head_children:
                 node.parent = head
@@ -577,18 +601,21 @@ class Page(Renderable):
                 if node.tag in ["meta", "title"]:
                     old_tag = query(
                         head,
-                        f"{node.tag}{''.join(exist.format(key) for key in node.properties.keys())}"
+                        f"{node.tag}{''.join(exist.format(key) for key in node.properties.keys())}",
                     )
                     if node is not None:
                         replace_node(head, lambda n, i, p: n == old_tag, node)
                     else:
                         head.children.append(node)
                 elif node.tag not in ["style", "script"]:
-                    if query(
-                        head, 
-                        f"{node.tag}\
-{''.join(exist_equal.format(key, value) for key, value in node.properties.items())}"
-                    ) is None:
+                    if (
+                        query(
+                            head,
+                            f"{node.tag}\
+{''.join(exist_equal.format(key, value) for key, value in node.properties.items())}",
+                        )
+                        is None
+                    ):
                         head.children.append(node)
                 else:
                     # replace or append
@@ -597,7 +624,11 @@ class Page(Renderable):
         replace_node(ast.tree, {"tag": "slot"}, page_ast.children)
 
         phml.ast = ast
+        for node in query_all(phml.ast, "[href^=/]"):
+            if not node["href"].startswith("/" + CONFIG.site.root.strip("/")):
+                node["href"] = url(node["href"])
         return phml.render(**kwargs)
+
 
 class Nav:
     def __init__(self, name: str) -> None:
@@ -607,10 +638,11 @@ class Nav:
     def add(self, item: Renderable | Nav):
         """Add a page or sub nav to the current nav object."""
         self.children.append(item)
-        
+
     def get(self, url: str) -> Renderable | Nav | None:
         segments = [segment for segment in url.strip("/").split("/") if segment != ""]
         input(segments)
+
         def recurse_get(segments: list[str], context: Nav, url: str) -> Renderable | Nav | None:
 
             pages = context.pages()
@@ -622,12 +654,13 @@ class Nav:
 
             if len(segments) == 0:
                 return context
-            
+
             for nav in navs:
                 if nav.name == segments[0]:
                     return recurse_get(segments[1:], nav, url + f"{segments[0]}/")
-            
+
             return None
+
         if len(segments) == 0:
             for page in self.pages():
                 if page.relative_url == "/":
@@ -657,24 +690,22 @@ class Nav:
             raise IndexError(error_message)
 
         self.children.pop(index)
-        
+
     def print(self, depth: int = 0) -> str:
         """Colored terminal representation of the file."""
-        out = (
-            f"{' ' * depth}\x1b[34m{self.__class__.__name__}\x1b[0m \
+        out = f"{' ' * depth}\x1b[34m{self.__class__.__name__}\x1b[0m \
 (\x1b[34m{self.name}\x1b[0m)"
-        )
         if isinstance(self.children, list):
             for child in list(self.children):
                 out += "\n" + child.print(depth + 4)
         return out
-        
+
     def __str__(self) -> str:
         return self.print()
-        
+
     def __repr__(self) -> str:
         return f"Nav({self.name!r}, children={len(self.children)})"
-    
+
     def pages(self) -> list[Renderable]:
         """List of all renderable pages in the nav."""
         return [page for page in self.children if isinstance(page, Renderable)]
@@ -700,6 +731,7 @@ class Nav:
         for nav in navs:
             yield nav
 
+
 class Container(Node):
     """Directory/Group representation of a file system node."""
 
@@ -713,6 +745,27 @@ class Container(Node):
         super().__init__(path)
         self.children = []
         self.name = name
+
+    def find(self, path: str) -> File | None:
+        """Get a file based on it's source or destination path.
+        All destinations are compared first then all the source paths.
+
+        Args:
+            path (str): The dest path to the file.
+
+        Returns:
+            Page | None: None if no Page is found.
+        """
+
+        path = path.strip().strip("/")
+        files = self.files()
+        
+        result = None
+        for file in files:
+            if file.relative_url.strip("/") == path:
+                return file
+
+        return result
 
     def find_layout_by_path(self, path: list[str]) -> Layout | None:
         """Get a layout based on it's file path. This is strict and if no
@@ -732,18 +785,16 @@ class Container(Node):
                     current = child
                     break
 
-        result = first(
-            lambda l: isinstance(l, Layout), current.children
-        )
+        result = first(lambda l: isinstance(l, Layout), current.children)
 
         if result is not None:
             return result
 
         return None
-    
+
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(name={self.name!r}, path={self.path!r}, children={len(self.children)})"
-    
+
     def find_page_by_path(self, path: str) -> Layout | None:
         """Get a page based on it's destination path.
 
@@ -754,7 +805,7 @@ class Container(Node):
             Page | None: None if no Page is found.
         """
         from re import sub
-        
+
         path = path.strip("/")
         pages = self.pages()
 
@@ -782,18 +833,14 @@ class Container(Node):
             Layout | None: A layout if found otherwise None.
         """
         if name == "":
-            result = first(
-                lambda l: isinstance(l, Layout), self.children
-            )
+            result = first(lambda l: isinstance(l, Layout), self.children)
 
             if result is not None:
                 return result
         else:
             for child in self.children:
                 if isinstance(child, Container) and child.name == name:
-                    result = first(
-                        lambda l: isinstance(l, Layout), child.children
-                    )
+                    result = first(lambda l: isinstance(l, Layout), child.children)
 
                     if result is not None:
                         return result
@@ -808,17 +855,19 @@ class Container(Node):
         """
         current = self
         path = [item.root, *item.path.split("/")]
-        
+
         for i, segment in enumerate(path):
-            if Path('/'.join(path[:i+1])).is_file():
+            if Path('/'.join(path[: i + 1])).is_file():
                 current.children.append(item)
             elif i != 0:
                 if REGEX["group"]["name"].match(segment) is not None:
                     found = False
-                    if current.path.strip("/") == "/".join(path[:i+1]):
+                    if current.path.strip("/") == "/".join(path[: i + 1]):
                         found = True
                     else:
-                        for group in [child for child in current.children if isinstance(child, Group)]:
+                        for group in [
+                            child for child in current.children if isinstance(child, Group)
+                        ]:
                             if group.path == '/'.join(path[1 : i + 1]) + "/":
                                 current = group
                                 found = True
@@ -831,14 +880,14 @@ class Container(Node):
                         current = new
                 else:
                     found = False
-                    
-                    if current.path.strip("/") == "/".join(path[:i+1]):
+
+                    if current.path.strip("/") == "/".join(path[: i + 1]):
                         found = True
                     else:
                         for directory in [
                             child for child in current.children if isinstance(child, Directory)
                         ]:
-                            if directory.path.strip("/") == '/'.join(path[1:i + 1]):
+                            if directory.path.strip("/") == '/'.join(path[1 : i + 1]):
                                 current = directory
                                 found = True
                                 break
@@ -849,7 +898,7 @@ class Container(Node):
                         current.children.append(new)
                         current = new
         return current
-    
+
     def build_nav(self) -> Nav:
         nav = Nav("home")
         nav_indexes = {"nav_pages": []}
@@ -870,7 +919,7 @@ class Container(Node):
         def unwrap_indecies(current: Nav, indecies: dict):
             for page in indecies["nav_pages"]:
                 current.add(page)
-            
+
             for key in indecies:
                 if key != "nav_pages":
                     sub_nav = Nav(key)
@@ -886,13 +935,15 @@ class Container(Node):
         def iterate_layouts(current: Container, parent: Layout | None = None):
             # Layouts without named inheritance
             _layouts = [
-                layout for layout in current.children 
+                layout
+                for layout in current.children
                 if isinstance(layout, Layout) and not layout.inherits
             ]
 
             # Layouts with named inheritance
             _ilayouts = [
-                layout for layout in current.children 
+                layout
+                for layout in current.children
                 if isinstance(layout, Layout) and layout.inherits
             ]
 
@@ -919,10 +970,7 @@ class Container(Node):
 
         def iterate_pages(current: Container):
             # Pages in the current directory
-            _pages = [
-                page for page in current.children 
-                if isinstance(page, Page | Markdown)
-            ]
+            _pages = [page for page in current.children if isinstance(page, Page | Markdown)]
 
             # Directories and Groups
             _containers = [cont for cont in current.children if isinstance(cont, Container)]
@@ -951,10 +999,11 @@ class Container(Node):
         Args:
             ext (str | list[str] | None): The extension of the files to find.
         """
+
         def build_compare():
             if ext is None:
                 return lambda e: True
-            
+
             if isinstance(ext, list):
                 return lambda e: e in ext
             return lambda e: e == ext
@@ -1014,7 +1063,7 @@ class Container(Node):
             return results
 
         return recurse_find(self)
-    
+
     def static(self) -> list[Static]:
         """List of only static files in the file system."""
 
@@ -1065,23 +1114,25 @@ class Container(Node):
             for child in list(self.children):
                 out += "\n" + child.print(depth + 4)
         return out
-    
+
     def __len__(self) -> int:
         return len(self.files())
 
 
 class Group(Container):
     """Group representation of a Container."""
+
     def __init__(self, path: str) -> None:
         super().__init__(path, get_group_name([node for node in path.split("/") if node != ""][-1]))
 
 
 class Directory(Container):
     """Directory representation of a Container."""
+
     def __init__(self, path: str) -> None:
         path_parts = [node for node in path.split("/") if node != ""]
         name = ""
         if len(path_parts) > 0:
             name = path_parts[-1]
-    
+
         super().__init__(path, name)

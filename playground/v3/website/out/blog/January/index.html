@@ -7,101 +7,104 @@
         <link rel="shortcut icon" href="/playground/v3/website/out/favicon.ico" type="image/x-icon" />
         <link rel="stylesheet" href="/playground/v3/website/out/highlight.css" />
         <title>Blog Post</title>
+        <link rel="stylesheet" href="/playground/v3/website/out/style.css" />
     </head>
     <body>
-        <div id="header">
-            <div></div>
-            <h3>Component</h3>
-            <nav>
-                <a href="/playground/v3/website/out/">Home</a>
-            </nav>
-        </div>
-        <div>
-            <h1>Blog Layout</h1>
-        </div>
-        <aside>
-            <ul>
-                <li class="toc-1">
-                    <a href="#an-h1-header">An h1 header</a>
-                </li>
-                <li class="toc-2">
-                    <a href="#an-h2-header">An h2 header</a>
-                </li>
-                <li class="toc-3">
-                    <a href="#an-h3-header">An h3 header</a>
-                </li>
-            </ul>
-        </aside>
-        <article>
-            <h1 id="an-h1-header">An h1 header</h1>
-            <p>Paragraphs are separated by a blank line.</p>
-            <p>
-                2
-                <sup>nd</sup>
-                paragraph. 
-                <em>Italic</em>
-                , 
-                <strong>bold</strong>
-                , and 
-                <code>monospace</code>
-                . Itemized lists
-                look like:
-            </p>
-            <ul>
-                <li>this one</li>
-                <li>that one</li>
-                <li>the other one</li>
-            </ul>
-            <p>
-                Note that --- not considering the asterisk --- the actual text
-                content starts at 4-columns in.
-            </p>
-            <blockquote>
-                <p>
-                    Block quotes are
-                    written like so.
-                </p>
-                <p>
-                    They can span multiple paragraphs,
-                    if you like.
-                </p>
-            </blockquote>
-            <p>
-                Use 3 dashes for an em-dash. Use 2 dashes for ranges (ex., "it's all
-                in chapters 12--14"). Three dots ... will be converted to an ellipsis.
-                Unicode is supported. â˜º
-            </p>
-            <h2 id="an-h2-header">An h2 header</h2>
-            <p>Here's a numbered list:</p>
-            <ol>
-                <li>first item</li>
-                <li>second item</li>
-                <li>third item</li>
-            </ol>
-            <p>
-                Note again how the actual text starts at 4 columns in (4 characters
-                from the left side). Here's a code sample:
-            </p>
-            <div class="highlight">
-<pre><span></span><code># <span class="nv">Let</span> <span class="nv">me</span> <span class="nv">re</span><span class="o">-</span><span class="nv">iterate</span> ...
-<span class="k">for</span> <span class="nv">i</span> <span class="nv">in</span> <span class="mi">1</span> .. <span class="mi">10</span> { <span class="k">do</span><span class="o">-</span><span class="nv">something</span><span class="ss">(</span><span class="nv">i</span><span class="ss">)</span> }
-</code></pre>
+        <phml>
+            <div id="header">
+                <div></div>
+                <h3>Component</h3>
+                <nav>
+                    <a href="/playground/v3/website/out/">Home</a>
+                </nav>
             </div>
-            <p>
-                As you probably guessed, indented 4 spaces. By the way, instead of
-                indenting the block, you can use delimited blocks, if you like:
-            </p>
-            <div class="highlight">
+            <phml>
+                <div>
+                    <h1>Blog Layout</h1>
+                </div>
+                <aside>
+                    <ul>
+                        <li class="toc-1">
+                            <a href="#an-h1-header">An h1 header</a>
+                        </li>
+                        <li class="toc-2">
+                            <a href="#an-h2-header">An h2 header</a>
+                        </li>
+                        <li class="toc-3">
+                            <a href="#an-h3-header">An h3 header</a>
+                        </li>
+                    </ul>
+                </aside>
+                <article>
+                    <h1 id="an-h1-header">An h1 header</h1>
+                    <p>Paragraphs are separated by a blank line.</p>
+                    <p>
+                        2
+                        <sup>nd</sup>
+                        paragraph. 
+                        <em>Italic</em>
+                        , 
+                        <strong>bold</strong>
+                        , and 
+                        <code>monospace</code>
+                        . Itemized lists
+                        look like:
+                    </p>
+                    <ul>
+                        <li>this one</li>
+                        <li>that one</li>
+                        <li>the other one</li>
+                    </ul>
+                    <p>
+                        Note that --- not considering the asterisk --- the actual text
+                        content starts at 4-columns in.
+                    </p>
+                    <blockquote>
+                        <p>
+                            Block quotes are
+                            written like so.
+                        </p>
+                        <p>
+                            They can span multiple paragraphs,
+                            if you like.
+                        </p>
+                    </blockquote>
+                    <p>
+                        Use 3 dashes for an em-dash. Use 2 dashes for ranges (ex., "it's all
+                        in chapters 12--14"). Three dots ... will be converted to an ellipsis.
+                        Unicode is supported. â˜º
+                    </p>
+                    <h2 id="an-h2-header">An h2 header</h2>
+                    <p>Here's a numbered list:</p>
+                    <ol>
+                        <li>first item</li>
+                        <li>second item</li>
+                        <li>third item</li>
+                    </ol>
+                    <p>
+                        Note again how the actual text starts at 4 columns in (4 characters
+                        from the left side). Here's a code sample:
+                    </p>
+                    <div class="highlight">
+<pre><span></span><code>#<span class="w"> </span><span class="nv">Let</span><span class="w"> </span><span class="nv">me</span><span class="w"> </span><span class="nv">re</span><span class="o">-</span><span class="nv">iterate</span><span class="w"> </span>...<span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="nv">in</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span>..<span class="w"> </span><span class="mi">10</span><span class="w"> </span>{<span class="w"> </span><span class="k">do</span><span class="o">-</span><span class="nv">something</span><span class="ss">(</span><span class="nv">i</span><span class="ss">)</span><span class="w"> </span>}<span class="w"></span>
+</code></pre>
+                    </div>
+                    <p>
+                        As you probably guessed, indented 4 spaces. By the way, instead of
+                        indenting the block, you can use delimited blocks, if you like:
+                    </p>
+                    <div class="highlight">
 <pre><span></span><code>define foobar() {
     print "Welcome to flavor country!";
 }
 </code></pre>
-            </div>
-            <p>
-                (which makes copying & pasting easier). You can optionally mark the
-                delimited block for Pandoc to syntax highlight it:
-            </p>
-            <div class="highlight">
+                    </div>
+                    <p>
+                        (which makes copying & pasting easier). You can optionally mark the
+                        delimited block for Pandoc to syntax highlight it:
+                    </p>
+                    <div class="highlight">
 <pre><span></span><code><span class="kn">import</span> <span class="nn">time</span>
 <span class="c1"># Quick, count to ten!</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
@@ -109,166 +112,171 @@
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
     <span class="nb">print</span> <span class="n">i</span>
 </code></pre>
-            </div>
-            <h3 id="an-h3-header">An h3 header</h3>
-            <p>Now a nested list:</p>
-            <ol>
-                <li>
-                    <p>First, get these ingredients:</p>
-                    <ul>
-                        <li>carrots</li>
-                        <li>celery</li>
-                        <li>lentils</li>
-                    </ul>
-                </li>
-                <li>
-                    <p>Boil some water.</p>
-                </li>
-                <li>
-                    <p>
-                        Dump everything in the pot and follow
-                            this algorithm:
-                    </p>
-                    <div class="highlight">
-<pre><span></span><code><span class="nv">find</span> <span class="nv">wooden</span> <span class="nv">spoon</span>
-<span class="nv">uncover</span> <span class="nv">pot</span>
-<span class="nv">stir</span>
-<span class="nv">cover</span> <span class="nv">pot</span>
-<span class="nv">balance</span> <span class="nv">wooden</span> <span class="nv">spoon</span> <span class="nv">precariously</span> <span class="nv">on</span> <span class="nv">pot</span> <span class="nv">handle</span>
-<span class="k">wait</span> <span class="mi">10</span> <span class="nv">minutes</span>
-<span class="k">goto</span> <span class="nl">first</span> <span class="nv">step</span> <span class="ss">(</span><span class="nv">or</span> <span class="nv">shut</span> <span class="nv">off</span> <span class="nv">burner</span> <span class="nv">when</span> <span class="nv">done</span><span class="ss">)</span>
-</code></pre>
                     </div>
-                    <p>Do not bump wooden spoon or it will fall.</p>
-                </li>
-            </ol>
-            <p>
-                Notice again how text always lines up on 4-space indents (including
-                that last line which continues item 3 above).
-            </p>
-            <p>
-                Here's a link to 
-                <a href="http://foo.bar">a website</a>
-                , to a 
-                <a href="local-doc.html">
-                    local
-                    doc
-                </a>
-                , and to a 
-                <a href="#an-h2-header">
-                    section heading in the current
-                    doc
-                </a>
-                . Here's a footnote 
-                <sup id="fnref:1">
-                    <a class="footnote-ref" href="#fn:1">1</a>
-                </sup>
-                .
-            </p>
-            <p>Tables can look like this:</p>
-            <p>size  material      color</p>
-            <hr/>
-            <p>
-                9     leather       brown
-                10    hemp canvas   natural
-                11    glass         transparent
-            </p>
-            <p>Table: Shoes, their sizes, and what they're made of</p>
-            <p>
-                (The above is the caption for the table.) Pandoc also supports
-                multi-line tables:
-            </p>
-            <table>
-                <thead>
-                    <tr>
-                        <th align="center">keyword</th>
-                        <th align="center">text</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td align="center">red</td>
-                        <td align="center">Sunsets, apples, and other red or reddish things.</td>
-                    </tr>
-                    <tr>
-                        <td align="center">green</td>
-                        <td align="center">Leaves, grass, frogs and other things it's not easy being.</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p>A horizontal rule follows.</p>
-            <hr/>
-            <p>Here's a definition list:</p>
-            <dl>
-                <dt>apples</dt>
-                <dd>
+                    <h3 id="an-h3-header">An h3 header</h3>
+                    <p>Now a nested list:</p>
+                    <ol>
+                        <li>
+                            <p>First, get these ingredients:</p>
+                            <ul>
+                                <li>carrots</li>
+                                <li>celery</li>
+                                <li>lentils</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <p>Boil some water.</p>
+                        </li>
+                        <li>
+                            <p>
+                                Dump everything in the pot and follow
+                                    this algorithm:
+                            </p>
+                            <div class="highlight">
+<pre><span></span><code><span class="nv">find</span><span class="w"> </span><span class="nv">wooden</span><span class="w"> </span><span class="nv">spoon</span><span class="w"></span>
+<span class="nv">uncover</span><span class="w"> </span><span class="nv">pot</span><span class="w"></span>
+<span class="nv">stir</span><span class="w"></span>
+<span class="nv">cover</span><span class="w"> </span><span class="nv">pot</span><span class="w"></span>
+<span class="nv">balance</span><span class="w"> </span><span class="nv">wooden</span><span class="w"> </span><span class="nv">spoon</span><span class="w"> </span><span class="nv">precariously</span><span class="w"> </span><span class="nv">on</span><span class="w"> </span><span class="nv">pot</span><span class="w"> </span><span class="nv">handle</span><span class="w"></span>
+<span class="k">wait</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="nv">minutes</span><span class="w"></span>
+<span class="k">goto</span><span class="w"> </span><span class="nl">first</span><span class="w"> </span><span class="nv">step</span><span class="w"> </span><span class="ss">(</span><span class="nv">or</span><span class="w"> </span><span class="nv">shut</span><span class="w"> </span><span class="nv">off</span><span class="w"> </span><span class="nv">burner</span><span class="w"> </span><span class="nv">when</span><span class="w"> </span><span class="nv">done</span><span class="ss">)</span><span class="w"></span>
+</code></pre>
+                            </div>
+                            <p>Do not bump wooden spoon or it will fall.</p>
+                        </li>
+                    </ol>
+                    <p>
+                        Notice again how text always lines up on 4-space indents (including
+                        that last line which continues item 3 above).
+                    </p>
+                    <p>
+                        Here's a link to 
+                        <a href="http://foo.bar">a website</a>
+                        , to a 
+                        <a href="local-doc.html">
+                            local
+                            doc
+                        </a>
+                        , and to a 
+                        <a href="#an-h2-header">
+                            section heading in the current
+                            doc
+                        </a>
+                        . Here's a footnote 
+                        <sup id="fnref:1">
+                            <a class="footnote-ref" href="#fn:1">1</a>
+                        </sup>
+                        .
+                    </p>
+                    <p>Tables can look like this:</p>
+                    <p>size  material      color</p>
+                    <hr/>
+                    <p>
+                        9     leather       brown
+                        10    hemp canvas   natural
+                        11    glass         transparent
+                    </p>
+                    <p>Table: Shoes, their sizes, and what they're made of</p>
+                    <p>
+                        (The above is the caption for the table.) Pandoc also supports
+                        multi-line tables:
+                    </p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="text-align: center;">keyword</th>
+                                <th style="text-align: center;">text</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="text-align: center;">red</td>
+                                <td style="text-align: center;">Sunsets, apples, and other red or reddish things.</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">green</td>
+                                <td style="text-align: center;">Leaves, grass, frogs and other things it's not easy being.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>A horizontal rule follows.</p>
+                    <hr/>
+                    <p>Here's a definition list:</p>
                     <dl>
-                        <dt>Good for making applesauce.</dt>
-                        <dt>oranges</dt>
+                        <dt>apples</dt>
                         <dd>
                             <dl>
-                                <dt>Citrus!</dt>
-                                <dt>tomatoes</dt>
-                                <dd>There's no "e" in tomatoe.</dd>
+                                <dt>Good for making applesauce.</dt>
+                                <dt>oranges</dt>
+                                <dd>
+                                    <dl>
+                                        <dt>Citrus!</dt>
+                                        <dt>tomatoes</dt>
+                                        <dd>There's no "e" in tomatoe.</dd>
+                                    </dl>
+                                </dd>
                             </dl>
                         </dd>
                     </dl>
-                </dd>
-            </dl>
-            <p>
-                Again, text is indented 4 spaces. (Put a blank line between each
-                term/definition pair to spread things out more.)
-            </p>
-            <p>Here's a "line block":</p>
-            <p>
-                | Line one
-                |   Line too
-                | Line tree
-            </p>
-            <p>and images can be specified like so:</p>
-            <p>
-                <img alt="example image" src="https://i.picsum.photos/id/152/536/354.jpg?hmac=Vh-3tACtfo0tExdnZBiHdzcsxRIS0Q-a8GN1QSC0b3U" title="An exemplary image" />
-            </p>
-            <p>
-                Inline math equations go in like so: $\omega = d\phi / dt$. Display
-                math should get its own line and be put in in double-dollarsigns:
-            </p>
-            <p>$$I = \int \rho R^2 dV$$</p>
-            <p>
-                And note that you can backslash-escape any punctuation characters
-                which you wish to be displayed literally, ex.: `foo`, *bar*, etc.
-            </p>
-            <div class="footnote">
-                <hr/>
-                <ol>
-                    <li id="fn:1">
-                        <p>
-                            Footnote text goes here. 
-                            <a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 384 512" class="fn-backlink" style="width: .75rem; height: .75rem;" fill="currentColor">
-                                    <!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
-                                    <path d="M32 448c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c53 0 96-43 96-96l0-306.7 73.4 73.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 109.3 160 416c0 17.7-14.3 32-32 32l-96 0z" />
-                                </svg>
-                            </a>
-                        </p>
-                    </li>
-                </ol>
-            </div>
-        </article>
-        <style>
-            #header {
-                width: 100%;
-                height: 5rem;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: .5rem;
-            }
+                    <p>
+                        Again, text is indented 4 spaces. (Put a blank line between each
+                        term/definition pair to spread things out more.)
+                    </p>
+                    <p>Here's a "line block":</p>
+                    <p>
+                        | Line one
+                        |   Line too
+                        | Line tree
+                    </p>
+                    <p>and images can be specified like so:</p>
+                    <p>
+                        <img alt="example image" src="https://i.picsum.photos/id/152/536/354.jpg?hmac=Vh-3tACtfo0tExdnZBiHdzcsxRIS0Q-a8GN1QSC0b3U" title="An exemplary image" />
+                    </p>
+                    <p>
+                        Inline math equations go in like so: $\omega = d\phi / dt$. Display
+                        math should get its own line and be put in in double-dollarsigns:
+                    </p>
+                    <p>$$I = \int \rho R^2 dV$$</p>
+                    <p>
+                        And note that you can backslash-escape any punctuation characters
+                        which you wish to be displayed literally, ex.: `foo`, *bar*, etc.
+                    </p>
+                    <p>
+                        <img alt="Kitty" src="../Kitty.jpg" />
+                    </p>
+                    <div class="footnote">
+                        <hr/>
+                        <ol>
+                            <li id="fn:1">
+                                <p>
+                                    Footnote text goes here. 
+                                    <a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 384 512" class="fn-backlink" style="width: .75rem; height: .75rem;" fill="currentColor">
+                                            <!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+                                            <path d="M32 448c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c53 0 96-43 96-96l0-306.7 73.4 73.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 109.3 160 416c0 17.7-14.3 32-32 32l-96 0z" />
+                                        </svg>
+                                    </a>
+                                </p>
+                            </li>
+                        </ol>
+                    </div>
+                </article>
+            </phml>
+            <style>
+                #header {
+                    width: 100%;
+                    height: 5rem;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: .5rem;
+                }
 
-            #header h3 {
-                margin: 0;
-                padding: 0;
-            }
-        </style>
+                #header h3 {
+                    margin: 0;
+                    padding: 0;
+                }
+            </style>
+        </phml>
     </body>
 </html>

@@ -1,8 +1,8 @@
-<phml>
+<PHML>
     <h1>Home</h1>
-    <navigation @if="not blank(nav)" :nav="nav" />
+    <Navigation @if="not blank(nav)" :nav="nav" />
     <p @else>No Nav</p>
-</phml>
+</PHML>
 
 <python>
     title = "Home"
