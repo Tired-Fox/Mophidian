@@ -58,6 +58,7 @@ def html(*meta: str) -> str:
 
     <head>{addons}{links}
         <title>{{title or ''}}</title>
+        <style></style>
     </head>
 
     <body>

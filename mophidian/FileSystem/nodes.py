@@ -16,6 +16,7 @@ from phml import (
     query_all,
     remove_nodes,
     tokanize_name,
+    check
 )
 from phml.core import VirtualPython
 from phml.builder import p
@@ -417,8 +418,8 @@ Use `moph highlight` to create that file."
             for node in head_children:
                 node.parent = head
                 exist = '[{}]'
-                exist_equal = '[{}={}]'
-                if node.tag in ["meta", "title"]:
+                exist_equal = '[{}="{}"]'
+                if check(node, "element") and node.tag in ["meta", "title"]:
                     old_tag = query(
                         head,
                         f"{node.tag}{''.join(exist.format(key) for key in node.properties.keys())}",
@@ -427,7 +428,7 @@ Use `moph highlight` to create that file."
                         replace_node(head, lambda n, i, p: n == old_tag, node)
                     else:
                         head.children.append(node)
-                elif node.tag not in ["style", "script"]:
+                elif check(node, "element") and node.tag not in ["style", "script"]:
                     if (
                         query(
                             head,
@@ -527,7 +528,6 @@ class Layout(File):
                 if query(layout_ast, "html") or query(layout_ast, "body"):
                     raise Exception("Layout must be components not full pages")
 
-                input(layout)
                 component: dict = parse_component(layout_ast)
             except Exception as error:
                 raise Exception("Layout must be a valid phml component") from error
@@ -553,7 +553,6 @@ class Layout(File):
         """
         ast = self.ast
         try:
-            input(f"{self} | page")
             component: dict = parse_component(page)
         except Exception as error:
             raise Exception("Page must be a valid phml component") from error
@@ -600,7 +599,7 @@ class Page(Renderable):
                 node.parent = head
                 exist = '[{}]'
                 exist_equal = '[{}={}]'
-                if node.tag in ["meta", "title"]:
+                if check(node, "element") and node.tag in ["meta", "title"]:
                     old_tag = query(
                         head,
                         f"{node.tag}{''.join(exist.format(key) for key in node.properties.keys())}",
@@ -609,7 +608,7 @@ class Page(Renderable):
                         replace_node(head, lambda n, i, p: n == old_tag, node)
                     else:
                         head.children.append(node)
-                elif node.tag not in ["style", "script"]:
+                elif check(node, "element") and node.tag not in ["style", "script"]:
                     if (
                         query(
                             head,

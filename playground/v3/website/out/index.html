@@ -6,78 +6,80 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="shortcut icon" href="/playground/v3/website/out/favicon.ico" type="image/x-icon" />
         <title>Home</title>
+        <style></style>
+        <link rel="stylesheet" href="/playground/v3/website/out/pico.min.css" />
         <link rel="stylesheet" href="/playground/v3/website/out/style.css" />
         <style>
-            body {
-                color: #365314;
-                background-color: #F4F6F3;
-            }
-            
             #header {
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
+                max-width: 65rem;
+                width: 100%
+            }
 
-                width: 100%;
-                padding: .5rem;
+            #header h3 {
+                margin-block: 0;
             }
         </style>
     </head>
     <body>
-        <div id="Header">
-            <a href="/playground/v3/website/out/blog/">Blog</a>
-            <h3>Mophidian</h3>
-            <a href="/playground/v3/website/out/docs/">Docs</a>
+        <div>
+            <div id="header">
+                <a href="/playground/v3/website/out/blog/">Blog</a>
+                <h3>Mophidian</h3>
+                <a href="/playground/v3/website/out/docs/">Docs</a>
+            </div>
+            <h1>Home</h1>
+            <ul id="nav-home">
+                <li class=""></li>
+                <li class="li-indent">
+                    <ul id="nav-account">
+                        <li class="">
+                            <a href="/playground/v3/website/out/account/">Account</a>
+                        </li>
+                        <li class="li-indent">
+                            <ul id="nav-random">
+                                <li class="li-indent">
+                                    <ul id="nav-stuff">
+                                        <li class="">
+                                            <a href="/playground/v3/website/out/account/random/stuff/">Stuff</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li class="li-indent">
+                    <ul id="nav-blog">
+                        <li class="">
+                            <a href="/playground/v3/website/out/blog/">Blog</a>
+                        </li>
+                        <li class="li-indent">
+                            <ul id="nav-December">
+                                <li class="">
+                                    <a href="/playground/v3/website/out/blog/December/">December</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="li-indent">
+                            <ul id="nav-January">
+                                <li class="">
+                                    <a href="/playground/v3/website/out/blog/January/">January</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="li-indent">
+                            <ul id="nav-snippets">
+                                <li class="">
+                                    <a href="/playground/v3/website/out/blog/snippets/">Snippets</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
-        <h1>Home</h1>
-        <ul id="nav-home">
-            <li class=""></li>
-            <li class="li-indent">
-                <ul id="nav-account">
-                    <li class="">
-                        <a href="/playground/v3/website/out/account/">Account</a>
-                    </li>
-                    <li class="li-indent">
-                        <ul id="nav-random">
-                            <li class="li-indent">
-                                <ul id="nav-stuff">
-                                    <li class="">
-                                        <a href="/playground/v3/website/out/account/random/stuff/">Stuff</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-            <li class="li-indent">
-                <ul id="nav-blog">
-                    <li class="">
-                        <a href="/playground/v3/website/out/blog/">Blog</a>
-                    </li>
-                    <li class="li-indent">
-                        <ul id="nav-December">
-                            <li class="">
-                                <a href="/playground/v3/website/out/blog/December/">December</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="li-indent">
-                        <ul id="nav-January">
-                            <li class="">
-                                <a href="/playground/v3/website/out/blog/January/">January</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="li-indent">
-                        <ul id="nav-snippets">
-                            <li class="">
-                                <a href="/playground/v3/website/out/blog/snippets/">Snippets</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-        </ul>
     </body>
 </html>

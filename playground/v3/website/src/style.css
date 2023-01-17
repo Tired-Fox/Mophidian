@@ -1,26 +1,9 @@
-@import url("https://fonts.googleapis.com/css?family=Poppins:400");
-
 * {
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
     scroll-behavior: smooth;
 }
 
-body {
-    font-family: "Poppins", sans-serif;
-}
-
-article {
-    margin-inline: 1rem;
-}
-
-[id^=nav-]:not([id=nav-home]) :is(ul, ol) {
-    padding-left: 1rem;
-}
-
-ul, ol {
-    padding-left: 2rem;
+:is(ul, ol) li {
+    list-style: none;
 }
 
 .toc-1 {

@@ -1,5 +1,6 @@
 <>
     <head>
+        <link rel="stylesheet" href="/pico.min.css">
         <link rel="stylesheet" :href="url('/style.css')">
     </head>
     <Header @if="blank(no_header)" />
