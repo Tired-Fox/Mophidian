@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -7,79 +7,41 @@
         <link rel="shortcut icon" href="/playground/v3/website/out/favicon.ico" type="image/x-icon" />
         <title>Home</title>
         <style></style>
+        <link rel="stylesheet" href="/playground/v3/website/out/tailwind.css" />
         <link rel="stylesheet" href="/playground/v3/website/out/pico.min.css" />
         <link rel="stylesheet" href="/playground/v3/website/out/style.css" />
         <style>
-            #header {
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
-                max-width: 65rem;
-                width: 100%
-            }
-
-            #header h3 {
-                margin-block: 0;
+            #hero {
+                flex: 1 1;
             }
         </style>
     </head>
-    <body>
-        <div>
-            <div id="header">
-                <a href="/playground/v3/website/out/blog/">Blog</a>
-                <h3>Mophidian</h3>
-                <a href="/playground/v3/website/out/docs/">Docs</a>
+    <body class="px-3">
+        <div class="flex flex-col h-screen">
+            <nav id="header" class="flex justify-center items-center gap-12 max-w-5xl w-fit mx-auto py-2">
+                <a href="/playground/v3/website/out/blog">Blog</a>
+                <h3 class="my-0">
+                    Mophidian
+                    <sup>
+                        <small>v1.0</small>
+                    </sup>
+                </h3>
+                <a href="/playground/v3/website/out/docs">Docs</a>
+            </nav>
+            <div id="hero" class="flex flex-col justify-center items-center">
+                <img src="/playground/v3/website/out/images/casual-life-3d-green-notebook-with-orange-bookmark.png" alt="3D Green Book" />
+                <p class="mt-2 mb-0">A simple yet affective pythonic SSG</p>
+                <small class="secondary">
+                    Illustration by 
+                    <a class="secondary" href="https://icons8.com/illustrations/author/zD2oqC8lLBBA">Icons 8</a>
+                    from 
+                    <a class="secondary" href="https://icons8.com/illustrations">Ouch!</a>
+                </small>
             </div>
-            <h1>Home</h1>
-            <ul id="nav-home">
-                <li class=""></li>
-                <li class="li-indent">
-                    <ul id="nav-account">
-                        <li class="">
-                            <a href="/playground/v3/website/out/account/">Account</a>
-                        </li>
-                        <li class="li-indent">
-                            <ul id="nav-random">
-                                <li class="li-indent">
-                                    <ul id="nav-stuff">
-                                        <li class="">
-                                            <a href="/playground/v3/website/out/account/random/stuff/">Stuff</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li class="li-indent">
-                    <ul id="nav-blog">
-                        <li class="">
-                            <a href="/playground/v3/website/out/blog/">Blog</a>
-                        </li>
-                        <li class="li-indent">
-                            <ul id="nav-December">
-                                <li class="">
-                                    <a href="/playground/v3/website/out/blog/December/">December</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="li-indent">
-                            <ul id="nav-January">
-                                <li class="">
-                                    <a href="/playground/v3/website/out/blog/January/">January</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="li-indent">
-                            <ul id="nav-snippets">
-                                <li class="">
-                                    <a href="/playground/v3/website/out/blog/snippets/">Snippets</a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+            <footer class="flex justify-between px-2 py-4">
+                <small class="secondary">Copyright &copy; Zachary Boehm. All Rights Reserved</small>
+                <nav>links</nav>
+            </footer>
         </div>
     </body>
 </html>

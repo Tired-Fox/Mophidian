@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -7,6 +7,7 @@
         <link rel="shortcut icon" href="/playground/v3/website/out/favicon.ico" type="image/x-icon" />
         <title>404 Not Found</title>
         <style></style>
+        <link rel="stylesheet" href="/playground/v3/website/out/tailwind.css" />
         <link rel="stylesheet" href="/playground/v3/website/out/pico.min.css" />
         <link rel="stylesheet" href="/playground/v3/website/out/style.css" />
         <style>
@@ -28,41 +29,20 @@
             #error-message {
                 color: #80849e;
             }
-            .flex {
-                display: flex;
-            }
-            .flex-col {
-                flex-direction: column;
-            }
-            .items-center {
-                align-items: center;
-            }
-            .justify-center {
-                justify-content: center;
-            }
-            .h-100 {
-                height: 100%;
-            }
             a {
                 color: inherit;
                 text-underline-offset: .25rem;
             }
-            .mt-2 {
-                margin-top: 2rem;
-            }
-            .mb-1 {
-                margin-bottom: 1rem;
-            }
         </style>
     </head>
-    <body>
-        <div class="flex flex-col items-center justify-center h-100">
+    <body class="px-3">
+        <div class="flex flex-col items-center justify-center h-screen">
             <h1 class="mb-1">
                 <span id="error-code">404</span>
                 <span id="error-message">Not Found</span>
             </h1>
             <p>Oops it looks like the page you are trying to reach doesn't exist</p>
-            <a class="mt-2" href="/playground/v3/website/out/Mophidian/">Back to Home</a>
+            <a class="mt-2" href="/playground/v3/website/out/Mophidian">Back to Home</a>
         </div>
     </body>
 </html>

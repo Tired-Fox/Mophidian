@@ -1,0 +1,9 @@
+<div id="header" class="w-full h-[5rem] flex justify-around items-center p-2">
+    <div></div>
+    <h3 class="m-0 p-0">{mophidian.site_name}</h3>
+    <nav class="flex gap-4">
+        <a href="/">Home</a>
+        <a href="/docs/">Docs</a>
+        <a href="/blog/">Blog</a>
+    </nav>
+</div>

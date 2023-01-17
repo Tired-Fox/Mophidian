@@ -1,10 +1,8 @@
-markdown:
-  pygmentize:
-    highlight: true
-    path: highlight.css
 site:
   root: playground/v3/website/out/
-  meta_tags:
-    - charset
-    - http_equiv
-    - viewport
+build:
+  html:
+    data-theme: dark
+  body:
+    class:
+      - px-3

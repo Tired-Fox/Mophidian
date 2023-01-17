@@ -10,7 +10,7 @@ from markdown.treeprocessors import Treeprocessor
 from markdown.util import AMP_SUBSTITUTE
 from xml.etree.ElementTree import Element
 
-from teddecor import Logger
+from teddecor import Logger, TED
 
 @functools.lru_cache(maxsize=None)
 def _norm_parts(path: str) -> list[str]:
@@ -50,9 +50,10 @@ def url_relative_to(current: str, other: str) -> str:
     return get_relative_url(current, other)
 
 class _RelativePathTreeprocessor(Treeprocessor):
-    def __init__(self, file, files) -> None:
+    def __init__(self, file, files, statics) -> None:
         self.file = file
         self.files = files
+        self.statics = statics
 
     def run(self, root: Element) -> Element:
         """
@@ -98,11 +99,16 @@ class _RelativePathTreeprocessor(Treeprocessor):
 
         # Validate that the target exists.
         target_file = self.files.find(target_uri)
+        if target_file is None:
+            target_file = self.statics.find(target_uri)
 
         if not Path(target_uri).exists() and target_file is None:
-            Logger.warning(
-                f"Page '{self.file.relative_url}' contains a link to "
-                f"'{target_uri}' which is not found in the files."
+            Logger.debug(
+                f"Page {TED.parse(f'[@Fyellow]{TED.escape(self.file.relative_url)}[@]')}",
+                "contains a link to",
+                f"{TED.parse(f'[@Fyellow]{TED.escape(target_uri)}[@]')}",
+                "which is not found in the files.",
+                label="Debug.[@Fred]Error[@]"
             ).flush()
             return url
 
@@ -120,10 +126,11 @@ class _RelativePathExtension(Extension):
     registers the Treeprocessor.
     """
 
-    def __init__(self, file, files) -> None:
+    def __init__(self, file, files, statics) -> None:
         self.file = file
         self.files = files
+        self.statics = statics
 
     def extendMarkdown(self, md: Markdown) -> None:
-        relpath = _RelativePathTreeprocessor(self.file, self.files)
+        relpath = _RelativePathTreeprocessor(self.file, self.files, self.statics)
         md.treeprocessors.register(relpath, "relpath", 0)

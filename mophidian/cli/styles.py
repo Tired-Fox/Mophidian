@@ -85,7 +85,7 @@ def generate_style(style: str):
     ).stdout
 
     if output is not None:
-        dest = Path(CONFIG.site.source).joinpath(CONFIG.markdown.pygmentize.path)
+        dest = Path(CONFIG.site.public).joinpath(CONFIG.markdown.pygmentize.path)
         output = output.decode('unicode_escape').replace("\r\n", "\n")
         output = _stylesheet_header(style, klass) + output
         with open(dest, "+w", encoding="utf-8") as highlight_file:

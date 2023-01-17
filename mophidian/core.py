@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from .config import CONFIG
 
 from .FileSystem.nodes import (
     Page,
@@ -19,6 +20,7 @@ from .FileSystem.nodes import (
 class Mophidian:
     """Class to hold globals to expose to the phml compiler."""
 
+    # Mophidian based Types
     Page = Page
     Markdown = Markdown
     Nav = Nav
@@ -31,3 +33,9 @@ class Mophidian:
     Container = Container
     TOC = TOC
     Anchor = Anchor
+
+    # Config values
+    site_name = CONFIG.site.name
+    favicon = CONFIG.build.favicon
+    version = CONFIG.site.version
+    code_hl_stylesheet = CONFIG.markdown.pygmentize.path   

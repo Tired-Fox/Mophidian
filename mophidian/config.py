@@ -1,8 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from pathlib import Path
 
-from teddecor.decorators import config, Options, TypesDefault
-from teddecor import Logger
+from teddecor.decorators import config, Options
+from teddecor import Logger, TED
 
 
 @dataclass
@@ -28,11 +29,8 @@ class MarkdownWrapper:
     tag = "article"
     """Tag of the element that wraps the markdown."""
 
-    classes = [str]
-    """The classes to apply to the markdown wrapper."""
-
-    id = str
-    """The id for the markdown wrapper."""
+    attributes = {}
+    """The attributes to apply to the markdown wrapper element."""
 
 @config.yaml
 class Markdown:
@@ -91,18 +89,16 @@ class Site:
     version = "1.0"
     """The version of the site `ex`: 0.1 or 1. Defaults to `1.0`"""
 
-    source = "src/"
-    """The directory to use for the source files. This equals the location of the main
-    pages. Defaults to `pages/`
-    """
+    source = "src/pages/"
+    """The directory to use for the source files."""
+
+    components = "src/components/"
+    """The directory to use for the component files."""
+
+    public = "public/"
 
     dest = "out/"
     """The directory to put the built files into. Defaults to `site/`"""
-
-    content = "content/"
-    """The directory where content files are located. These files are markdown and they are used in
-    dynamic routes. Defaults to `content/`
-    """
 
     root = ""
     """Root directory of the website. Used for links. Ex: `https://user.github.io/project/` where
@@ -123,19 +119,19 @@ class Site:
 class Build:
     """Mohpidian.build configuration."""
 
-    version_format = "v{}"
-    """How the generator should format the version. Defaults to `v{}`"""
-
     refresh_delay = 2.0
     """The delay until the live server reloads the browser after a file change is detected.
     Defaults to `2.0`.
     """
 
-    use_root = False
-    """Temporary"""
-    
     favicon = "/favicon.ico"
     """Path to the favicon from website root."""
+
+    body = {}
+    """The attributes to apply to the body tag."""
+
+    html = {}
+    """The attributes to apply to the html tag."""
 
 @config.yaml
 class Integrations:
@@ -148,8 +144,6 @@ class Integrations:
     package_manager = Options(PackageManagers, default="npm")
     """The users prefered package manager. Defaults to `npm`"""
 
-
-@config.yaml(load_save="./moph.yaml")
 class Config:
     """Mophidian configuration."""
 
@@ -165,9 +159,33 @@ class Config:
     integrations = Integrations
     """Integrations configuration."""
 
-try:
-    CONFIG = Config()
-except FileNotFoundError:
-    Logger.warning("No save file found, generating defaults").flush()
-    CONFIG = Config({})
+def build_config(_type: str = ".yaml", data: dict | None = None):
+    if _type in [".yml", ".yaml"]:
+        @config.yaml(load_save=f"./moph{_type}")
+        class YamlConfig(Config):
+            pass
+        return YamlConfig(data)
+    elif _type == ".toml":
+        @config.yaml(load_save="./moph.toml")
+        class TomlConfig(Config):
+            pass
+        return TomlConfig(data)
+    elif _type == ".json":
+        @config.yaml(load_save="./moph.json")
+        class JsonConfig(Config):
+            pass
+        return JsonConfig(data)
+
+valid_files = ("moph.json", "moph.toml", "moph.yaml", "moph.yml",)
+configs = [file for files in [Path("./").glob(e) for e in valid_files] for file in files]
+
+if len(configs) > 1:
+    config_files = ", ".join(TED.parse(f"'[@Fred$]{file}[]'") for file in configs)
+    Logger.error(f"More than one config found: {config_files}").flush()
+    exit()
+elif len(configs) == 0:
+    Logger.warning("No config file found, generating default yaml config").flush()
+    CONFIG = build_config(".yaml", {})
     CONFIG.save()
+else:
+    CONFIG = build_config(configs[0].suffix)

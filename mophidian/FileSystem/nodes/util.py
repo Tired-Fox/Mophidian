@@ -1,32 +1,8 @@
 from __future__ import annotations
 import re
-from typing import Any, Callable
 from functools import cache
 
 from mophidian.config import CONFIG
-
-def get_group_name(group: str) -> str:
-    """Get the group name from the format `(name)`."""
-    name = REGEX["group"]["name"].match(group)
-    if name is not None:
-        return name.group(1)
-    return ""
-
-def first(condition: Callable, collection: list | dict | tuple) -> Any:
-    """Find the first match given the condition.
-
-    Return:
-        Any | None: The found value or None if no value was found.
-    """
-    if isinstance(collection, dict):
-        for value in collection.values():
-            if condition(value):
-                return value
-    else:
-        for value in collection:
-            if condition(value):
-                return value
-    return None
 
 def title(text: str | list[str]) -> str:
     """Generate the title case version of the passed in text."""

@@ -17,6 +17,10 @@
   - [x] Add css link for code highlights
 - [x] Auto add website root to href's starting with `/`. Only if they don't already start with the root.
 - [x] Custom relative path plugin for markdown
+- [ ] Sitemap
+- [ ] RSS
+- [ ] Page search
+- [ ] Command to make new project
 - [ ] Live Reload Server
   - [ ] Page and Component linking on render
   - [ ] Pages have all layout ancestors linked
