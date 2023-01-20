@@ -513,6 +513,22 @@ video {
   --tw-backdrop-sepia:  ;
 }
 
+.absolute {
+  position: absolute;
+}
+
+.sticky {
+  position: sticky;
+}
+
+.top-0 {
+  top: 0px;
+}
+
+.left-0 {
+  left: 0px;
+}
+
 .m-0 {
   margin: 0px;
 }
@@ -559,6 +575,10 @@ video {
   height: 5rem;
 }
 
+.h-1 {
+  height: 0.25rem;
+}
+
 .w-fit {
   width: -moz-fit-content;
   width: fit-content;
@@ -568,8 +588,16 @@ video {
   width: 100%;
 }
 
+.w-\[15rem\] {
+  width: 15rem;
+}
+
 .max-w-5xl {
   max-width: 64rem;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
 }
 
 .flex-col {
@@ -578,6 +606,10 @@ video {
 
 .items-center {
   align-items: center;
+}
+
+.justify-end {
+  justify-content: flex-end;
 }
 
 .justify-center {

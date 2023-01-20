@@ -2,8 +2,6 @@
     scroll-behavior: smooth;
 }
 
-
-
 :is(small, p, span).secondary {
     color: var(--secondary);
 }

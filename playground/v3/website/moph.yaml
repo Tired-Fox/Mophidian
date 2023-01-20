@@ -6,3 +6,8 @@ build:
   body:
     class:
       - px-3
+markdown:
+  wrapper:
+    attributes:
+      class:
+        - w-full

@@ -17,9 +17,6 @@
   - [x] Add css link for code highlights
 - [x] Auto add website root to href's starting with `/`. Only if they don't already start with the root.
 - [x] Custom relative path plugin for markdown
-- [ ] Sitemap
-- [ ] RSS
-- [ ] Page search
 - [ ] Command to make new project
 - [ ] Live Reload Server
   - [ ] Page and Component linking on render
@@ -36,6 +33,9 @@
       - [ ] layout edit means page updates
       - [ ] page edit only gets page update
       - [ ] component update = page update
+- [ ] Sitemap
+- [ ] RSS
+- [ ] Page search
 - [ ] Dynamic routes
   - [ ] dynamic route generation through python element
   - [ ] Generates from `content/` directory

@@ -4,8 +4,7 @@ from typing import Callable, Iterator
 
 from .util import REGEX
 from .base import Node
-from .files import File, Layout, Page, Markdown, Static, Renderable
-from .nav import Nav
+from .files import File, Layout, Page, Markdown, Static, Renderable, Nav
 
 __all__ = [
     "Container",
@@ -103,18 +102,15 @@ class Container(Node):
         """
 
         current = self
+        result = first(lambda l: isinstance(l, Layout), current.children)
         for node in path:
             for child in current.children:
                 if isinstance(child, Container) and child.name == node:
                     current = child
+                    result = first(lambda l: isinstance(l, Layout), current.children) or result
                     break
 
-        result = first(lambda l: isinstance(l, Layout), current.children)
-
-        if result is not None:
-            return result
-
-        return None
+        return result
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(name={self.name!r}, path={self.path!r}, children={len(self.children)})"
@@ -178,15 +174,16 @@ class Container(Node):
             item (File | Container): The item to add to the directory
         """
         current = self
-        path = [item.root, *item.path.split("/")]
+        path = [item.root, *[i for i in item.path.split("/") if i.strip() != ""]]
 
         for i, segment in enumerate(path):
             if Path('/'.join(path[: i + 1])).is_file():
                 current.children.append(item)
-            elif i != 0:
+            elif '/'.join(path[: i + 1]) != item.root:
+                new_path = Path(item.root).joinpath(*path[1: i + 1]).as_posix()
                 if REGEX["group"]["name"].match(segment) is not None:
                     found = False
-                    if current.path.strip("/") == "/".join(path[: i + 1]):
+                    if current.path.strip("/") == new_path:
                         found = True
                     else:
                         for group in [
@@ -199,13 +196,14 @@ class Container(Node):
 
                     # If valid, append a new group
                     if not found:
-                        new = Group('/'.join(path[: i + 1]) + "/")
+                        new = Group(new_path, item.root)
                         current.children.append(new)
                         current = new
                 else:
                     found = False
+                    new_path = Path(item.root).joinpath(*path[1: i + 1]).as_posix()
 
-                    if current.path.strip("/") == "/".join(path[: i + 1]):
+                    if current.path.strip("/") == new_path:
                         found = True
                     else:
                         for directory in [
@@ -218,7 +216,7 @@ class Container(Node):
 
                     # If valid, append a new directory
                     if not found:
-                        new = Directory('/'.join(path[: i + 1]) + "/")
+                        new = Directory(new_path, item.root)
                         current.children.append(new)
                         current = new
         return current
@@ -293,8 +291,8 @@ class Container(Node):
                     lyt.parent = self.find_layout_by_name(lyt.inherit_from)
 
         def iterate_pages(current: Container):
-            # Pages in the current directory
-            _pages = [page for page in current.children if isinstance(page, Page | Markdown)]
+            # Renderable files in the current directory
+            _pages = [page for page in current.children if isinstance(page, Renderable)]
 
             # Directories and Groups
             _containers = [cont for cont in current.children if isinstance(cont, Container)]

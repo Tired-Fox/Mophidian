@@ -16,23 +16,24 @@ from .FileSystem.nodes import (
     Anchor
 )
 
+MOPHIDIAN_TYPES = {
+    "Page": Page,
+    "Markdown": Markdown,
+    "Nav": Nav,
+    "Static": Static,
+    "Layout": Layout,
+    "Directory": Directory,
+    "Group": Group,
+    "Renderable": Renderable,
+    "File": File,
+    "Container": Container,
+    "TOC": TOC,
+    "Anchor": Anchor,
+}
+
 @dataclass
 class Mophidian:
     """Class to hold globals to expose to the phml compiler."""
-
-    # Mophidian based Types
-    Page = Page
-    Markdown = Markdown
-    Nav = Nav
-    Static = Static
-    Layout = Layout
-    Directory = Directory
-    Group = Group
-    Renderable = Renderable
-    File = File
-    Container = Container
-    TOC = TOC
-    Anchor = Anchor
 
     # Config values
     site_name = CONFIG.site.name

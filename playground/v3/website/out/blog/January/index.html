@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="shortcut icon" href="/playground/v3/website/out/favicon.ico" type="image/x-icon" />
-        <title>Blog Post</title>
+        <title>Blog | Sample Markdown</title>
         <link rel="stylesheet" href="/playground/v3/website/out/highlight.css" />
         <style></style>
         <link rel="stylesheet" href="/playground/v3/website/out/tailwind.css" />
@@ -17,36 +17,62 @@
                 margin-inline: auto;
                 max-width: 80%;
             }
+
+            #toc {
+                margin: var(--block-spacing-vertical) 0;
+            }
+
+            #toc :is(li, a) {
+                width: fit-content;
+            }
         </style>
         <link rel="stylesheet" href="/playground/v3/website/out/style.css" />
     </head>
     <body class="px-3">
         <div id="header" class="w-full h-[5rem] flex justify-around items-center p-2">
-            <div></div>
-            <h3 class="m-0 p-0">Mophidian</h3>
-            <nav class="flex gap-4">
+            <div class="flex-1"></div>
+            <h3 class="m-0 p-0 flex-3">Mophidian</h3>
+            <nav class="flex justify-end gap-4 flex-1">
                 <a href="/playground/v3/website/out/">Home</a>
                 <a href="/playground/v3/website/out/docs">Docs</a>
                 <a href="/playground/v3/website/out/blog">Blog</a>
             </nav>
         </div>
         <div>
-            <h1>Blog Layout</h1>
-        </div>
-        <aside>
-            <ul>
-                <li class="toc-1">
-                    <a href="#an-h1-header">An h1 header</a>
-                </li>
-                <li class="toc-2">
-                    <a href="#an-h2-header">An h2 header</a>
-                </li>
-                <li class="toc-3">
-                    <a href="#an-h3-header">An h3 header</a>
+            <h3>Docs</h3>
+            <ul id="nav-home">
+                <li class=""></li>
+                <li class="li-indent">
+                    <ul id="nav-blog">
+                        <li class="">
+                            <a href="/playground/v3/website/out/blog/">Blog</a>
+                        </li>
+                        <li class="li-indent">
+                            <ul id="nav-December">
+                                <li class="">
+                                    <a href="/playground/v3/website/out/blog/December/">December</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="li-indent">
+                            <ul id="nav-January">
+                                <li class="">
+                                    <a href="/playground/v3/website/out/blog/January/">January</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="li-indent">
+                            <ul id="nav-snippets">
+                                <li class="">
+                                    <a href="/playground/v3/website/out/blog/snippets/">Snippets</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                 </li>
             </ul>
-        </aside>
-        <article>
+        </div>
+        <article class="w-full">
             <h1 id="an-h1-header">An h1 header</h1>
             <p>Paragraphs are separated by a blank line.</p>
             <p>
@@ -260,5 +286,9 @@
                 </ol>
             </div>
         </article>
+        <footer class="flex justify-between px-2 py-4">
+            <small class="secondary">Copyright &copy; Zachary Boehm. All Rights Reserved</small>
+            <nav>links</nav>
+        </footer>
     </body>
 </html>

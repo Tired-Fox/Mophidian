@@ -2,7 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from teddecor.decorators import config, Options
+from teddecor.decorators import config, Options, TypesDefault
 from teddecor import Logger, TED
 
 
@@ -29,7 +29,7 @@ class MarkdownWrapper:
     tag = "article"
     """Tag of the element that wraps the markdown."""
 
-    attributes = {}
+    attributes = { "*": TypesDefault(str, list) }
     """The attributes to apply to the markdown wrapper element."""
 
 @config.yaml
@@ -83,7 +83,7 @@ https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, I
 class Site:
     """Mophidian.site configuration."""
 
-    name = "Mophidian"
+    name = ""
     """The name of the site. Defaults to `Mophidian`"""
 
     version = "1.0"
@@ -127,10 +127,10 @@ class Build:
     favicon = "/favicon.ico"
     """Path to the favicon from website root."""
 
-    body = {}
+    body = { "*": TypesDefault(str, list) }
     """The attributes to apply to the body tag."""
 
-    html = {}
+    html = { "*": TypesDefault(str, list) }
     """The attributes to apply to the html tag."""
 
 @config.yaml
@@ -166,12 +166,12 @@ def build_config(_type: str = ".yaml", data: dict | None = None):
             pass
         return YamlConfig(data)
     elif _type == ".toml":
-        @config.yaml(load_save="./moph.toml")
+        @config.toml(load_save="./moph.toml")
         class TomlConfig(Config):
             pass
         return TomlConfig(data)
     elif _type == ".json":
-        @config.yaml(load_save="./moph.json")
+        @config.json(load_save="./moph.json")
         class JsonConfig(Config):
             pass
         return JsonConfig(data)
@@ -186,6 +186,5 @@ if len(configs) > 1:
 elif len(configs) == 0:
     Logger.warning("No config file found, generating default yaml config").flush()
     CONFIG = build_config(".yaml", {})
-    CONFIG.save()
 else:
     CONFIG = build_config(configs[0].suffix)

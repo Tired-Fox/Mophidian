@@ -4,7 +4,7 @@ from re import search
 from teddecor import Logger, TED
 from phml import PHML
 
-from mophidian.core import Mophidian
+from mophidian.core import Mophidian, MOPHIDIAN_TYPES
 from mophidian.config import CONFIG
 
 from .nodes import (
@@ -91,7 +91,6 @@ def render_pages(
         "url": url,
         "title_case": title,
         "nav": nav,
-        "mophidian": Mophidian()
     }
 
     # Render pages
@@ -151,6 +150,7 @@ def build(display_files: bool = False):
 
     Logger.info("Building pages").flush()
     phml = PHML()
+    phml.expose(mophidian=Mophidian(), **MOPHIDIAN_TYPES)
 
     # Build components and files
     Logger.debug("Discovering files and components").flush()
