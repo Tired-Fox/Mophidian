@@ -1,16 +1,9 @@
 from __future__ import annotations
-from dataclasses import dataclass
 from pathlib import Path
 
-from teddecor.decorators import config, Options, TypesDefault
+from teddecor.decorators import config, TypesDefault
 from teddecor import Logger, TED
 
-
-@dataclass
-class PackageManagers:
-    NPM: str = "npm"
-    YARN: str = "yarn"
-    PNPM: str = "pnpm"
 
 @config.yaml
 class Pygmentize:
@@ -133,17 +126,6 @@ class Build:
     html = { "*": TypesDefault(str, list) }
     """The attributes to apply to the html tag."""
 
-@config.yaml
-class Integrations:
-    tailwind = False
-    """Auto use and setup tailwind css with node. Defaults to `False`"""
-
-    sass = False
-    """Auto use and setup sass with node. Defaults to `False`"""
-
-    package_manager = Options(PackageManagers, default="npm")
-    """The users prefered package manager. Defaults to `npm`"""
-
 class Config:
     """Mophidian configuration."""
 
@@ -155,9 +137,6 @@ class Config:
 
     build = Build
     """Build configuration."""
-
-    integrations = Integrations
-    """Integrations configuration."""
 
 def build_config(_type: str = ".yaml", data: dict | None = None):
     if _type in [".yml", ".yaml"]:

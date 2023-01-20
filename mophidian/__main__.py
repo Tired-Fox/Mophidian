@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 from __future__ import annotations
+from pathlib import Path
 import click
+from shutil import rmtree
 
-from teddecor import Logger, LL
+from teddecor import Logger, LL, TED
 
-from mophidian.FileSystem import build
-from mophidian.config import CONFIG
-
+from mophidian.FileSystem import build as full_build
+from mophidian.config import CONFIG, build_config
 
 
 @click.group()
@@ -22,7 +23,7 @@ def build_command(debug: bool, files: bool):
     if debug:
         Logger.level(LL.DEBUG)
 
-    build(files)
+    full_build(files)
 
 @click.argument("style", default="")
 @click.option("-l", "--list", flag_value=True, help="list the possible color themes. Allows for style selection.", default=False)
@@ -35,7 +36,46 @@ def code_highlight(style: str, list: bool):
 
     generate_highlight(style, list)
 
+@click.argument("name", default="")
+@click.option("-f", "--force", flag_value=True, help="force write files and directories even if they already exist", default=False)
+@cli.command(name="new", help="Create a new mophidian project")
+def new(force: bool, name: str):
+    """Stylize markdown code blocks with pygmentize. This command allows you to generate the
+    CSS file with a given styles highlight colors.
+    """
+    
+    while name == "":
+        name = input("Enter the name of your project: ")
+    
+    Logger.info("Generating file strucutre").flush()
 
+    path = Path(name.lower())
+
+    if path.is_dir():
+        if force:
+            rmtree(path)
+        else:
+            Logger.error(
+                TED.parse(
+                    f"Failed to create project [@Fyellow]/{name}[@F] since it already exists"
+                )
+            ).flush()
+            exit()
+
+    path.joinpath("src/pages").mkdir(parents=True, exist_ok=True)
+    path.joinpath("src/components").mkdir(parents=True, exist_ok=True)
+    path.joinpath("public").mkdir(parents=True, exist_ok=True)
+
+    CONFIG = build_config(".yml", {})
+    CONFIG.site.name = name
+    input(CONFIG.site.name)
+    CONFIG.save(path.joinpath("moph.yml"))
+
+    Logger.success(
+        TED.parse(
+            f"Next cd into [@Fyellow]{name!r}[@F] and use [@Fyellow]'moph build'"
+        )
+    ).flush()
 
 
 if __name__ == "__main__":
