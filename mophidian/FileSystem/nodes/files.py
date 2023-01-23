@@ -3,7 +3,7 @@ from functools import cached_property
 
 from pathlib import Path
 from shutil import copyfile, SameFileError
-from typing import Any
+from typing import TYPE_CHECKING, Any
 import frontmatter
 
 from phml import (
@@ -16,7 +16,7 @@ from phml import (
     query_all,
     remove_nodes,
     tokanize_name,
-    check
+    check,
 )
 from phml.core import VirtualPython
 from phml.builder import p
@@ -29,6 +29,9 @@ from mophidian.config import CONFIG
 from .markdown_extensions import _RelativePathExtension
 from .util import REGEX, PAGE_IGNORE, html, title, url
 from .base import apply_attribute_configs, build_attributes, Node
+
+if TYPE_CHECKING:
+    from .containers import Directory
 
 __all__ = [
     "File",
@@ -413,14 +416,16 @@ Use `moph highlight` to create that file."
 
         ast = apply_attribute_configs(ast)
 
+        ast = phml.compile(**kwargs)
+
+        # Fix href and src links
+        root = "/" + CONFIG.site.root.strip("/")
+        for link_type in ["href", "src", "xlink:href"]:
+            for node in query_all(ast, f"[{link_type}^=/]"):
+                if not node[link_type].startswith(root):
+                    node[link_type] = root + node[link_type]
+        
         phml.ast = ast
-
-        # Get all tags with an href that starts with `/`
-        # for link_type in ["href", "src"]:
-        #     for node in query_all(phml.ast, f"[{link_type}^=/]"):
-        #         if not node[link_type].startswith("/" + CONFIG.site.root.strip("/")):
-        #             node[link_type] = url(node[link_type])
-
         return phml.render(**kwargs)
 
 
@@ -597,9 +602,18 @@ class Page(Renderable):
         replace_node(ast.tree, {"tag": "slot"}, page_ast.children)
 
         ast = apply_attribute_configs(ast)
+        ast = phml.compile(**kwargs)
+
+        # Fix href and src links
+        root = "/" + CONFIG.site.root.strip("/")
+        for link_type in ["href", "src", "xlink:href"]:
+            for node in query_all(ast, f"[{link_type}^=/]"):
+                if link_type == "xlink:href":
+                    input(node)
+                if not node[link_type].startswith(root):
+                    node[link_type] = root + node[link_type]
 
         phml.ast = ast
-
         return phml.render(**kwargs)
     
 class Nav:

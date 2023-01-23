@@ -66,7 +66,7 @@ def build_files(path: str) -> tuple[Directory, Nav]:
                     root.add(Page(_file.as_posix(), path))
 
         # Markdown files
-        elif _file.suffix == ".md":
+        elif _file.suffix in [".md", ".mdx"]:
             root.add(Markdown(_file.as_posix(), path))
 
         # Static files
@@ -111,25 +111,6 @@ def render_pages(
             **page_vars,
             **global_vars
         )
-        
-        for link in ["href", "src"]:
-            match = search("{link}=\"\/(?!{root})([^\"]*)\"|{link}='\/(?!{root})([^']*)'|\
-{link}=\/(?!{root})([^\s<>\"']+)".format(link=link, root=CONFIG.site.root), output)
-            while match is not None:
-                rel = match.group(1)
-                if rel is None:
-                    rel = match.group(2)
-                if rel is None:
-                    rel = match.group(3)
-                result = f'{link}="/{Path(CONFIG.site.root).joinpath(rel).as_posix()}\
-{"/" if rel == "" else ""}"'
-                output = (
-                    output[:match.start()]
-                    + result
-                    + output[match.start() + len(match.group(0)):]
-                )
-                match = search("{link}=\"\/(?!{root})([^\"]*)\"|{link}='\/(?!{root})([^']*)'|\
-{link}=\/(?!{root})([^\s<>\"']+)".format(link=link, root=CONFIG.site.root), output)
 
         with open(dest, "+w", encoding="utf-8") as file:
             file.write(output)
