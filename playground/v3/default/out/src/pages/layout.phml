@@ -1,0 +1,44 @@
+<>
+    <article>
+        <slot />
+    </article>
+</>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    article {
+        width: 90%;
+        max-width: 70rem;
+        margin-inline: auto;
+        margin-block: 2rem;
+
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        line-height: 2rem;
+    }
+
+    code {
+        background-color: rgb(186, 187, 187);
+        font-size: 13px;
+        padding: .1rem .25rem;
+        border-radius: .25rem;
+    }
+
+    a {
+        color: green;
+        text-underline-offset: .25rem;
+    }
+
+    a:hover {
+        text-underline-offset: .4rem;
+    }
+</style>

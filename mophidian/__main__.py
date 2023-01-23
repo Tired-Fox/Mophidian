@@ -38,15 +38,16 @@ def code_highlight(style: str, list: bool):
 
 @click.argument("name", default="")
 @click.option("-f", "--force", flag_value=True, help="force write files and directories even if they already exist", default=False)
+@click.option("-p", "--preset", flag_value=True, help="generate the project with a preset", default=False)
 @cli.command(name="new", help="Create a new mophidian project")
-def new(force: bool, name: str):
+def new(force: bool, preset: bool, name: str):
     """Stylize markdown code blocks with pygmentize. This command allows you to generate the
     CSS file with a given styles highlight colors.
     """
-    
+
     while name == "":
         name = input("Enter the name of your project: ")
-    
+
     Logger.info("Generating file strucutre").flush()
 
     path = Path(name.lower())
@@ -62,13 +63,17 @@ def new(force: bool, name: str):
             ).flush()
             exit()
 
-    path.joinpath("src/pages").mkdir(parents=True, exist_ok=True)
-    path.joinpath("src/components").mkdir(parents=True, exist_ok=True)
-    path.joinpath("public").mkdir(parents=True, exist_ok=True)
+    if preset:
+        from shutil import copytree
+
+        copytree(Path(__file__).parent.joinpath("preset"), path, dirs_exist_ok=True)
+    else:
+        path.joinpath("src/pages").mkdir(parents=True, exist_ok=True)
+        path.joinpath("src/components").mkdir(parents=True, exist_ok=True)
+        path.joinpath("public").mkdir(parents=True, exist_ok=True)
 
     CONFIG = build_config(".yml", {})
     CONFIG.site.name = name
-    input(CONFIG.site.name)
     CONFIG.save(path.joinpath("moph.yml"))
 
     Logger.success(
@@ -80,25 +85,6 @@ def new(force: bool, name: str):
 
 if __name__ == "__main__":
     cli()
-
-# @cli.command(name="new")
-# @click.option("--sass", flag_value=True, help=open_help, default=False)
-# @click.option("--tailwind", flag_value=True, help=tailwind_help, default=False)
-# @click.option("--no_defaults", flag_value=True, help=tailwind_help, default=False)
-# @click.option("--template", type=str, show_default=True, help=template_help, default="blank")
-# def new_command(sass: bool, tailwind: bool, no_defaults: bool, template: str):
-#     """Create a new mophidian project.
-
-#     Args:
-#         sass (bool): Whether to use sass integration.
-#         tailwind (bool): Whether to use tailwindcss integration
-#         no_defaults (bool): Don't use default values. Includes markdown extensions.
-#         template (str): Which template to use. Defaults to "blank".
-#     """
-#     from mophidian.core.new import generate
-
-#     generate(sass=sass, tailwind=tailwind, no_defaults=no_defaults, template=template)
-
 
 # @cli.command(name="serve")
 # @click.option("-o", "--open", flag_value=True, help=open_help, default=False)

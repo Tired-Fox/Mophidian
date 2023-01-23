@@ -3,6 +3,8 @@
 - [x] Global config using decorators
 - [ ] Global reference to pages, components, and layouts
 
+[SVG Repo](https://www.svgrepo.com/)
+
 ```
 components:
   - **/*.phml 
