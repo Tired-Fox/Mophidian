@@ -1,11 +1,10 @@
 from pathlib import Path
-from re import search
 
 from teddecor import Logger, TED
 from phml import PHML
 
 from mophidian.core import Mophidian, MOPHIDIAN_TYPES
-from mophidian.config import CONFIG
+from mophidian import CONFIG, states
 
 from .nodes import (
     Directory,
@@ -129,12 +128,12 @@ def write_static_files(root: Directory, static: Directory, out: str):
 def build(display_files: bool = False):
     """Take the components and files and render and write them to the given output directory."""
 
-    Logger.info("Building pages").flush()
+    Logger.Debug("Building pages")
     phml = PHML()
     phml.expose(mophidian=Mophidian(), **MOPHIDIAN_TYPES)
 
     # Build components and files
-    Logger.debug("Discovering files and components").flush()
+    Logger.Debug("Discovering files and components")
     components = build_components(CONFIG.site.components)
     root, nav = build_files(CONFIG.site.source)
     static = build_static(CONFIG.site.public)
@@ -143,13 +142,13 @@ def build(display_files: bool = False):
     phml.add(components.full_paths(), strip=CONFIG.site.components) # type: ignore
 
     if display_files:
-        Logger.custom(f"({len(root)}) files found", label="File System", clr="178")
-        Logger.message(root).flush()
+        Logger.custom(f"({len(root)}) files found", label="File System", clr="178").Message(root)
 
     # Render all the pages
-    Logger.debug(f"Rendering pages to {TED.parse(f'[@F yellow $]{CONFIG.site.dest}')}").flush()
-    render_pages(root, static, nav=nav, out=CONFIG.site.dest, phml=phml)
-    write_static_files(root, static, out=CONFIG.site.dest)
+    dest = states["dest"]
+    Logger.Debug(f"Rendering pages to {TED.parse(f'[@F yellow $]{dest}')}")
+    render_pages(root, static, nav=nav, out=dest, phml=phml)
+    write_static_files(root, static, out=dest)
 
-    Logger.info("Finished building pages").flush()
+    Logger.Debug("Finished building pages")
     return root, components, phml

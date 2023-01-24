@@ -370,12 +370,12 @@ class Markdown(Renderable):
                     page_files.find(CONFIG.markdown.pygmentize.path) is None
                     and static_files.find(CONFIG.markdown.pygmentize.path) is None
                 ):
-                    if not mophidian.markdown_code_highlight_warned:
+                    if not mophidian.states["markdown_code_highlight_warned"]:
                         Logger.warning(
                             "Markdown code highlighting requires a pygmentize css file. \
 Use `moph highlight` to create that file."
                         ).flush()
-                        mophidian.markdown_code_highlight_warned = True
+                        mophidian.states["markdown_code_highlight_warned"] = True
                 else:
                     head.insert(
                         -1,

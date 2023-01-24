@@ -4,10 +4,12 @@ from pathlib import Path
 import click
 from shutil import rmtree
 
-from teddecor import Logger, LL, TED
+from teddecor import TED, Logger, LogLevel
 
 from mophidian.FileSystem import build as full_build
 from mophidian.config import CONFIG, build_config
+from mophidian import states, DestState
+from .Server import Server, LiveServer
 
 
 @click.group()
@@ -21,8 +23,9 @@ def build_command(debug: bool, files: bool):
     """Build the website in the specified dest directory."""
 
     if debug:
-        Logger.level(LL.DEBUG)
+        Logger.level(LogLevel.DEBUG)
 
+    states["dest"] = DestState.PREVIEW
     full_build(files)
 
 @click.argument("style", default="")
@@ -48,7 +51,7 @@ def new(force: bool, preset: bool, name: str):
     while name == "":
         name = input("Enter the name of your project: ")
 
-    Logger.info("Generating file strucutre").flush()
+    Logger.Info("Generating file strucutre")
 
     path = Path(name.lower())
 
@@ -60,7 +63,7 @@ def new(force: bool, preset: bool, name: str):
                 TED.parse(
                     f"Failed to create project [@Fyellow]/{name}[@F] since it already exists"
                 )
-            ).flush()
+            )
             exit()
 
     if preset:
@@ -76,90 +79,42 @@ def new(force: bool, preset: bool, name: str):
     CONFIG.site.name = name
     CONFIG.save(path.joinpath("moph.yml"))
 
-    Logger.success(
+    Logger.info(
         TED.parse(
-            f"Next cd into [@Fyellow]{name!r}[@F] and use [@Fyellow]'moph build'"
+            f"Finished! Next cd into [@Fyellow]{name!r}[@F] and use [@Fyellow]'moph build'"
         )
-    ).flush()
+    )
+    
+@cli.command(name="serve")
+@click.option("-o", "--open", flag_value=True, default=False, help="open the server in the browser")
+@click.option("--host", flag_value=True, default=False, help="expose the network url for the server")
+def serve(open: bool, host: bool):
+    """Serve the site; when files change, rebuild the site and reload the server."""
+
+    full_build()
+    server = LiveServer(port=8081, open=open, expose_host=host)
+    try:
+        server.start()
+    except KeyboardInterrupt:
+        server.stop()
+    rmtree(states["dest"], ignore_errors=True)
+        
+@cli.command(name="preview")
+@click.option("-o", "--open", flag_value=True, default=False, help="open the server in the browser")
+@click.option("--host", flag_value=True, default=False, help="expose the network url for the server")
+def preview(open: bool, host: bool):
+    """Preview the project. This includes building to the websites root and launching a server.
+    There are no live updates, to get that use `moph serve`.
+    """
+
+    full_build()
+    server = Server(port=8081, open=open, expose_host=host)
+    try:
+        server.start()
+    except KeyboardInterrupt:
+        server.stop()
+    rmtree(states["dest"], ignore_errors=True)
 
 
 if __name__ == "__main__":
     cli()
-
-# @cli.command(name="serve")
-# @click.option("-o", "--open", flag_value=True, help=open_help, default=False)
-# def serve_command(open: bool):
-#     """Start a live reload server that auto builds and reloads on file changes.
-
-#     Args:
-#         open (bool): Whether to open in the default browser automatically.
-#     """
-#     import livereload
-
-#     # Init server and builder
-#     server = livereload.Server()
-#     builder = Builder(logger=Logger)
-
-#     # Change source dir to be source + website root for proper links
-#     CONFIG.site.dest = ".dist/"
-#     old_dest = CONFIG.site.dest
-#     CONFIG.site.dest = CONFIG.site.dest + CONFIG.site.root
-
-#     # Full build before deploy
-#     builder.full()
-
-#     def rebuild(dirty: bool = False):
-#         builder.rebuild(dirty)
-
-#     # Watch pages, content, and static
-#     server.watch(
-#         filepath=CONFIG.site.source,
-#         func=lambda: rebuild(True),
-#         delay="forever",
-#     )
-#     server.watch(
-#         filepath=CONFIG.site.content,
-#         func=lambda: rebuild(True),
-#         delay="forever",
-#     )
-
-#     server.watch(
-#         filepath="components/",
-#         func=rebuild,
-#         delay="forever",
-#     )
-
-#     server.watch(
-#         filepath="layouts/",
-#         func=rebuild,
-#         delay="forever",
-#     )
-
-#     server.watch(
-#         filepath="static/",
-#         func=lambda: builder.copy_all_static_dir(dirty=True),
-#         delay="forever",
-#     )
-
-#     server.watch(filepath=CONFIG.site.dest)
-
-#     # TODO start sass and tailwind watch commands
-#     Logger.Message("\n\n")
-
-#     Logger.Custom(f"Serving to http://localhost:3000/", label="Serve", clr="yellow")
-#     try:
-#         with contextlib.redirect_stdout(None):
-#             with contextlib.redirect_stderr(None):
-#                 server.serve(
-#                     port=3000,
-#                     root=f"{old_dest}",
-#                     open_url_delay=0.3 if open else None,
-#                     live_css=True,
-#                     restart_delay=2,
-#                 )
-#     finally:
-#         Logger.Custom("Shutting down...", label="Shutdown")
-#         builder.del_dest(old_dest)
-
-
-
