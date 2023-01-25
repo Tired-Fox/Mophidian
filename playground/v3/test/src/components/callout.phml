@@ -9,6 +9,10 @@
     danger_style = ["danger", "error", "important"]
     warning_style = ["warn", "warning"]
 
+    Props = {
+        "style": None,
+    }
+
     def border_color(style: str):
         if style in danger_style:
             return "callout-danger"
@@ -26,7 +30,7 @@
             return "shape-circle"
 </python>
 
-<div :class="classnames('callout', border_color(style))" #style #message>
+<div :class="classnames('callout', border_color(style))" #style>
     <GGIcon :name="style_name(style)" />
     <div class="callout-body">
         <slot />
