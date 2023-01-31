@@ -49,22 +49,50 @@ class Container(Node):
         self.children = []
         self.name = name
 
-    def find(self, path: str) -> File | None:
-        """Get a file based on it's source or destination path.
-        All destinations are compared first then all the source paths.
+    def remove(self, full_path: str):
+        """Remove a specific file in file system given the files full path.
 
         Args:
-            path (str): The dest path to the file.
+            full_path (str): The full path of the file to remove from the file system.
+
+        Raises:
+            Exception: When no file is found that matches the full path.
+        """
+        def iterate_children(container: Container) -> bool:
+            for child in container.children:
+                if isinstance(child, File) and child.full_path == full_path:
+                    container.children.remove(child)
+                    return True
+                elif isinstance(child, Container):
+                    result = iterate_children(child)
+                    if result and len(child.children) == 0:
+                        container.children.remove(child)
+                    return result
+            return False
+
+        if not iterate_children(self):
+            raise Exception(f"No file found for full path {full_path!r}")
+
+    def find(self, path: str) -> File | None:
+        """Get a file based on it's full source path, path with root stripped, and relative url.
+        First the full path is checked, then the path, then the relative url.
+
+        Args:
+            path (str): The path to the file.
 
         Returns:
-            Page | None: None if no Page is found.
+            File | None: None if no file is found.
         """
 
         path = path.strip().strip("/")
         
         result = None
         for file in self:
-            if file.relative_url.strip("/") == path:
+            if file.full_path.strip("/") == path:
+                return file
+            elif file.path.strip("/") == path:
+                return file
+            elif file.relative_url.strip("/") == path:
                 return file
 
         return result
@@ -114,6 +142,13 @@ class Container(Node):
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(name={self.name!r}, path={self.path!r}, children={len(self.children)})"
+
+    def __str__(self) -> str:
+        out = f"\x1b[34m{self.__class__.__name__}\x1b[0m > \x1b[32m{self.name!r}\x1b[0m"
+        if isinstance(self.children, list):
+            for child in list(self.children):
+                out += "\n" + child.print(4)
+        return out
 
     def find_page_by_path(self, path: str) -> Layout | None:
         """Get a page based on it's destination path.
@@ -175,15 +210,20 @@ class Container(Node):
         """
         current = self
         path = [item.root, *[i for i in item.path.split("/") if i.strip() != ""]]
-
         for i, segment in enumerate(path):
             if Path('/'.join(path[: i + 1])).is_file():
+                if len([
+                    c for c in current.children
+                    if isinstance(c, File)
+                    and c.full_path == item.full_path
+                ]) > 0:
+                    raise Exception(f"Duplicate file at path {item.full_path!r}")
                 current.children.append(item)
             elif '/'.join(path[: i + 1]) != item.root:
-                new_path = Path(item.root).joinpath(*path[1: i + 1]).as_posix()
+                new_path = Path(item.root).joinpath(*path[1: i + 1])
                 if REGEX["group"]["name"].match(segment) is not None:
                     found = False
-                    if current.path.strip("/") == new_path:
+                    if current.path.strip("/") == new_path.as_posix():
                         found = True
                     else:
                         for group in [
@@ -196,12 +236,11 @@ class Container(Node):
 
                     # If valid, append a new group
                     if not found:
-                        new = Group(new_path, item.root)
+                        new = Group(new_path.as_posix(), item.root)
                         current.children.append(new)
                         current = new
                 else:
                     found = False
-                    new_path = Path(item.root).joinpath(*path[1: i + 1]).as_posix()
 
                     if current.path.strip("/") == new_path:
                         found = True
@@ -216,7 +255,7 @@ class Container(Node):
 
                     # If valid, append a new directory
                     if not found:
-                        new = Directory(new_path, item.root)
+                        new = Directory(new_path.as_posix(), item.root)
                         current.children.append(new)
                         current = new
         return current

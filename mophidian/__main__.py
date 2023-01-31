@@ -9,7 +9,7 @@ from teddecor import TED, Logger, LogLevel
 from mophidian.FileSystem import build as full_build
 from mophidian.config import CONFIG, build_config
 from mophidian import states, DestState
-from .Server import Server, LiveServer
+from .Server.server import Server, LiveServer
 
 
 @click.group()
@@ -84,7 +84,7 @@ def new(force: bool, preset: bool, name: str):
             f"Finished! Next cd into [@Fyellow]{name!r}[@F] and use [@Fyellow]'moph build'"
         )
     )
-    
+
 @cli.command(name="serve")
 @click.option("-o", "--open", flag_value=True, default=False, help="open the server in the browser")
 @click.option("--host", flag_value=True, default=False, help="expose the network url for the server")
@@ -92,13 +92,13 @@ def serve(open: bool, host: bool):
     """Serve the site; when files change, rebuild the site and reload the server."""
 
     full_build()
-    server = LiveServer(port=8081, open=open, expose_host=host)
+    server = Server(port=8081, open=open, expose_host=host)
     try:
         server.start()
     except KeyboardInterrupt:
         server.stop()
     rmtree(states["dest"], ignore_errors=True)
-        
+
 @cli.command(name="preview")
 @click.option("-o", "--open", flag_value=True, default=False, help="open the server in the browser")
 @click.option("--host", flag_value=True, default=False, help="expose the network url for the server")

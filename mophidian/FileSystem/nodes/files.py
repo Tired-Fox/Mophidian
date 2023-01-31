@@ -1,4 +1,5 @@
 from __future__ import annotations
+from dataclasses import dataclass
 from functools import cached_property
 
 from pathlib import Path
@@ -43,9 +44,23 @@ __all__ = [
     "Component",
     "TOC",
     "Anchor",
-    "Nav"
+    "Nav",
+    "FileState"
 ]
 
+@dataclass
+class FileState:
+    """File's state
+
+    States:
+        (0) DEFAULT: Already up to date and doesn't need to be rendered
+        (1) UPDATED: New file or file has been modified and needs to be rendered
+        (2) DELETE : File no longer exists so delete it
+    """
+    NULL: int = 0
+    UPDATED: int = 1
+    DELETED: int = 2
+    
 class Anchor:
     """Link representation of a header tag."""
 
@@ -127,6 +142,9 @@ class File(Node):
 
     relative_url: str
     """Relative url from website root. Does not include website root."""
+    
+    state: int
+    """State of the file, either needs a update/render, needs to be deleted, or neither."""
 
     def __init__(self, path: str, ignore: str = "", unique: bool = False) -> None:
         super().__init__(path, ignore)
@@ -138,6 +156,7 @@ class File(Node):
             file_info.groups() if file_info is not None else ("", None, None, "")
         )
 
+        self.state = FileState.UPDATED
         self.extension = extension or ""
         self.inherit_from = inherit_from or ""
         self.file_name = file_name or ""
@@ -189,7 +208,7 @@ class File(Node):
 
     def dest(self, dest_dir: str) -> Path:
         """Destination path of the file given a destination directory."""
-        return Path(dest_dir).joinpath(self._dest)
+        return Path(dest_dir).joinpath(self._dest.strip("/"))
 
     def print(self, depth: int = 0) -> str:
         """Colored terminal representation of the file."""
@@ -294,7 +313,7 @@ class Markdown(Renderable):
     def ast(self) -> AST:
 
         # rip meta data from markdown file
-        with open(Path(self.root).joinpath(self.path), "r") as markdown_file:
+        with open(Path(self.full_path), "r") as markdown_file:
             meta, content = frontmatter.parse(markdown_file.read())
 
         # convert markdown content to html content
@@ -544,7 +563,7 @@ class Page(Renderable):
     @property
     def ast(self) -> AST:
         phml = PHML()
-        page_ast = phml.load(Path(self.root).joinpath(self.path)).ast
+        page_ast = phml.load(Path(self.full_path)).ast
 
         if query(page_ast, "html") or query(page_ast, "body"):
             raise Exception("Layout must be components not full pages")
@@ -608,8 +627,6 @@ class Page(Renderable):
         root = "/" + CONFIG.site.root.strip("/")
         for link_type in ["href", "src", "xlink:href"]:
             for node in query_all(ast, f"[{link_type}^=/]"):
-                if link_type == "xlink:href":
-                    input(node)
                 if not node[link_type].startswith(root):
                     node[link_type] = root + node[link_type]
 

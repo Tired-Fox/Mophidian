@@ -5,6 +5,8 @@ from phml import PHML
 
 from mophidian.core import Mophidian, MOPHIDIAN_TYPES
 from mophidian import CONFIG, states
+from mophidian.FileSystem.nodes import FileState
+from shutil import rmtree
 
 from .nodes import (
     Directory,
@@ -94,25 +96,34 @@ def render_pages(
 
     # Render pages
     for page in root.renderable():
-        page_vars = {
-            "title": page.title
-        }
+        if page.state == FileState.UPDATED or (dirty and page.state != FileState.DELETED):
+            page_vars = {
+                "title": page.title
+            }
 
-        # Ensure path to file
-        page.dest(out).parent.mkdir(parents=True, exist_ok=True)
+            # Ensure path to file
+            page.dest(out).parent.mkdir(parents=True, exist_ok=True)
 
-        # Write file
-        dest = Path(page.dest(out))
-        output = page.render(
-            phml,
-            page_files=root,
-            static_files=static_files,
-            **page_vars,
-            **global_vars
-        )
+            # Write file
+            dest = Path(page.dest(out))
+            output = page.render(
+                phml,
+                page_files=root,
+                static_files=static_files,
+                **page_vars,
+                **global_vars
+            )
 
-        with open(dest, "+w", encoding="utf-8") as file:
-            file.write(output)
+            with open(dest, "+w", encoding="utf-8") as file:
+                file.write(output)
+            page.state = FileState.NULL
+        if page.state == FileState.DELETED:
+            dest = Path(page.dest(out))
+            root.remove(page.full_path)
+            if len(list(dest.parent.glob("**/*.*"))) == 1:
+                rmtree(dest.parent)
+            else:
+                rmtree(dest)
 
 def write_static_files(root: Directory, static: Directory, out: str):
     """Write static files to their destination."""
@@ -151,4 +162,4 @@ def build(display_files: bool = False):
     write_static_files(root, static, out=dest)
 
     Logger.Debug("Finished building pages")
-    return root, components, phml
+    return root, static, components, phml

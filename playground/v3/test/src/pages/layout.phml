@@ -1,5 +1,5 @@
 <>
-    <article>
+    <article :data="'something'" src="{data}">
         <slot />
     </article>
 </>

@@ -1,3 +1,8 @@
-<svg #name>
+<python>
+    Props = {
+        "name": "shape-circle"
+    }
+</python>
+<svg>
     <use :xlink:href="'/all.svg#gg-'+name"/>
 </svg>

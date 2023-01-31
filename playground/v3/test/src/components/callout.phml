@@ -20,7 +20,6 @@
             return "callout-warning"
         else:
             return "callout-info"
-
     def style_name(style: str):
         if style in danger_style:
             return "shape-hexagon"
@@ -30,8 +29,8 @@
             return "shape-circle"
 </python>
 
-<div :class="classnames('callout', border_color(style))" #style>
-    <GGIcon :name="style_name(style)" />
+<div :class="classnames('callout', border_color(style))"\>
+    <GG-Icon :name="style_name(style)" />
     <div class="callout-body">
         <slot />
     </div>
