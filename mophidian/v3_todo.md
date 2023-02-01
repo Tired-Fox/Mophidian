@@ -17,7 +17,15 @@
   - [x] Add css link for code highlights
 - [x] Auto add website root to href's starting with `/`. Only if they don't already start with the root.
 - [x] Custom relative path plugin for markdown
-- [ ] Command to make new project
+- [x] Command to make new project
+
+Any layout page change == build_hierarchy + render linked pages
+New component == None
+Remove Component == render all linked pages after component is removed
+Update component == render all linked pages
+page change == render page
+static file change == re-write static file
+
 - [ ] Live Reload Server
   - [ ] Page and Component linking on render
   - [ ] Pages have all layout ancestors linked

@@ -4,7 +4,7 @@ from typing import Callable, Iterator
 
 from .util import REGEX
 from .base import Node
-from .files import File, Layout, Page, Markdown, Static, Renderable, Nav
+from .files import File, Layout, Page, Markdown, Static, Renderable, Nav, Component, FileState
 
 __all__ = [
     "Container",
@@ -342,6 +342,12 @@ class Container(Node):
                 else:
                     page.layout = self.find_layout_by_path(page.parents)
 
+                # Link the page to all layouts that it uses
+                layout = page.layout
+                while layout is not None:
+                    layout.link_file(page)
+                    layout = layout.parent
+
             # Recursively process containers
             for container in _containers:
                 iterate_pages(container)
@@ -406,6 +412,12 @@ class Container(Node):
         """Iterator of only markdown files in the file system."""
         for file in self:
             if isinstance(file, Markdown):
+                yield file
+ 
+    def components(self) -> Iterator[Component]:
+        """Iterator of only component files in the file system."""
+        for file in self:
+            if isinstance(file, Component):
                 yield file
 
     def print(self, depth: int = 0) -> str:

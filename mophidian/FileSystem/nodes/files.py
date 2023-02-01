@@ -18,6 +18,8 @@ from phml import (
     remove_nodes,
     tokanize_name,
     check,
+    cmpt_name_from_path,
+    find
 )
 from phml.core import VirtualPython
 from phml.builder import p
@@ -124,6 +126,36 @@ class TOC:
 
     def __repr__(self) -> str:
         return f"[{', '.join([repr(child) for child in self._children])}]"
+
+class Linker:
+    """Base class defining logic for linking pages to other objects."""
+
+    linked_files: list[Renderable]
+    """List of pages using this class. Includes nested pages deep in linked tree."""
+    
+    def __init__(self) -> None:
+        self.linked_files = []
+
+    def link_file(self, page: Renderable):
+        """Add a page to the list of linked page objects. Only add it if it isn't linked."""
+
+        if not self.is_linked(page) and isinstance(page, Renderable):
+            self.linked_files.append(page)
+
+    def unlink_file(self, page: Renderable):
+        """Remove a page from the list of linked page objects."""
+
+        if self.is_linked(page) and isinstance(page, Renderable):
+            self.linked_files.remove(page)
+
+    def is_linked(self, page: Renderable):
+        """Check if a page is linked to this object."""
+        return page in self.linked_files
+
+    def update_linked(self):
+        """Sets all linked pages state to updated."""
+        for page in self.linked_files:
+            page.state = FileState.UPDATED
 
 class File(Node):
     """File representation in the file system."""
@@ -238,13 +270,27 @@ class Renderable(File):
 
     title: str
     """Title of the page based on the file name."""
+    
+    components: list[Component]
+    """List of used components. For live updates only."""
 
     def __init__(self, path: str, ignore: str = "") -> None:
         super().__init__(path, ignore)
         self.layout = None
+        self.components = []
         self.title = self._make_title()
         self.next = None
         self.prev = None
+        
+    def delete(self):
+        layout = self.layout
+
+        while layout is not None:
+            layout.unlink_file(self)
+            layout = layout.parent
+
+        for component in self.components:
+            component.unlink_file(self)
 
     def _make_title(self) -> str:
         name = Path(self._dest).parent.as_posix().split("/")[-1]
@@ -264,6 +310,89 @@ class Renderable(File):
         next = self.next.relative_url if self.next is not None else "None"
         prev = self.prev.relative_url if self.prev is not None else "None"
         return f"{self.__class__.__name__}(path={self.path!r}, url={self.relative_url!r}, prev={prev!r}, next={next!r})"
+
+class Page(Renderable):
+    """Page representation of a File."""
+
+    @property
+    def ast(self) -> AST:
+        phml = PHML()
+        page_ast = phml.load(Path(self.full_path)).ast
+
+        if query(page_ast, "html") or query(page_ast, "body"):
+            raise Exception("Layout must be components not full pages")
+
+        return page_ast
+
+    def render(self, phml: PHML, component_files: Directory, **kwargs) -> str:
+        # Remove unwanted kwargs
+        kwargs.pop("static_files", None)
+        kwargs.pop("page_files", None)
+
+        ast = phml.parse(html(*CONFIG.site.meta_tags)).ast
+        if self.layout is not None:
+            page_ast = self.layout.render(self.ast)
+        else:
+            page_ast = self.ast
+
+        headers = query_all(page_ast, "head")
+
+        remove_nodes(page_ast, {"tag": "head"}, strict=False)
+        head_children = []
+        for head in headers:
+            head_children.extend(head.children)
+
+        head = query(ast, "head")
+
+        if head is not None:
+            for node in head_children:
+                node.parent = head
+                exist = '[{}]'
+                exist_equal = '[{}={}]'
+                if check(node, "element") and node.tag in ["meta", "title"]:
+                    old_tag = query(
+                        head,
+                        f"{node.tag}{''.join(exist.format(key) for key in node.properties.keys())}",
+                    )
+                    if node is not None:
+                        replace_node(head, lambda n, i, p: n == old_tag, node)
+                    else:
+                        head.children.append(node)
+                elif check(node, "element") and node.tag not in ["style", "script"]:
+                    if (
+                        query(
+                            head,
+                            f"{node.tag}\
+{''.join(exist_equal.format(key, value) for key, value in node.properties.items())}",
+                        )
+                        is None
+                    ):
+                        head.children.append(node)
+                else:
+                    # replace or append
+                    head.children.append(node)
+            replace_node(ast.tree, {"tag": "head"}, head)
+        replace_node(ast.tree, {"tag": "slot"}, page_ast.children)
+
+        # Find all components
+        for component in component_files.components():
+            if find(ast, {"tag": component.cname}) is not None:
+                component.link_file(self)
+                self.components.append(component)
+
+        ast = apply_attribute_configs(ast)
+        ast = phml.compile(**kwargs)
+
+        # Fix href and src links
+        root = "/" + CONFIG.site.root.strip("/")
+        for link_type in ["href", "src", "xlink:href"]:
+            for node in query_all(ast, f"[{link_type}^=/]"):
+                if not node[link_type].startswith(root):
+                    node[link_type] = root + node[link_type]
+
+        phml.ast = ast
+
+        return phml.render(**kwargs)
 
 class Markdown(Renderable):
     """Markdown file representation. These files are rendered with the markdown module
@@ -350,7 +479,7 @@ class Markdown(Renderable):
         ast.tree = p(None, p(CONFIG.markdown.wrapper.tag, props, *ast.tree.children))
         return ast
 
-    def render(self, phml: PHML, page_files: Directory, static_files: Directory, **kwargs):
+    def render(self, phml: PHML, page_files: Directory, static_files: Directory, component_files: Directory, **kwargs):
         """Render the markdown file into a full html page. Apply the plugins
         and configurations from the config. All markdown file meta data is exposed
         to the compiler.
@@ -433,8 +562,13 @@ Use `moph highlight` to create that file."
 
         replace_node(ast.tree, {"tag": "slot"}, page_ast.children)
 
-        ast = apply_attribute_configs(ast)
+        # Find all components
+        for component in component_files.components():
+            if find(ast, {"tag": component.cname}) is not None:
+                component.link_file(self)
+                self.components.append(component)
 
+        ast = apply_attribute_configs(ast)
         ast = phml.compile(**kwargs)
 
         # Fix href and src links
@@ -486,16 +620,17 @@ class Static(File):
         except SameFileError:
             pass
 
-
-class Layout(File):
+class Layout(File, Linker):
     """Layout representation of a file."""
 
     parent: Layout | None
     """The parent layout to inherit from."""
 
     def __init__(self, path: str, ignore: str = "") -> None:
-        super().__init__(path, ignore)
+        File.__init__(self, path, ignore)
+        Linker.__init__(self)
         self.parent: Layout | None = None
+        self.linked_files = []
 
     def __fetch_layouts(self) -> list[Layout]:
         lyts = [self]
@@ -553,85 +688,14 @@ class Layout(File):
         return ast
 
 
-class Component(File):
-    pass
+class Component(File, Linker):
+    """Represents a phml component file."""
+    
+    def __init__(self, path: str, ignore: str = "", unique: bool = False) -> None:
+        File.__init__(self, path, ignore, unique)
+        Linker.__init__(self)
+        self.cname = cmpt_name_from_path(self.path)
 
-
-class Page(Renderable):
-    """Page representation of a File."""
-
-    @property
-    def ast(self) -> AST:
-        phml = PHML()
-        page_ast = phml.load(Path(self.full_path)).ast
-
-        if query(page_ast, "html") or query(page_ast, "body"):
-            raise Exception("Layout must be components not full pages")
-
-        return page_ast
-
-    def render(self, phml: PHML, **kwargs) -> str:
-        # Remove unwanted kwargs
-        kwargs.pop("static_files", None)
-        kwargs.pop("page_files", None)
-
-        ast = phml.parse(html(*CONFIG.site.meta_tags)).ast
-        if self.layout is not None:
-            page_ast = self.layout.render(self.ast)
-        else:
-            page_ast = self.ast
-
-        headers = query_all(page_ast, "head")
-
-        remove_nodes(page_ast, {"tag": "head"}, strict=False)
-        head_children = []
-        for head in headers:
-            head_children.extend(head.children)
-
-        head = query(ast, "head")
-
-        if head is not None:
-            for node in head_children:
-                node.parent = head
-                exist = '[{}]'
-                exist_equal = '[{}={}]'
-                if check(node, "element") and node.tag in ["meta", "title"]:
-                    old_tag = query(
-                        head,
-                        f"{node.tag}{''.join(exist.format(key) for key in node.properties.keys())}",
-                    )
-                    if node is not None:
-                        replace_node(head, lambda n, i, p: n == old_tag, node)
-                    else:
-                        head.children.append(node)
-                elif check(node, "element") and node.tag not in ["style", "script"]:
-                    if (
-                        query(
-                            head,
-                            f"{node.tag}\
-{''.join(exist_equal.format(key, value) for key, value in node.properties.items())}",
-                        )
-                        is None
-                    ):
-                        head.children.append(node)
-                else:
-                    # replace or append
-                    head.children.append(node)
-            replace_node(ast.tree, {"tag": "head"}, head)
-        replace_node(ast.tree, {"tag": "slot"}, page_ast.children)
-
-        ast = apply_attribute_configs(ast)
-        ast = phml.compile(**kwargs)
-
-        # Fix href and src links
-        root = "/" + CONFIG.site.root.strip("/")
-        for link_type in ["href", "src", "xlink:href"]:
-            for node in query_all(ast, f"[{link_type}^=/]"):
-                if not node[link_type].startswith(root):
-                    node[link_type] = root + node[link_type]
-
-        phml.ast = ast
-        return phml.render(**kwargs)
     
 class Nav:
     def __init__(self, name: str) -> None:

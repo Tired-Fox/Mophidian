@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from teddecor import Logger, TED
@@ -81,6 +82,7 @@ def build_files(path: str) -> tuple[Directory, Nav]:
 def render_pages(
     root: Directory,
     static_files: Directory,
+    component_files: Directory,
     out: str,
     phml: PHML,
     nav: Nav = Nav(""),
@@ -110,6 +112,7 @@ def render_pages(
                 phml,
                 page_files=root,
                 static_files=static_files,
+                component_files=component_files,
                 **page_vars,
                 **global_vars
             )
@@ -117,24 +120,41 @@ def render_pages(
             with open(dest, "+w", encoding="utf-8") as file:
                 file.write(output)
             page.state = FileState.NULL
-        if page.state == FileState.DELETED:
+        elif page.state == FileState.DELETED:
             dest = Path(page.dest(out))
             root.remove(page.full_path)
+            page.delete()
             if len(list(dest.parent.glob("**/*.*"))) == 1:
                 rmtree(dest.parent)
-            else:
-                rmtree(dest)
+            elif dest.is_file():
+                os.remove(dest)
 
 def write_static_files(root: Directory, static: Directory, out: str):
     """Write static files to their destination."""
 
     # static files found in the pages directory
     for file in root.static():
-        file.write(out)
+        if file.state == FileState.UPDATED:
+            file.write(out)
+        elif file.state == FileState.DELETED:
+            dest = file.dest(out)
+            root.remove(file.full_path)
+            if len(list(dest.parent.glob("**/*.*"))) == 1:
+                rmtree(dest.parent)
+            else:
+                rmtree(dest)
 
     # static files in the static directory
     for file in static.static():
-        file.write(out)
+        if file.state == FileState.UPDATED:
+            file.write(out)
+        elif file.state == FileState.DELETED:
+            dest = file.dest(out)
+            root.remove(file.full_path)
+            if len(list(dest.parent.glob("**/*.*"))) == 1:
+                rmtree(dest.parent)
+            else:
+                rmtree(dest)
 
 def build(display_files: bool = False):
     """Take the components and files and render and write them to the given output directory."""
@@ -150,7 +170,10 @@ def build(display_files: bool = False):
     static = build_static(CONFIG.site.public)
 
     # Add components to phml compiler
-    phml.add(components.full_paths(), strip=CONFIG.site.components) # type: ignore
+    phml.add(
+        *[(cmpt.cname, cmpt.full_path) for cmpt in components.components()],
+        strip=CONFIG.site.components
+    ) # type: ignore
 
     if display_files:
         Logger.custom(f"({len(root)}) files found", label="File System", clr="178").Message(root)
@@ -158,8 +181,8 @@ def build(display_files: bool = False):
     # Render all the pages
     dest = states["dest"]
     Logger.Debug(f"Rendering pages to {TED.parse(f'[@F yellow $]{dest}')}")
-    render_pages(root, static, nav=nav, out=dest, phml=phml)
+    render_pages(root, static, components, nav=nav, out=dest, phml=phml)
     write_static_files(root, static, out=dest)
 
     Logger.Debug("Finished building pages")
-    return root, static, components, phml
+    return root, static, components, nav, phml
