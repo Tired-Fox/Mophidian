@@ -1,6 +1,7 @@
 from pathlib import Path
 from shutil import rmtree
 from os import remove
+import time
 
 from phml import PHML
 from teddecor import TED, Logger
@@ -93,7 +94,9 @@ def render_pages(
     out: str,
     phml: PHML,
     nav: Nav = Nav(""),
-    dirty: bool = False
+    dirty: bool = False,
+    *,
+    inject: list | None = None
 ):
     """Render all the pages with their layouts to their destination file."""
 
@@ -123,6 +126,10 @@ def render_pages(
                 **page_vars,
                 **global_vars
             )
+
+            if inject is not None:
+                for i in inject:
+                    output += "\n" + i
 
             with open(dest, "+w", encoding="utf-8") as file:
                 file.write(output)
@@ -163,7 +170,7 @@ def write_static_files(root: Directory, static: Directory, out: str):
             else:
                 remove(dest)
 
-def build(display_files: bool = False):
+def build(display_files: bool = False, inject: list | None = None):
     """Take the components and files and render and write them to the given output directory."""
 
     Logger.Debug("Building pages")
@@ -194,7 +201,15 @@ def build(display_files: bool = False):
     dest = states["dest"]
     Logger.Debug(f"Rendering pages to {TED.parse(f'[@F yellow $]{dest}')}")
 
-    render_pages(file_system, public, components, nav=nav, out=dest, phml=phml)
+    render_pages(
+        file_system,
+        public,
+        components,
+        nav=nav,
+        out=dest,
+        phml=phml,
+        inject=inject
+    )
     write_static_files(file_system, public, out=dest)
 
     Logger.Debug("Finished building pages")

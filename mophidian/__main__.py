@@ -91,9 +91,8 @@ def new(force: bool, preset: bool, name: str):
 def serve(open: bool, host: bool):
     """Serve the site; when files change, rebuild the site and reload the server."""
 
-    file_system, static, components, phml = full_build()
     server = LiveServer(port=8081, open=open, expose_host=host)
-    server.run(file_system, static, components, phml)
+    server.run()
     rmtree(states["dest"], ignore_errors=True)
 
 @cli.command(name="preview")

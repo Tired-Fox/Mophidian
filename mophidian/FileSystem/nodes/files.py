@@ -320,7 +320,7 @@ class Page(Renderable):
         page_ast = phml.load(Path(self.full_path)).ast
 
         if query(page_ast, "html") or query(page_ast, "body"):
-            raise Exception("Layout must be components not full pages")
+            raise Exception("Page must be a component not full pages")
 
         return page_ast
 
@@ -653,14 +653,14 @@ class Layout(File, Linker):
 
                 # If it quacks like a full page, then it's a full page
                 if query(layout_ast, "html") or query(layout_ast, "body"):
-                    raise Exception("Layout must be components not full pages")
+                    raise Exception(f"<{self.full_path!r}> Layout must be a component not a full pages")
 
                 component: dict = parse_component(layout_ast)
             except Exception as error:
-                raise Exception("Layout must be a valid phml component") from error
+                raise Exception(f"<{self.full_path!r}> Layout must be a valid phml component") from error
 
             if query(component["component"], "slot") is None:
-                raise Exception("Layout must contain a slot element")
+                raise Exception(f"<{self.full_path!r}> Layout must contain a slot element")
 
             # Replace the slot element in the parent with the next layout
             substitute_component(ast.tree, ("slot", component), VirtualPython())
@@ -682,7 +682,7 @@ class Layout(File, Linker):
         try:
             component: dict = parse_component(page)
         except Exception as error:
-            raise Exception("Page must be a valid phml component") from error
+            raise Exception(f"<{self.full_path!r}> Page must be a valid phml component") from error
 
         substitute_component(ast.tree, ("slot", component), VirtualPython())
         return ast

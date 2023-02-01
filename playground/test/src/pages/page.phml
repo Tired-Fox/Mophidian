@@ -1,5 +1,5 @@
 <>
-    <h1>Home</h1>
-    <Sample />
-    <Extra />
+    <h1>Home Page</h1>
+    <Sample></Sample>
+    <Extra></Extra>
 </>

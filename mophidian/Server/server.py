@@ -6,15 +6,18 @@ import posixpath
 import string
 from threading import Thread
 from time import sleep
+import time
 from typing import Any
 import webbrowser
+from re import match
 
 from watchdog.observers import Observer
 from teddecor import TED, style, Log, LogLevel
 from phml import PHML
+from phml.builder import p
 
 from mophidian import states, CONFIG
-from mophidian.core import render_pages, write_static_files
+from mophidian.core import render_pages, write_static_files, build
 from mophidian.FileSystem import Directory, Renderable, Layout, Component, FileState, Static, Page, Markdown
 from .watchdog import Handler
 
@@ -22,31 +25,30 @@ PORT_RANGE = [49200, 65535]
 
 # Reference: https://docs.python.org/3/library/http.server.html
 
-# TODO: Inject his javascript into html to allow for live reloading
-_SCRIPT_LIVE_RELOAD = """\
-var livereload = function(epoch, requestId) {
-    var req = new XMLHttpRequest();
-    req.onloadend = function() {
-        if (parseFloat(this.responseText) > epoch) {
-            location.reload();
-            return;
-        }
-        var launchNext = livereload.bind(this, epoch, requestId);
-        if (this.status === 200) {
-            launchNext();
-        } else {
-            setTimeout(launchNext, 3000);
-        }
-    };
-    req.open("GET", "/livereload/" + epoch + "/" + requestId);
-    req.send();
+_SCRIPT_TEMPLATE_STR = """
+<script>
+    var livereload = function(version) {
+        var req = new XMLHttpRequest();
+        req.onloadend = function() {
+            if (parseFloat(this.responseText) > version) {
+                location.reload();
+                return;
+            }
+            var launchNext = livereload.bind(this, version);
+            if (this.status === 200) {
+                launchNext();
+            } else {
+                setTimeout(launchNext, 3000);
+            }
+        };
+        req.open("GET", "/livereload/" + version);
+        req.send();
+    }
+    livereload(${version});
     console.log('Enabled live reload');
-}
-livereload(${epoch}, ${request_id});\
+</script>
 """
-#! Server request handler will have to be updated to handle epoc update
-
-_LIVE_RELOAD_JS = string.Template(_SCRIPT_LIVE_RELOAD)
+_SCRIPT_TEMPLATE = string.Template(_SCRIPT_TEMPLATE_STR)
 
 hostName = "localhost"
 serverPort = 8080
@@ -55,7 +57,7 @@ WATCHUPDATE = "yellow"
 WATCHCREATE = "cyan"
 WATCHDELETE = "magenta"
 
-# TODO: Use watch dog and watch for changes, if any occur stop the server and start again
+version = 0.0
 
 class LiveServer:
     
@@ -103,33 +105,25 @@ class LiveServer:
         self.component_files = Directory("")
         self.phml = PHML()
 
-    def run(
-        self,
-        file_system: Directory,
-        static_files: Directory,
-        component_files: Directory,
-        phml: PHML
-    ):
+    def run(self):
         """Start the server and file watcher. Creates infinit loop that is interuptable."""
-        self.start(file_system, static_files, component_files, phml)
+        self.start()
         try:
             while True:
                 sleep(1)
         except KeyboardInterrupt:
             self.stop()
 
-    def start(
-        self,
-        file_system: Directory,
-        static_files: Directory,
-        component_files: Directory,
-        phml: PHML
-    ):
+    def start(self):
         """Start the server and file watcher."""
-        self.file_system = file_system
-        self.static_files = static_files
-        self.component_files = component_files
-        self.phml = phml
+        global version
+        version = time.time()
+        (
+            self.file_system,
+            self.static_files,
+            self.component_files,
+            self.phml
+        ) = build(inject=[_SCRIPT_TEMPLATE.substitute(version=int(version))])
 
         self.server.start()
         self.watchdog.start()
@@ -141,14 +135,16 @@ class LiveServer:
         self.watchdog.stop()
 
     def render_pages(self):
+        global version
+        version = time.time()
         render_pages(
             self.file_system,
             self.static_files,
             self.component_files,
             states["dest"],
             self.phml,
-            self.file_system.build_nav()
-            inject=[]
+            self.file_system.build_nav(),
+            inject=[_SCRIPT_TEMPLATE.substitute(version=int(version))]
         )
 
     def write_static(self):
@@ -340,10 +336,23 @@ class ServerThread(Thread):
 
 class ServiceHandler(SimpleHTTPRequestHandler):
     def __init__(self, request, client_address, server, *, directory: str | None = "") -> None:
-        if states["dest"] != "" and directory != states["dest"] and Path(states["dest"]).is_dir():
-            directory = Path(states["dest"]).as_posix()
+        if Path("dist").is_dir():
+            directory = "dist/"
         super().__init__(request, client_address, server, directory=directory)
         self.logger = Log(level=LogLevel.ERROR)
+
+    def do_GET(self) -> None:
+        global version
+
+        path = self.translate_path(self.path).lstrip("dist/").replace("\\", "/")
+        if match(r"/?livereload/(\d+)/?", path) is not None:
+            self.send_response(200)
+            # send response headers
+            self.end_headers()
+            # send the body of the response
+            self.wfile.write(bytes(f"{int(version)}", "utf-8"))
+            return
+        return super().do_GET()
 
     def log_request(self, code: int | str = "", size: int | str = "") -> None:
         # TODO: Custom request messages
