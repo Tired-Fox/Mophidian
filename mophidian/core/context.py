@@ -1,14 +1,12 @@
 from dataclasses import dataclass
-from .config import CONFIG
+from mophidian.config import CONFIG
 
-from .FileSystem.nodes import (
+from mophidian.FileSystem import (
     Page,
     Markdown,
     Nav,
     Static,
-    Layout,
     Directory,
-    Group,
     Renderable,
     File,
     Container,
@@ -21,22 +19,20 @@ MOPHIDIAN_TYPES = {
     "Markdown": Markdown,
     "Nav": Nav,
     "Static": Static,
-    "Layout": Layout,
     "Directory": Directory,
-    "Group": Group,
     "Renderable": Renderable,
     "File": File,
     "Container": Container,
     "TOC": TOC,
     "Anchor": Anchor,
 }
+"""The type objects that will be exposed to the phml pages."""
 
 @dataclass
 class Mophidian:
     """Class to hold globals to expose to the phml compiler."""
 
-    # Config values
     site_name = CONFIG.site.name
     favicon = CONFIG.build.favicon
     version = CONFIG.site.version
-    code_hl_stylesheet = CONFIG.markdown.pygmentize.path   
+    code_hl_stylesheet = CONFIG.markdown.pygmentize.path

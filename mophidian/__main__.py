@@ -6,7 +6,7 @@ from shutil import rmtree
 
 from teddecor import TED, Logger, LogLevel
 
-from mophidian.FileSystem import build as full_build
+from mophidian.core import build as full_build
 from mophidian.config import CONFIG, build_config
 from mophidian import states, DestState
 from .Server.server import Server, LiveServer
@@ -91,12 +91,9 @@ def new(force: bool, preset: bool, name: str):
 def serve(open: bool, host: bool):
     """Serve the site; when files change, rebuild the site and reload the server."""
 
-    full_build()
-    server = Server(port=8081, open=open, expose_host=host)
-    try:
-        server.start()
-    except KeyboardInterrupt:
-        server.stop()
+    file_system, static, components, phml = full_build()
+    server = LiveServer(port=8081, open=open, expose_host=host)
+    server.run(file_system, static, components, phml)
     rmtree(states["dest"], ignore_errors=True)
 
 @cli.command(name="preview")

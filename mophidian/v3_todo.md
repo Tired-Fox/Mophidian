@@ -19,31 +19,37 @@
 - [x] Custom relative path plugin for markdown
 - [x] Command to make new project
 
-Any layout page change == build_hierarchy + render linked pages
-New component == None
-Remove Component == render all linked pages after component is removed
-Update component == render all linked pages
-page change == render page
-static file change == re-write static file
+- [x] Any layout page change == build_hierarchy + render linked pages
+- [x] New component == None
+- [x] Remove Component == render all linked pages after component is removed
+- [x] Update component == render all linked pages
+- [x] page change == render page
+- [x] static file change == re-write static file
 
 - [ ] Live Reload Server
-  - [ ] Page and Component linking on render
-  - [ ] Pages have all layout ancestors linked
-  - [ ] Update/Render individual Component/Page/Layout
+  - [x] Page and Component linking on render
+  - [x] Pages have all layout ancestors linked
+  - [x] Update/Render individual Component/Page/Layout
     - [ ] Any update in dynamic route
       - [ ] Add or remove of page == full site reload
       - [ ] Edit a file
         - [ ] root page gets updated
         - [ ] updated page gets updated
-    - [ ] Adding and removing pages/layout from path == Full Reload
+    - [x] Adding and removing pages/layout from path == Full Reload
     - [ ] Adding and removing component files adds to compiler but updates nothing
-    - [ ] Edit a page/component/layout and only have individual items that are linked Update
-      - [ ] layout edit means page updates
-      - [ ] page edit only gets page update
-      - [ ] component update = page update
+    - [x] Edit a page/component/layout and only have individual items that are linked Update
+      - [x] layout edit means page updates
+      - [x] page edit only gets page update
+      - [x] component update = page update
+  - [ ] Trigger file updates on watchdog events
+    - [ ] update
+    - [ ] add
+    - [ ] remove
+
 - [ ] Sitemap
 - [ ] RSS
 - [ ] Page search
+
 - [ ] Dynamic routes
   - [ ] dynamic route generation through python element
   - [ ] Generates from `content/` directory

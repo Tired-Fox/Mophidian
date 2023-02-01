@@ -149,7 +149,7 @@ def build_config(_type: str = ".yaml", data: dict | None = None):
         class TomlConfig(Config):
             pass
         return TomlConfig(data)
-    elif _type == ".json":
+    else:
         @config.json(load_save="./moph.json")
         class JsonConfig(Config):
             pass
