@@ -31,6 +31,9 @@ def build(dirty: bool = False, live_reload: bool = False):
     file_system, nav = construct_file_system(CONFIG.site.source)
     public = construct_static(CONFIG.site.public)
 
+    for page in nav.section('blog').pages:
+        input(page.title)
+
     #? Add components to phml compiler
     phml.add(
         *[(cmpt.cname, cmpt.full_path) for cmpt in components.components()],

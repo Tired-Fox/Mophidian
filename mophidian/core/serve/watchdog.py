@@ -79,6 +79,7 @@ class Handler(FileSystemEventHandler):
         return bool(
             path.startswith(CONFIG.site.source.strip("/"))
             and pPath.suffix in [".md", ".mdx", ".phml"]
+            and REGEX["layout"]["name"].match(pPath.name) is None
         )
 
     def is_component(self, path) -> bool:

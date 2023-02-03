@@ -1,14 +1,9 @@
 # Todo
 
-
-```
-components:
-  - **/*.phml 
-pages:
-  - **/*:
-    - *.phml
-    - +layout.phml
-```
+- [ ] Simplify list sorting and filtering
+- [ ] Fix `:` not being captured in attribute value
+- [ ] Fix needing to make things global to expose them to functions
+- [ ] Expose kwargs to python blocks as they are being processed
 
 ## Complete
 - [x] Global config using decorators

@@ -745,6 +745,14 @@ class Nav:
         """Add a page or sub nav to the current nav object."""
         self.children.append(item)
 
+    def section(self, name: str) -> Nav | None:
+        """Get a specific sub nav / section by it's name."""
+
+        for nav in self.navs:
+            if nav.name == name:
+                return nav
+        return None
+
     def get(self, url: str) -> Renderable | Nav | None:
         """Get a specific page or sub nav based on it's url."""
         segments = [segment for segment in url.strip("/").split("/") if segment != ""]
@@ -812,10 +820,12 @@ class Nav:
     def __repr__(self) -> str:
         return f"Nav({self.name!r}, children={len(self.children)})"
 
+    @property
     def pages(self) -> list[Renderable]:
         """List of all renderable pages in the nav."""
         return [page for page in self.children if isinstance(page, Renderable)]
-
+    
+    @property
     def navs(self) -> list[Nav]:
         """List of all sub navs in the nav."""
         return [nav for nav in self.children if isinstance(nav, Nav)]

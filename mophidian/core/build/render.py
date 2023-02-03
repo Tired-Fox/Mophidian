@@ -97,9 +97,6 @@ def render_pages(
 
             if CONFIG.build.rss:
                 page_vars["rss_feed"] = Path(CONFIG.site.base_url).joinpath(CONFIG.site.root, "feed.xml").as_posix()
-
-            # Update page epoch
-            page.epoch = epoch
             
             # Ensure path to file
             page.dest(out).parent.mkdir(parents=True, exist_ok=True)
@@ -119,6 +116,8 @@ def render_pages(
                 output += f'\n{_SCRIPT_TEMPLATE.substitute(version=int(epoch), path=page.full_path)}'
 
             if is_file_different(page, output) or dirty:
+                # Update page epoch
+                page.epoch = epoch
                 with open(dest, "+w", encoding="utf-8") as file:
                     file.write(output)
             page.state = FileState.NULL # Set state as up to date and doesn't need to be rendered
