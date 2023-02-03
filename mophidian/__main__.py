@@ -6,27 +6,49 @@ from shutil import rmtree
 
 from teddecor import TED, Logger, LogLevel
 
-from mophidian.core import build as full_build
-from mophidian.config import CONFIG, build_config
 from mophidian import states, DestState
-from .Server.server import Server, LiveServer
+from mophidian.cli.styles import generate_highlight
+from mophidian.config import CONFIG, build_config
+from mophidian.core import (
+    Server,
+    LiveServer,
+    build as full_build,
+    generate_sitemaps,
+    generate_rss
+)
 
 
 @click.group()
 def cli():
     '''Pythonic Static Site Generator CLI.'''
 
-@click.option("-d", "--debug", flag_value=True, help="Enable debug logs", default=False)
-@click.option("-f", "--files", flag_value=True, help="Log the files that were found in the build process", default=False)
+@click.option("--debug", flag_value=True, help="Enable debug logs", default=False)
+@click.option(
+    "--dirty",
+    flag_value=True,
+    help="Force write files even if the rendered file already exists",
+    default=False
+)
 @cli.command(name="build", help=f"Compile and build the website to {CONFIG.site.dest!r}")
-def build_command(debug: bool, files: bool):
+def build_command(debug: bool, dirty: bool):
     """Build the website in the specified dest directory."""
 
     if debug:
         Logger.level(LogLevel.DEBUG)
 
+    if dirty:
+        rmtree("out/")
+
     states["dest"] = DestState.PREVIEW
-    full_build(files)
+    file_system, static, _, _ = full_build(dirty=dirty)
+
+    if CONFIG.build.sitemap.enabled:
+        generate_sitemaps(file_system)
+        
+    if CONFIG.build.rss.enabled:
+        generate_rss(file_system)
+
+    Logger.flush()
 
 @click.argument("style", default="")
 @click.option("-l", "--list", flag_value=True, help="list the possible color themes. Allows for style selection.", default=False)
@@ -35,8 +57,6 @@ def code_highlight(style: str, list: bool):
     """Stylize markdown code blocks with pygmentize. This command allows you to generate the
     CSS file with a given styles highlight colors.
     """
-    from mophidian.cli.styles import generate_highlight
-
     generate_highlight(style, list)
 
 @click.argument("name", default="")
@@ -69,7 +89,7 @@ def new(force: bool, preset: bool, name: str):
     if preset:
         from shutil import copytree
 
-        copytree(Path(__file__).parent.joinpath("preset"), path, dirs_exist_ok=True)
+        copytree(Path(__file__).parent.joinpath("preset/default"), path, dirs_exist_ok=True)
     else:
         path.joinpath("src/pages").mkdir(parents=True, exist_ok=True)
         path.joinpath("src/components").mkdir(parents=True, exist_ok=True)

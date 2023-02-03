@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <atom:link href="https:\tired-fox.github.io\Mophidian\feed.xml" rel="self" type="application/rss+xml" />
+    <title>None</title>
+    <link>https:\tired-fox.github.io\Mophidian</link>
+    <language>en-us</language>
+    <item>
+      <title>v0.1.0 of Mophidian</title>
+      <pubDate>Thu, 02 Feb 2023 18:03:33 Central Standard Time</pubDate>
+      <link>https:/tired-fox.github.io/Mophidian/blog/v0.1.0</link>
+      <guid>https:/tired-fox.github.io/Mophidian/blog/v0.1.0</guid>
+    </item>
+  </channel>
+</rss>

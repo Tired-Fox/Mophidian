@@ -1,0 +1,6 @@
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap @for="index in indecies">
+    <loc>{index.loc}</loc>
+    <lastmod>{index.last_mod}</lastmod>
+  </sitemap>
+</sitemapindex>

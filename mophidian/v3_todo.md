@@ -27,24 +27,23 @@
 - [x] static file change == re-write static file
 
 - [ ] Live Reload Server
+  - [x] All pages are referenced in dict for key(full_path) lookup
+  - [x] Each file gets an epoch
+    - [x] Epoch is referenced in `/livereload/{epoch}/{path}/{to}/{src}/{file}`
+    - [x] src file epoch is checked with passed epoch. If a newer epoch exists, refresh the page.
   - [x] Page and Component linking on render
   - [x] Pages have all layout ancestors linked
   - [x] Update/Render individual Component/Page/Layout
-    - [ ] Any update in dynamic route
-      - [ ] Add or remove of page == full site reload
-      - [ ] Edit a file
-        - [ ] root page gets updated
-        - [ ] updated page gets updated
     - [x] Adding and removing pages/layout from path == Full Reload
-    - [ ] Adding and removing component files adds to compiler but updates nothing
+    - [x] Adding and removing component files adds to compiler but updates nothing
     - [x] Edit a page/component/layout and only have individual items that are linked Update
       - [x] layout edit means page updates
       - [x] page edit only gets page update
       - [x] component update = page update
-  - [ ] Trigger file updates on watchdog events
-    - [ ] update
-    - [ ] add
-    - [ ] remove
+  - [x] Trigger file updates on watchdog events
+    - [x] update
+    - [x] add
+    - [x] remove
 
 - [ ] Sitemap
 - [ ] RSS
@@ -57,6 +56,11 @@
   - [ ] `dir` catch all
   - [ ] `slug` file used for desired output else relevant `layout.phml` will be used.
   - [ ] `page.phml` and `layout.phml` will be given data about all the pages found for the catch all
+  - [ ] Add or remove of page == full site reload
+  - [ ] Edit a file
+    - [ ] root page gets updated
+    - [ ] updated page gets updated
+
 - [ ] Integrations
   - [ ] Tailwind
   - [ ] Sass

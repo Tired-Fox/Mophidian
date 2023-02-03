@@ -1,3 +1,0 @@
-<svg #name>
-    <use :xlink:href="'/all.svg#gg-'+name"/>
-</svg>

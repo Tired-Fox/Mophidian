@@ -1,0 +1,9 @@
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url @for="url in urls">
+    <loc>{url.loc}</loc>
+    <lastmod>{url.last_mod}</lastmod>
+    <priority @if="not blank(url.priority) and url.priority > 0.0 and url.priority < 1.0">
+      {url.priority}
+    </priority>
+  </url>
+</urlset>

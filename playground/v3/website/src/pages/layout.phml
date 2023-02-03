@@ -1,4 +1,10 @@
 <>
 	<div>Header</div>
-	<slot />
+	<Slot />
 </>
+<style>
+    p {
+        display: flex;
+        align-items: center;
+    }
+</style>

@@ -1,4 +1,0 @@
-<>
-    <Nav.Navbar></Nav.Navbar>
-    <slot />
-</>
