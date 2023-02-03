@@ -1,7 +1,9 @@
 # Todo
 
-- [ ] Simplify list sorting and filtering
-- [ ] Fix `:` not being captured in attribute value
+- [x] Simplify list sorting and filtering
+- [x] Fix `:` not being captured in attribute value
+- [x] Fix lambda's not having `built-ins` in `globals`
+
 - [ ] Fix needing to make things global to expose them to functions
 - [ ] Expose kwargs to python blocks as they are being processed
 

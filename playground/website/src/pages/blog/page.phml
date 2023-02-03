@@ -1,9 +1,5 @@
 <python>
     from mophidian.file_system import Markdown
-    global Markdown
-
-    page_filter = lambda p: isinstance(p, Markdown)
-    page_sort = lambda p: p.title if p is not None else ""
 </python>
 
 <>
@@ -13,7 +9,7 @@
         <h5>Here is where you can get the latest updates for the project</h5>
         <h3 class="mt-2">Posts</h3>
         <ul id="posts">
-            <li  @for="post in sorted(list(filter(page_filter, nav.section('blog').pages)), key=page_sort)">
+            <li  @for="post in filter_sort(nav.section('blog').pages, Markdown, key='title')">
                 <a :href="post.url">{post.title}</a>
             </li>
         </ul>

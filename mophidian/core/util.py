@@ -1,8 +1,61 @@
 from __future__ import annotations
 import re
 from functools import cache
+from typing import Any, Callable
 
 from mophidian.config import CONFIG
+
+def filter_sort(
+    collection,
+    valid: Callable,
+    key: str | Callable | None = None
+):
+    """Filter a iterable collection by the filter and sort it by the sort. The
+    filter is a callable similar to the build in filter function. Or it could be
+    a type where `isinstance()` is called, or it could be a instance of something
+    where a normal comparison is used. The sort is either a str of an attribute
+    to get from the collection of or a collable similar to the build in sort
+    function.
+
+    First the collection will be filtered and collected into a list then that
+    resulting list will be sorted by the given sort or with the default sort
+    method.
+
+    Under the hood it is doing something simliar to
+    `sorted(list(filter({filter}, {collection})), key={sort})` where
+    `filter` = `Callable` and sort` = `getattr(collection, {sort})`
+    or `Callable`.
+
+    Args:
+        collection: A object that implements `__iter__`, `__getitem__`,
+            `__hasitem__`.
+        valid (instance | type | Callable): Object isntance to check for equal,
+            type to check if it is an instance of, or a Callable to return true
+            or false if a value should be kept
+        key (str | Callable): The attribute name to get from each collection
+            item for sorting or a Callable to return a value for sorting.
+
+    Returns:
+        New list that is the filtered and sorted result of the passed in
+        collection.
+    """
+    def filter_value(collection_item: Any) -> bool:
+        if isinstance(valid, type):
+            return isinstance(collection_item, valid)
+        if callable(valid):
+            return valid(collection_item)
+
+        return collection_item == valid
+
+    def sort_value(collection_item: Any) -> Any:
+        if isinstance(key, str):
+            return getattr(collection_item, key)
+        elif key is not None:
+            return key(collection_item)
+        else:
+            return collection_item
+
+    return sorted(list(filter(filter_value, collection)), key=sort_value)
 
 def title(text: str | list[str]) -> str:
     """Generate the title case version of the passed in text."""

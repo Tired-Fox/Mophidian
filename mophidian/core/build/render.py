@@ -7,7 +7,7 @@ import time
 from phml import PHML
 
 from mophidian import states, CONFIG
-from mophidian.core.util import title, url
+from mophidian.core.util import title, url, filter_sort
 from mophidian.file_system import (
     Directory,
     Nav,
@@ -85,6 +85,7 @@ def render_pages(
         "url": url,
         "title_case": title,
         "nav": nav,
+        "filter_sort": filter_sort
     }
 
     epoch = time.time()
