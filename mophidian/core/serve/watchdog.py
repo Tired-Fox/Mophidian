@@ -78,8 +78,7 @@ class Handler(FileSystemEventHandler):
         pPath = Path(path)
         return bool(
             path.startswith(CONFIG.site.source.strip("/"))
-            and pPath.suffix == ".phml"
-            and REGEX["page"]["name"].match(pPath.name) is not None
+            and pPath.suffix in [".md", ".mdx", ".phml"]
         )
 
     def is_component(self, path) -> bool:

@@ -51,13 +51,12 @@ def build_command(debug: bool, dirty: bool):
     Logger.flush()
 
 @click.argument("style", default="")
-@click.option("-l", "--list", flag_value=True, help="list the possible color themes. Allows for style selection.", default=False)
 @cli.command(name="highlight", help="Generate a pygmentize CSS file")
-def code_highlight(style: str, list: bool):
+def code_highlight(style: str):
     """Stylize markdown code blocks with pygmentize. This command allows you to generate the
     CSS file with a given styles highlight colors.
     """
-    generate_highlight(style, list)
+    generate_highlight(style)
 
 @click.argument("name", default="")
 @click.option("-f", "--force", flag_value=True, help="force write files and directories even if they already exist", default=False)

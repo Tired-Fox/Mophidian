@@ -94,14 +94,15 @@ def generate_style(style: str):
     else:
         Logger.error(f"Failed to generate css for style {style!r}")
 
-def generate_highlight(style: str = "", _list: bool = False):
+def generate_highlight(style: str = ""):
     """Generate the pygmentize highlight css file."""
-    if _list:
-        style = list_styles()
 
     style = style.strip()
 
-    if style != "":
-        generate_style(style)
+    if style == "":
+        style = list_styles()
+
+    if style == "":
+        Logger.Error("A style name must be provided")
     else:
-        Logger.error("A style name must be provided").flush()
+        generate_style(style)

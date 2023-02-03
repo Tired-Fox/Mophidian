@@ -1,0 +1,33 @@
+- [ ] Quick Start / Getting Started
+  - [ ] Fastest way to get up and running
+  - [ ] Minimal and simplest commands to know
+- [ ] CLI
+  - [ ] Command options
+  - [ ] Different commands and their details / options
+- [ ] Workflow
+  - [ ] Create new project
+  - [ ] Write page
+  - [ ] write layout
+  - [ ] Components as needed
+  - [ ] Expand
+- [ ] File System
+  - [ ] Structure and linking and using different file types. MD, page, layout, and components.
+  - [ ] Writing files
+    - [ ] Writing pages
+    - [ ] Writing layouts
+    - [ ] Writing/Using components
+  - [ ] Static files
+  - [ ] Layout and page linking and how it works
+  - [ ] Directory grouping
+- [ ] Configuration
+  - [ ] Different sections and what each setting does
+- [ ] Additional features
+  - [ ] Sitemap
+  - [ ] RSS
+- [ ] Future Plans
+  - [ ] Dynamic routes
+    - [ ] Content directory
+    - [ ] Custom file querying and building of dynamically built pages from python logic
+  - [ ] python directory
+    - [ ] auto scope python directory
+    - [ ] allows for extracting methods and logic into python files

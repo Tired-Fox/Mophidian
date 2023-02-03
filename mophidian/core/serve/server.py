@@ -347,6 +347,16 @@ class ServiceHandler(SimpleHTTPRequestHandler):
         super().__init__(request, client_address, server, directory=directory)
         self.logger = Log(level=LogLevel.ERROR)
 
+    def send_error(self, code: int, message: str | None = None, explain: str | None = None) -> None:
+        custom_page = Path("dist/").joinpath(CONFIG.site.root, f"{code}.html")
+        if custom_page.is_file():
+            self.send_response(code)
+            self.end_headers()
+            with open(custom_page, "r", encoding="utf-8") as custom_error_file:
+                self.wfile.write(custom_error_file.read().encode("utf-8"))
+            return
+        return super().send_error(code, message, explain)
+
     def do_GET(self) -> None:
         path = self.translate_path(self.path).lstrip("dist/").replace("\\", "/")
         live_reload = match(r"/?livereload/(\d+)/(.+)", path)
@@ -404,6 +414,7 @@ class Server(ThreadingHTTPServer):
         self.is_active = False
         self.logger = Log(level=LogLevel.INFO)
         self.files = files
+        self.full_url = f"http://{host}:{port}/"
         
     def serve_forever(self, poll_interval: float = 0.5) -> None:
         self.is_active = True

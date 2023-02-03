@@ -474,7 +474,7 @@ class Markdown(Renderable):
     def ast(self) -> AST:
 
         # rip meta data from markdown file
-        with open(Path(self.full_path), "r") as markdown_file:
+        with open(Path(self.full_path), "r", encoding="utf-8") as markdown_file:
             meta, content = frontmatter.parse(markdown_file.read())
 
         # convert markdown content to html content
