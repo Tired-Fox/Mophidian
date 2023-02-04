@@ -3,8 +3,8 @@
 - [x] Simplify list sorting and filtering
 - [x] Fix `:` not being captured in attribute value
 - [x] Fix lambda's not having `built-ins` in `globals`
+- [x] Fix needing to make things global to expose them to functions
 
-- [ ] Fix needing to make things global to expose them to functions
 - [ ] Expose kwargs to python blocks as they are being processed
 
 ## Complete
