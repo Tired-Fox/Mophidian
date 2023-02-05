@@ -1,0 +1,33 @@
+<python>
+    colors = {
+        "red": "#F00",
+        "green": "#0F0",
+        "blue": "#00F",
+    }
+
+    def get_color(color: str) -> str:
+        if color == "red":
+            return f"border: 1px solid {colors[color]}"
+        if color == "green":
+            return f"border: 2px dotted {colors[color]}"
+        return f"border: 3px dashed {colors['blue']}"
+
+    Props = {
+        "color": "blue"
+    }
+</python>
+<div id="sample" :style="get_color(color)" >
+    <p>Sample Text</p>
+</div>
+<style>
+    #sample {
+        width: 90%;
+        height: 10rem;
+        margin-inline: auto;
+        padding: 2rem;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
