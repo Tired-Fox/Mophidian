@@ -1,0 +1,19 @@
+<>
+    <head>
+        <link rel="stylesheet" href="/tailwind.css">
+        <link type="rss" />
+    </head>
+    <Slot />
+</>
+<style>
+    .emojione {
+        aspect-ratio: 1/1;
+        width: 1.3rem;
+        margin-inline: .25rem;
+    }
+    
+    p {
+        display: flex;
+        align-items: center;
+    }
+</style>

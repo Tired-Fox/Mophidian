@@ -1,0 +1,14 @@
+site:
+  name: Mophidian
+  root: Mophidian
+  base_url: https://tired-fox.github.io/
+markdown:
+  extensions:
+    - pymdownx.emoji
+build:
+  sitemap:
+    enabled: false
+  rss:
+    enabled: false
+    paths:
+      - blog/

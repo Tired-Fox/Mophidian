@@ -1,0 +1,23 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <atom:link href="{feed_link}" rel="self" type="application/rss+xml" />
+    <title>{title}</title>
+    <link>{site_link}</link>
+    <description @if="not blank(site_description)">{site_description}</description>
+    <language>{language or 'en-us'}</language>    
+    <image @if="not blank(image)">
+      <title>{image.title}</title>
+      <link>{site_link}</link>
+      <url>{image.link}</url>
+      <width>{image.width}</width>
+      <height>{image.height}</height>
+    </image>
+    <item @for="item in items">
+      <title>{item.title}</title>
+      <pubDate>{item.pub_date}</pubDate>
+      <link>{item.url}</link>
+      <guid>{item.url}</guid>
+      <description @if="not blank(item.description)">{item.description}</description>
+    </item>
+  </channel>
+</rss>

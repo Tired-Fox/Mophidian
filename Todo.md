@@ -1,25 +1,63 @@
 # Todo
 
+- [x] Simplify list sorting and filtering
+- [x] Fix `:` not being captured in attribute value
+- [x] Fix lambda's not having `built-ins` in `globals`
+- [x] Fix needing to make things global to expose them to functions
+- [x] Expose kwargs to python blocks as they are being processed
+
+## Complete
 - [x] Global config using decorators
-- [ ] Global reference to pages, components, and layouts
+- [x] Tool for Pygments themes
+x] global variable for creating url with website root inserted to beginning.
+- [x] Automatically rip `head` element from `pages`, `layouts`, and `components` and append there children to root templates `head`
+- [x] Route all files as any file name -> index.html or have special file names that stay as is in their current directory
+- [x] Generate page title from file name
+  - [x] `tokanize_name` from phml
+  - [x] Title case the title
+- [x] Get page by path
+- [x] Generate site nav
+  - [x] Full nav tree
+  - [x] Each page's next and previous
+- [x] Generate TOC from markdown file
+- [x] favicon through config and head link tag
+- [x] when copying elements from page head to base head, don't duplicate tags, and replace meta/title tags
+- [x] Dirty/Non dirty file saving
+- [x] Markdown styling
+  - [x] Command for generating colored code highlights
+  - [x] Add css link for code highlights
+- [x] Auto add website root to href's starting with `/`. Only if they don't already start with the root.
+- [x] Custom relative path plugin for markdown
+- [x] Command to make new project
 
-```
-components:
-  - **/*.phml 
-pages:
-  - **/*:
-    - *.phml
-    - +layout.phml
-```
+- [x] Any layout page change == build_hierarchy + render linked pages
+- [x] New component == None
+- [x] Remove Component == render all linked pages after component is removed
+- [x] Update component == render all linked pages
+- [x] page change == render page
+- [x] static file change == re-write static file
 
-* `+layout.phml` files have a `<slot />` tag that is placeholder for markdown and html files
-  * Must be a full html file
-  * html/phml files in same directory can be partials
-* When layouts and pages are parsed they are checked for components and a double link is created between page and component.
-  * When a component is updated all linked pages are updated
-  * When a layout is updated all pages are updated
-* Flask is utilized while developing and debugging the website for live updates and debugging component injection
-* When the site is compiled for deployment it is static and dynamic routes are compiled to static files
+- [ ] Live Reload Server
+  - [x] All pages are referenced in dict for key(full_path) lookup
+  - [x] Each file gets an epoch
+    - [x] Epoch is referenced in `/livereload/{epoch}/{path}/{to}/{src}/{file}`
+    - [x] src file epoch is checked with passed epoch. If a newer epoch exists, refresh the page.
+  - [x] Page and Component linking on render
+  - [x] Pages have all layout ancestors linked
+  - [x] Update/Render individual Component/Page/Layout
+    - [x] Adding and removing pages/layout from path == Full Reload
+    - [x] Adding and removing component files adds to compiler but updates nothing
+    - [x] Edit a page/component/layout and only have individual items that are linked Update
+      - [x] layout edit means page updates
+      - [x] page edit only gets page update
+      - [x] component update = page update
+  - [x] Trigger file updates on watchdog events
+    - [x] update
+    - [x] add
+    - [x] remove
+
+- [x] Sitemap
+- [x] RSS
 
 ## Backlog
 
@@ -27,13 +65,27 @@ pages:
   - [ ] Javascript & Webfont variants
 - [ ] Math plugin/Integration
 - [ ] Add custom errors
-- [ ] Tool for Pygments themes
 - [ ] Tool for selecting presets
 - [ ] Tool for adding/removing integrations
 - [ ] Support for bootstrap??
 - [ ] Support for read time??
-- [ ] Custom wsgi_app server with live reloading including watchdog
 
+- [ ] Page search
+- [ ] Integrations
+  - [ ] Tailwind
+  - [ ] Sass
+
+- [ ] Dynamic routes
+  - [ ] dynamic route generation through python element
+  - [ ] Generates from `content/` directory
+  - [ ] `...dir` recursive catch all
+  - [ ] `dir` catch all
+  - [ ] `slug` file used for desired output else relevant `layout.phml` will be used.
+  - [ ] `page.phml` and `layout.phml` will be given data about all the pages found for the catch all
+  - [ ] Add or remove of page == full site reload
+  - [ ] Edit a file
+    - [ ] root page gets updated
+    - [ ] updated page gets updated
 
 Inspirational Sources:
 - [mkDocs Material Theme](https://squidfunk.github.io/mkdocs-material/) ([github](https://github.com/squidfunk/mkdocs-material))
@@ -41,3 +93,4 @@ Inspirational Sources:
 - [Algolia](https://www.algolia.com/)
 - [Tailwindcss](https://tailwindcss.com/)
 - [Transparent Textures](https://www.transparenttextures.com/)
+- [SVG Repo](https://www.svgrepo.com/)

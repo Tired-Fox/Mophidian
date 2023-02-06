@@ -25,7 +25,7 @@ Use markdown to create websites
   - [Markdown](https://pypi.org/project/Markdown/) [docs](https://python-markdown.github.io/reference/)
     - [Plugins](https://python-markdown.github.io/extensions/)
   
-Code highlight done with CodeHilite plugin with `pygmentize -S <theme> -f html -a .codehilite > styles/highlight.css` setting the theme. `pygmentize -L style` for list of themes.
+Code highlight done with CodeHilite plugin with `pygmentize -S <theme> -f html -a .highlight > styles/highlight.css` setting the theme. `pygmentize -L style` for list of themes.
 
 Add font awesome support by downloading the webfonts and adding css files. https://fontawesome.com/docs/web/setup/host-yourself/webfonts. Add an integration for this.
 

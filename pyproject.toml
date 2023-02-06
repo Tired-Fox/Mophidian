@@ -29,7 +29,7 @@ tests = [
 "Website" = "https://tired-fox.github.io/Mophidian/"
 
 [project.scripts]
-mophidian = "mophidian.__main__:cli"
+moph = "mophidian.__main__:cli"
 
 # [project.entry-points.""]
 

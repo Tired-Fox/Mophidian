@@ -1,122 +1,134 @@
 #!/usr/bin/env python
-import contextlib
+from __future__ import annotations
+from pathlib import Path
 import click
+from shutil import rmtree
 
-from mophidian.core.builder import Builder
-from mophidian.moph_log import Logger
-from mophidian.core.config import CONFIG
+from teddecor import TED, Logger, LogLevel
 
-open_help = "If specified, then the live server will automatically open in the browser."
-tailwind_help = "Enable tailwind compiling"
-template_help = "Specify the type of template you would like to start with. Default 'blank'"
+from mophidian import states, DestState
+from mophidian.cli.styles import generate_highlight
+from mophidian.config import CONFIG, build_config
+from mophidian.core import (
+    Server,
+    LiveServer,
+    build as full_build,
+    generate_sitemaps,
+    generate_rss
+)
 
 
 @click.group()
 def cli():
-    '''Group of all commands for this package.'''
+    '''Pythonic Static Site Generator CLI.'''
 
+@click.option("--debug", flag_value=True, help="Enable debug logs", default=False)
+@click.option(
+    "--dirty",
+    flag_value=True,
+    help="Force write files even if the rendered file already exists",
+    default=False
+)
+@cli.command(name="build", help=f"Compile and build the website to {CONFIG.site.dest!r}")
+def build_command(debug: bool, dirty: bool):
+    """Build the website in the specified dest directory."""
 
-@cli.command(name="new")
-@click.option("--sass", flag_value=True, help=open_help, default=False)
-@click.option("--tailwind", flag_value=True, help=tailwind_help, default=False)
-@click.option("--no_defaults", flag_value=True, help=tailwind_help, default=False)
-@click.option("--template", type=str, show_default=True, help=template_help, default="blank")
-def new_command(sass: bool, tailwind: bool, no_defaults: bool, template: str):
-    """Create a new mophidian project.
+    if debug:
+        Logger.level(LogLevel.DEBUG)
 
-    Args:
-        sass (bool): Whether to use sass integration.
-        tailwind (bool): Whether to use tailwindcss integration
-        no_defaults (bool): Don't use default values. Includes markdown extensions.
-        template (str): Which template to use. Defaults to "blank".
+    if dirty:
+        rmtree("out/")
+
+    states["dest"] = DestState.PREVIEW
+    file_system, static, _, _ = full_build(dirty=dirty)
+
+    if CONFIG.build.sitemap.enabled:
+        generate_sitemaps(file_system)
+        
+    if CONFIG.build.rss.enabled:
+        generate_rss(file_system)
+
+    Logger.flush()
+
+@click.argument("style", default="")
+@cli.command(name="highlight", help="Generate a pygmentize CSS file")
+def code_highlight(style: str):
+    """Stylize markdown code blocks with pygmentize. This command allows you to generate the
+    CSS file with a given styles highlight colors.
     """
-    from mophidian.core.new import generate
+    generate_highlight(style)
 
-    generate(sass=sass, tailwind=tailwind, no_defaults=no_defaults, template=template)
+@click.argument("name", default="")
+@click.option("-f", "--force", flag_value=True, help="force write files and directories even if they already exist", default=False)
+@click.option("-p", "--preset", flag_value=True, help="generate the project with a preset", default=False)
+@cli.command(name="new", help="Create a new mophidian project")
+def new(force: bool, preset: bool, name: str):
+    """Stylize markdown code blocks with pygmentize. This command allows you to generate the
+    CSS file with a given styles highlight colors.
+    """
 
+    while name == "":
+        name = input("Enter the name of your project: ")
+
+    Logger.Info("Generating file strucutre")
+
+    path = Path(name.lower())
+
+    if path.is_dir():
+        if force:
+            rmtree(path)
+        else:
+            Logger.error(
+                TED.parse(
+                    f"Failed to create project [@Fyellow]/{name}[@F] since it already exists"
+                )
+            )
+            exit()
+
+    if preset:
+        from shutil import copytree
+
+        copytree(Path(__file__).parent.joinpath("preset/default"), path, dirs_exist_ok=True)
+    else:
+        path.joinpath("src/pages").mkdir(parents=True, exist_ok=True)
+        path.joinpath("src/components").mkdir(parents=True, exist_ok=True)
+        path.joinpath("public").mkdir(parents=True, exist_ok=True)
+
+    CONFIG = build_config(".yml", {})
+    CONFIG.site.name = name
+    CONFIG.save(path.joinpath("moph.yml"))
+
+    Logger.info(
+        TED.parse(
+            f"Finished! Next cd into [@Fyellow]{name!r}[@F] and use [@Fyellow]'moph build'"
+        )
+    )
 
 @cli.command(name="serve")
-@click.option("-o", "--open", flag_value=True, help=open_help, default=False)
-def serve_command(open: bool):
-    """Start a live reload server that auto builds and reloads on file changes.
+@click.option("-o", "--open", flag_value=True, default=False, help="open the server in the browser")
+@click.option("--host", flag_value=True, default=False, help="expose the network url for the server")
+def serve(open: bool, host: bool):
+    """Serve the site; when files change, rebuild the site and reload the server."""
 
-    Args:
-        open (bool): Whether to open in the default browser automatically.
+    server = LiveServer(port=8081, open=open, expose_host=host)
+    server.run()
+    rmtree(states["dest"], ignore_errors=True)
+
+@cli.command(name="preview")
+@click.option("-o", "--open", flag_value=True, default=False, help="open the server in the browser")
+@click.option("--host", flag_value=True, default=False, help="expose the network url for the server")
+def preview(open: bool, host: bool):
+    """Preview the project. This includes building to the websites root and launching a server.
+    There are no live updates, to get that use `moph serve`.
     """
-    import livereload
 
-    # Init server and builder
-    server = livereload.Server()
-    builder = Builder(logger=Logger)
-
-    # Change source dir to be source + website root for proper links
-    CONFIG.site.dest = ".dist/"
-    old_dest = CONFIG.site.dest
-    CONFIG.site.dest = CONFIG.site.dest + CONFIG.site.root
-
-    # Full build before deploy
-    builder.full()
-
-    def rebuild(dirty: bool = False):
-        builder.rebuild(dirty)
-
-    # Watch pages, content, and static
-    server.watch(
-        filepath=CONFIG.site.source,
-        func=lambda: rebuild(True),
-        delay="forever",
-    )
-    server.watch(
-        filepath=CONFIG.site.content,
-        func=lambda: rebuild(True),
-        delay="forever",
-    )
-
-    server.watch(
-        filepath="components/",
-        func=rebuild,
-        delay="forever",
-    )
-
-    server.watch(
-        filepath="layouts/",
-        func=rebuild,
-        delay="forever",
-    )
-
-    server.watch(
-        filepath="static/",
-        func=lambda: builder.copy_all_static_dir(dirty=True),
-        delay="forever",
-    )
-
-    server.watch(filepath=CONFIG.site.dest)
-
-    # TODO start sass and tailwind watch commands
-    Logger.Message("\n\n")
-
-    Logger.Custom(f"Serving to http://localhost:3000/", label="Serve", clr="yellow")
+    full_build()
+    server = Server(port=8081, open=open, expose_host=host)
     try:
-        with contextlib.redirect_stdout(None):
-            with contextlib.redirect_stderr(None):
-                server.serve(
-                    port=3000,
-                    root=f"{old_dest}",
-                    open_url_delay=0.3 if open else None,
-                    live_css=True,
-                    restart_delay=2,
-                )
-    finally:
-        Logger.Custom("Shutting down...", label="Shutdown")
-        builder.del_dest(old_dest)
-
-
-# @click.option("-o", "--open", flag_value=True, help=open_help, default=False)s
-# @click.option("-d", "--debug", flag_value=True, help=debug_help, default=False)
-@cli.command(name="build")
-def build_command():
-    """Build the website in the specified dest directory."""
-    Builder().full()
+        server.start()
+    except KeyboardInterrupt:
+        server.stop()
+    rmtree(states["dest"], ignore_errors=True)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,0 @@
-<phml>
-    <h1>Home</h1>
-    <a :href="url('/')">Home</a>
-</phml>
-
-<python>
-    title = "Home"
-</python>
