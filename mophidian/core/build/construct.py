@@ -211,7 +211,6 @@ def generate_rss(file_system: Directory):
         items = []
         paths = [path.strip("/") for path in CONFIG.build.rss.paths]
         for file in file_system.markdown():
-            print(file.path, paths)
             if any(path in file.path for path in paths):
                 items.append(RSSItem(
                     file.title, 

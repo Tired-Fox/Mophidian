@@ -7,8 +7,8 @@ markdown:
     - pymdownx.emoji
 build:
   sitemap:
-    enabled: true
+    enabled: false
   rss:
-    enabled: true
+    enabled: false
     paths:
       - blog/
