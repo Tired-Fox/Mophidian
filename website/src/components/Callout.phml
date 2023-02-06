@@ -1,0 +1,13 @@
+<python>
+    Props = {
+        "message": ""
+    }
+</python>
+
+<div class="callout">
+    <div><!-- icon --></div>
+    <div>
+        {message}
+        <Slot />
+    </div>
+</div>

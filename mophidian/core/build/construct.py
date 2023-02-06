@@ -1,7 +1,6 @@
 from re import match
 from pathlib import Path
 import time
-import pytz
 
 from teddecor import TED, Logger
 from phml import PHML, Formats
