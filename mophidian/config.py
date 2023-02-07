@@ -259,10 +259,9 @@ configs = [file for files in [Path("./").glob(e) for e in valid_files] for file 
 
 if len(configs) > 1:
     config_files = ", ".join(TED.parse(f"'[@Fred$]{file}[]'") for file in configs)
-    Logger.error(f"More than one config found: {config_files}").flush()
+    Logger.Error(f"More than one config found: {config_files}")
     exit()
 elif len(configs) == 0:
-    Logger.warning("No config file found, generating default yaml config").flush()
     CONFIG = build_config(".yaml", {})
 else:
     CONFIG = build_config(configs[0].suffix)

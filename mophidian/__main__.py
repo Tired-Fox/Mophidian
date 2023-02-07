@@ -6,7 +6,7 @@ from shutil import rmtree
 
 from teddecor import TED, Logger, LogLevel
 
-from mophidian import states, DestState
+from mophidian import states, DestState, __version__
 from mophidian.cli.styles import generate_highlight
 from mophidian.config import CONFIG, build_config
 from mophidian.core import (
@@ -18,9 +18,14 @@ from mophidian.core import (
 )
 
 
-@click.group()
-def cli():
+@click.group(invoke_without_command=True)
+@click.option("-v", "--version", flag_value=True, help="Version of mophidian", default=False)
+def cli(version: bool):
     '''Pythonic Static Site Generator CLI.'''
+    
+    if version:
+        click.echo(f"Mophidian v{__version__}")
+        exit()
 
 @click.option("--debug", flag_value=True, help="Enable debug logs", default=False)
 @click.option(
