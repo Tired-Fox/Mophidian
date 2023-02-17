@@ -109,10 +109,10 @@ def new(force: bool, preset: bool, name: str):
         )
     )
 
-@cli.command(name="serve")
 @click.option("-o", "--open", flag_value=True, default=False, help="open the server in the browser")
 @click.option("--host", flag_value=True, default=False, help="expose the network url for the server")
-def serve(open: bool, host: bool):
+@cli.command(name="dev")
+def dev(open: bool, host: bool):
     """Serve the site; when files change, rebuild the site and reload the server."""
 
     server = LiveServer(port=8081, open=open, expose_host=host)
