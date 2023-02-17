@@ -20,7 +20,7 @@ from mophidian.core import (
 
 @click.group(invoke_without_command=True)
 @click.option("-v", "--version", flag_value=True, help="Version of mophidian", default=False)
-def cli(version: bool):
+def cli(version: bool = False):
     '''Pythonic Static Site Generator CLI.'''
     
     if version:
@@ -117,7 +117,7 @@ def serve(open: bool, host: bool):
 
     server = LiveServer(port=8081, open=open, expose_host=host)
     server.run()
-    rmtree(states["dest"], ignore_errors=True)
+    rmtree("dist", ignore_errors=True)
 
 @cli.command(name="preview")
 @click.option("-o", "--open", flag_value=True, default=False, help="open the server in the browser")
@@ -133,7 +133,7 @@ def preview(open: bool, host: bool):
         server.start()
     except KeyboardInterrupt:
         server.stop()
-    rmtree(states["dest"], ignore_errors=True)
+    rmtree("dist", ignore_errors=True)
 
 
 if __name__ == "__main__":

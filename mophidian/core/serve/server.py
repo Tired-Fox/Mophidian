@@ -212,11 +212,12 @@ class LiveServer:
         pPage = Path(path)
         new_page = None
         if pPage.suffix == ".phml":
-            new_page = Page(path, ignore=CONFIG.site.root)
+            new_page = Page(path, ignore=CONFIG.site.source)
         elif pPage.suffix in [".md", ".mdx"]:
-            new_page = Markdown(path, ignore=CONFIG.site.root)
+            new_page = Markdown(path, ignore=CONFIG.site.source)
         
         if new_page is not None:
+            new_page.state = FileState.UPDATED
             self.file_system.add(new_page)
             self.files[new_page.full_path] = new_page
             self.file_system.build_hierarchy()
