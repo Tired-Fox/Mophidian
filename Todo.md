@@ -1,5 +1,6 @@
 # Todo
 
+[Review](https://hynek.me/articles/testing-packaging/)
 - [ ] Separate live server to it's own library/package/module
 - [ ] Separate config annotation to it's own library/package/module
 
