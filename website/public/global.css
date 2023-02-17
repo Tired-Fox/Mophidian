@@ -45,3 +45,23 @@ a {
     text-decoration: underline dotted;
     text-underline-offset: .2rem;
 }
+
+.w-full {
+    width: 100%;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.items-center {
+    align-items: center;
+}
