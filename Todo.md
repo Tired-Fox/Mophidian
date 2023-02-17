@@ -2,7 +2,11 @@
 
 [Review](https://hynek.me/articles/testing-packaging/)
 - [ ] Separate live server to it's own library/package/module
+  - `pylws`
 - [ ] Separate config annotation to it's own library/package/module
+  - `typed_cfg`
+- [ ] Rename and rebrand TEDDecor `simll` (Simple Inline Markup Language and Logging)
+  - [ ] Only markup and logging
 
 - [ ] General
   - [ ] Add custom errors
