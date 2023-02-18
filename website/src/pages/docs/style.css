@@ -4,6 +4,7 @@
     margin-inline: auto;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     margin-block: 1.5rem;
+    overflow-x: auto;
 }
 
 pre {
@@ -17,7 +18,7 @@ pre {
 
 article {
     width: 85%;
-    max-width: 70rem;
+    max-width: 75ch;
     margin-inline: auto;
     display: flex;
     flex-direction: column;
@@ -30,4 +31,28 @@ p code {
     padding: .25rem;
     border-radius: .15rem;
     white-space: nowrap;
+}
+
+table {
+    border: 1px solid #373a4d;
+    border-collapse: collapse;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+table thead {
+    background-color: #1e202b;
+}
+
+table tbody>tr {
+    background-color: #dcd7c9;
+    color: #282a3a;
+}
+
+table tbody>tr:nth-child(even) {
+    background-color: #dcd7c9c9;
+    color: #282a3a;
+}
+
+table :is(td, th) {
+    padding: .35rem;
 }

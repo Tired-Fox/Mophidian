@@ -1,12 +1,31 @@
 # Todo
 
+[Review](https://hynek.me/articles/testing-packaging/)
+
+- [x] Separate config annotation to it's own library/package/module `tcfg`
+- [x] Rename and rebrand TEDDecor `simll` (Simple Inline Markup Language and Logging)
+  - [x] Only markup, logging, and pprint
+
+- [ ] General
+  - [ ] Add custom errors
+
+- [ ] Tooling
+  - [ ] presets
+  - [ ] integrations
+    - [ ] Tailwind
+    - [ ] Sass
+    - [ ] Fontawesome
+      - [ ] Javascript & Webfont variants
+    - [ ] Math
+    - [ ] read time??
+
+## Complete
+
 - [x] Simplify list sorting and filtering
 - [x] Fix `:` not being captured in attribute value
 - [x] Fix lambda's not having `built-ins` in `globals`
 - [x] Fix needing to make things global to expose them to functions
 - [x] Expose kwargs to python blocks as they are being processed
-
-## Complete
 - [x] Global config using decorators
 - [x] Tool for Pygments themes
 x] global variable for creating url with website root inserted to beginning.
@@ -60,20 +79,6 @@ x] global variable for creating url with website root inserted to beginning.
 - [x] RSS
 
 ## Backlog
-
-- [ ] Fontawesome integration
-  - [ ] Javascript & Webfont variants
-- [ ] Math plugin/Integration
-- [ ] Add custom errors
-- [ ] Tool for selecting presets
-- [ ] Tool for adding/removing integrations
-- [ ] Support for bootstrap??
-- [ ] Support for read time??
-
-- [ ] Page search
-- [ ] Integrations
-  - [ ] Tailwind
-  - [ ] Sass
 
 - [ ] Dynamic routes
   - [ ] dynamic route generation through python element

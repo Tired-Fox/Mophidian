@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Callable, Iterator
 
 from mophidian.core.util import REGEX
+from mophidian import CONFIG
 from .base import Node
 from .files import File, Layout, Page, Markdown, Static, Renderable, Nav, Component, FileState
 
@@ -209,6 +210,7 @@ class Container(Node):
         Args:
             item (File | Container): The item to add to the directory
         """
+
         current = self
         path = [item.root, *[i for i in item.path.split("/") if i.strip() != ""]]
         for i, segment in enumerate(path):
@@ -219,6 +221,7 @@ class Container(Node):
                     and c.full_path == item.full_path
                 ]) > 0:
                     raise Exception(f"Duplicate file at path {item.full_path!r}")
+
                 current.children.append(item)
             elif '/'.join(path[: i + 1]) != item.root:
                 new_path = Path(item.root).joinpath(*path[1: i + 1])

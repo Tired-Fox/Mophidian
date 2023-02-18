@@ -46,7 +46,7 @@ class Node:
 
     def __init__(self, path: str, ignore: str = "") -> None:
         path = path.replace("\\", "/").strip("/")
-        self.root, self.path = ignore, sub(ignore, "", path)
+        self.root, self.path = ignore.replace("\\", "/"), sub(ignore, "", path)
 
         self.src = self.path
         while True:

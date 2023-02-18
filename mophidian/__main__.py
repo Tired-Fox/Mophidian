@@ -4,9 +4,9 @@ from pathlib import Path
 import click
 from shutil import rmtree
 
-from teddecor import TED, Logger, LogLevel
+from saimll import SAIML, Logger, LogLevel
 
-from mophidian import states, DestState
+from mophidian import states, DestState, __version__
 from mophidian.cli.styles import generate_highlight
 from mophidian.config import CONFIG, build_config
 from mophidian.core import (
@@ -18,9 +18,14 @@ from mophidian.core import (
 )
 
 
-@click.group()
-def cli():
+@click.group(invoke_without_command=True)
+@click.option("-v", "--version", flag_value=True, help="Version of mophidian", default=False)
+def cli(version: bool = False):
     '''Pythonic Static Site Generator CLI.'''
+    
+    if version:
+        click.echo(f"Mophidian v{__version__}")
+        exit()
 
 @click.option("--debug", flag_value=True, help="Enable debug logs", default=False)
 @click.option(
@@ -79,7 +84,7 @@ def new(force: bool, preset: bool, name: str):
             rmtree(path)
         else:
             Logger.error(
-                TED.parse(
+                SAIML.parse(
                     f"Failed to create project [@Fyellow]/{name}[@F] since it already exists"
                 )
             )
@@ -99,20 +104,20 @@ def new(force: bool, preset: bool, name: str):
     CONFIG.save(path.joinpath("moph.yml"))
 
     Logger.info(
-        TED.parse(
+        SAIML.parse(
             f"Finished! Next cd into [@Fyellow]{name!r}[@F] and use [@Fyellow]'moph build'"
         )
     )
 
-@cli.command(name="serve")
 @click.option("-o", "--open", flag_value=True, default=False, help="open the server in the browser")
 @click.option("--host", flag_value=True, default=False, help="expose the network url for the server")
-def serve(open: bool, host: bool):
+@cli.command(name="dev")
+def dev(open: bool, host: bool):
     """Serve the site; when files change, rebuild the site and reload the server."""
 
     server = LiveServer(port=8081, open=open, expose_host=host)
     server.run()
-    rmtree(states["dest"], ignore_errors=True)
+    rmtree("dist", ignore_errors=True)
 
 @cli.command(name="preview")
 @click.option("-o", "--open", flag_value=True, default=False, help="open the server in the browser")
@@ -128,7 +133,7 @@ def preview(open: bool, host: bool):
         server.start()
     except KeyboardInterrupt:
         server.stop()
-    rmtree(states["dest"], ignore_errors=True)
+    rmtree("dist", ignore_errors=True)
 
 
 if __name__ == "__main__":

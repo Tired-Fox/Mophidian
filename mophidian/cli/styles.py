@@ -3,14 +3,14 @@ from re import match
 from subprocess import run
 import sys
 
-from teddecor import Logger, TED
+from saimll import Logger, SAIML
 
 from mophidian.config import CONFIG
 
-pygmentize_examples =  TED.parse('*See examples of each style at \
+pygmentize_examples =  SAIML.parse('*See examples of each style at \
 _[@Fcyan~https://pygments.org/styles/]Pygements Website')
 
-choose_style_prompt = TED.parse(
+choose_style_prompt = SAIML.parse(
                     "*\\[[@Fyellow]Prompt[@F]\\] Enter a style to generate or leave blank \
 to skip: "
 ) + "\x1b[1;31m"
@@ -50,7 +50,7 @@ def list_styles() -> str:
 
         styles = [Style(lines) for lines in styles]
         for _style in styles:
-            print(f"{TED.parse(f'*[@Fred$]{_style.name}')}: {TED.parse(f'*[$]{_style.desc}')}")
+            print(f"{SAIML.parse(f'*[@Fred$]{_style.name}')}: {SAIML.parse(f'*[$]{_style.desc}')}")
 
         print("\n" + pygmentize_examples + "\n")
         try:

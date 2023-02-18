@@ -17,7 +17,7 @@ pre {
 
 article {
     width: 85%;
-    max-width: 70rem;
+    max-width: 65ch;
     margin-inline: auto;
     display: flex;
     flex-direction: column;

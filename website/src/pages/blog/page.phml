@@ -9,9 +9,12 @@
         <h5>Here is where you can get the latest updates for the project</h5>
         <h3 class="mt-2">Posts</h3>
         <ul id="posts">
-            <li  @for="post in filter_sort(nav.section('blog').pages, Markdown, key='title')">
-                <a :href="post.url">{post.title}</a>
-            </li>
+            <For each={ post in filter_sort(nav.section('blog').pages, Markdown, key='title') /}>
+                <li>
+                    <a :href="post.url">{post.title}</a>
+                </li>
+            </For>
+            
         </ul>
     </main>
 </>

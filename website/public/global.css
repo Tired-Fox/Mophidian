@@ -6,7 +6,11 @@
     padding: 0;
 }
 
-html {font-size: 100%;} /*16px*/
+html {
+    font-size: 100%; /*16px*/
+    scroll-behavior: smooth;
+    scroll-padding: 5.1rem;
+}
 
 body {
     font-weight: 400;
@@ -44,4 +48,24 @@ a {
     color: #98b3a7;
     text-decoration: underline dotted;
     text-underline-offset: .2rem;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.items-center {
+    align-items: center;
 }
