@@ -24,7 +24,7 @@ from phml import ( # Used to parse the phml content and manipulate it's ast
 )
 from phml.core import VirtualPython # Dummy instance for subtituting elements for <Slot />
 from phml.builder import p # To create injected elements
-from teddecor import TED, Logger # Custom logging
+from saimll import SAIML, Logger # Custom logging
 
 from markdown import Markdown as MarkdownParse # For parsing markdown files into html
 
@@ -325,7 +325,7 @@ class Page(Renderable):
         page_ast = phml.load(Path(self.full_path)).ast
 
         if query(page_ast, "html") or query(page_ast, "body"):
-            Logger.warning(f"<{TED.parse(f'[@Fgreen]{self.full_path!r}')}> Page must be a component not full pages")
+            Logger.warning(f"<{SAIML.parse(f'[@Fgreen]{self.full_path!r}')}> Page must be a component not full pages")
 
         return page_ast
 
@@ -491,7 +491,7 @@ class Markdown(Renderable):
             from traceback import print_exc
 
             print_exc()
-            TED.print(
+            SAIML.print(
                 f"*[@Fred]KeyError[@F]:[] invalid variable in extension configs [$@Fgreen]{key_error}"
             )
             exit()
@@ -696,12 +696,12 @@ class Layout(File, Linker):
 
             # If it quacks like a full page, then it's a full page
             if query(layout_ast, "html") or query(layout_ast, "body"):
-                Logger.warning(f"<{TED.parse(f'[@Fgreen]{self.full_path!r}')}> Layout must be a component not a full pages")
+                Logger.warning(f"<{SAIML.parse(f'[@Fgreen]{self.full_path!r}')}> Layout must be a component not a full pages")
                 return ast
 
             component: dict = parse_component(layout_ast)
             if query(component["component"], "Slot") is None:
-                Logger.warning(f"<{TED.parse(f'[@Fgreen]*{self.full_path!r}')}> Layout must contain a {TED.parse('*<[@F#6305DC]Slot[@F] />')} element")
+                Logger.warning(f"<{SAIML.parse(f'[@Fgreen]*{self.full_path!r}')}> Layout must contain a {SAIML.parse('*<[@F#6305DC]Slot[@F] />')} element")
                 return ast
 
             # Replace the <Slot /> element in the parent with the next layout

@@ -1,8 +1,8 @@
 from __future__ import annotations
 from pathlib import Path
 
-from teddecor.decorators import config, TypesDefault
-from teddecor import Logger, TED
+from tcfg import cfg, TypesDefault
+from saimll import Logger, SAIML
 
 __all__ = [
     "Pygmentize",
@@ -48,7 +48,7 @@ https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, I
         "codehilite": {"css_class": "highlight"},
 }
 
-@config.yaml
+@cfg.yaml
 class Pygmentize:
     """Mophidian.markdown.pygmentize configuration."""
 
@@ -58,7 +58,7 @@ class Pygmentize:
     path = "highlight.css"
     """(str) Path of where to generate the pygmentize css file."""
 
-@config.yaml
+@cfg.yaml
 class MarkdownWrapper:
     """Mophidian.markdown.wrapper configuration."""
 
@@ -68,7 +68,7 @@ class MarkdownWrapper:
     attributes = { "*": TypesDefault(str, list) }
     """(dict[str, str | list]) The attributes to apply to the markdown wrapper element."""
 
-@config.yaml
+@cfg.yaml
 class Markdown:
     """Mophidian.markdown configuration."""
 
@@ -121,7 +121,7 @@ https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, I
     """(dict[str, dict]) The configurations for each markdown extension."""
 
 
-@config.yaml
+@cfg.yaml
 class Site:
     """Mophidian.site configuration."""
 
@@ -163,7 +163,7 @@ class Site:
         'viewport': `<meta name="viewport" content="width=device-width, initial-scale=1.0">`
     """
 
-@config.yaml
+@cfg.yaml
 class RSSImage:
     title = ""
     """Image title"""
@@ -174,7 +174,7 @@ class RSSImage:
     height = 88
     """Image height. Max of 400"""
 
-@config.yaml
+@cfg.yaml
 class RSS:
     enabled = False
     """(bool) Toggle to generate a rss feed on build and expose the link to the pages."""
@@ -190,7 +190,7 @@ class RSS:
     """(str) The language associated with the rss feed. Example: en-us."""
 
 
-@config.yaml
+@cfg.yaml
 class Sitemap:
     enabled = False
     """(bool) Toggle to generate a sitemap on build."""
@@ -201,7 +201,7 @@ class Sitemap:
     sitemap is generated for all rendered pages."""
 
 
-@config.yaml
+@cfg.yaml
 class Build:
     """Mohpidian.build configuration."""
 
@@ -239,17 +239,17 @@ class Config:
 
 def build_config(_type: str = ".yaml", data: dict | None = None):
     if _type in [".yml", ".yaml"]:
-        @config.yaml(load_save=f"./moph{_type}")
+        @cfg.yaml(load_save=f"./moph{_type}")
         class YamlConfig(Config):
             pass
         return YamlConfig(data)
     elif _type == ".toml":
-        @config.toml(load_save="./moph.toml")
+        @cfg.toml(load_save="./moph.toml")
         class TomlConfig(Config):
             pass
         return TomlConfig(data)
     else:
-        @config.json(load_save="./moph.json")
+        @cfg.json(load_save="./moph.json")
         class JsonConfig(Config):
             pass
         return JsonConfig(data)
@@ -258,7 +258,7 @@ valid_files = ("moph.json", "moph.toml", "moph.yaml", "moph.yml",)
 configs = [file for files in [Path("./").glob(e) for e in valid_files] for file in files]
 
 if len(configs) > 1:
-    config_files = ", ".join(TED.parse(f"'[@Fred$]{file}[]'") for file in configs)
+    config_files = ", ".join(SAIML.parse(f"'[@Fred$]{file}[]'") for file in configs)
     Logger.Error(f"More than one config found: {config_files}")
     exit()
 elif len(configs) == 0:

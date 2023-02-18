@@ -1,5 +1,5 @@
 
-from teddecor import TED, Logger
+from saimll import SAIML, Logger
 from phml import PHML
 
 from mophidian import CONFIG, states
@@ -39,7 +39,7 @@ def build(dirty: bool = False, live_reload: bool = False):
 
     #? Render all the pages
     dest = states["dest"]
-    Logger.debug(f"Rendering pages to {TED.parse(f'[@F yellow $]{dest}')}")
+    Logger.debug(f"Rendering pages to {SAIML.parse(f'[@F yellow $]{dest}')}")
 
     render_pages(
         file_system,

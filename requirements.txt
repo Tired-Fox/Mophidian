@@ -3,6 +3,7 @@ pymdown-extensions
 python-frontmatter
 click
 Pygments
-teddecor>=1.3.0
+saimll>=0.3.0
+tcfg>=0.3.0
 watchdog==2.1.9
 # js2py

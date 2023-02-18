@@ -2,7 +2,7 @@ from re import match
 from pathlib import Path
 import time
 
-from teddecor import TED, Logger
+from saimll import SAIML, Logger
 from phml import PHML, Formats
 
 from mophidian import CONFIG
@@ -61,10 +61,10 @@ def construct_components(path: str) -> Directory:
         if file.suffix == ".phml":
             components.add(Component(file.as_posix(), path))
         else:
-            suggestion = f"{TED.parse(f'[@Fred]{file.suffix}')} to {TED.parse('[@Fgreen].phml')}"
+            suggestion = f"{SAIML.parse(f'[@Fred]{file.suffix}')} to {SAIML.parse('[@Fgreen].phml')}"
             Logger.Debug(
                 "Invalid component:",
-                f"{TED.parse(f'[@Fyellow]{TED.escape(file.as_posix())}')}.",
+                f"{SAIML.parse(f'[@Fyellow]{SAIML.escape(file.as_posix())}')}.",
                 "Try changing",
                 suggestion,
                 label="Debug.[@Fred]Error[@]"

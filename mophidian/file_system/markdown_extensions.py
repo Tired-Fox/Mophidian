@@ -10,7 +10,7 @@ from markdown.treeprocessors import Treeprocessor
 from markdown.util import AMP_SUBSTITUTE
 from xml.etree.ElementTree import Element
 
-from teddecor import Logger, TED
+from saimll import Logger, SAIML
 
 @functools.lru_cache(maxsize=None)
 def _norm_parts(path: str) -> list[str]:
@@ -104,9 +104,9 @@ class _RelativePathTreeprocessor(Treeprocessor):
 
         if not Path(target_uri).exists() and target_file is None:
             Logger.debug(
-                f"Page {TED.parse(f'[@Fyellow]{TED.escape(self.file.relative_url)}[@]')}",
+                f"Page {SAIML.parse(f'[@Fyellow]{SAIML.escape(self.file.relative_url)}[@]')}",
                 "contains a link to",
-                f"{TED.parse(f'[@Fyellow]{TED.escape(target_uri)}[@]')}",
+                f"{SAIML.parse(f'[@Fyellow]{SAIML.escape(target_uri)}[@]')}",
                 "which is not found in the files.",
                 label="Debug.[@Fred]Error[@]"
             ).flush()

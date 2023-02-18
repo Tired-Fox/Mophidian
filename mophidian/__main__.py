@@ -4,7 +4,7 @@ from pathlib import Path
 import click
 from shutil import rmtree
 
-from teddecor import TED, Logger, LogLevel
+from saimll import SAIML, Logger, LogLevel
 
 from mophidian import states, DestState, __version__
 from mophidian.cli.styles import generate_highlight
@@ -84,7 +84,7 @@ def new(force: bool, preset: bool, name: str):
             rmtree(path)
         else:
             Logger.error(
-                TED.parse(
+                SAIML.parse(
                     f"Failed to create project [@Fyellow]/{name}[@F] since it already exists"
                 )
             )
@@ -104,7 +104,7 @@ def new(force: bool, preset: bool, name: str):
     CONFIG.save(path.joinpath("moph.yml"))
 
     Logger.info(
-        TED.parse(
+        SAIML.parse(
             f"Finished! Next cd into [@Fyellow]{name!r}[@F] and use [@Fyellow]'moph build'"
         )
     )

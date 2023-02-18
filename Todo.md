@@ -1,9 +1,10 @@
 # Todo
 
 [Review](https://hynek.me/articles/testing-packaging/)
-- [ ] Separate config annotation to it's own library/package/module `tcfg`
-- [ ] Rename and rebrand TEDDecor `simll` (Simple Inline Markup Language and Logging)
-  - [ ] Only markup and logging
+
+- [x] Separate config annotation to it's own library/package/module `tcfg`
+- [x] Rename and rebrand TEDDecor `simll` (Simple Inline Markup Language and Logging)
+  - [x] Only markup, logging, and pprint
 
 - [ ] General
   - [ ] Add custom errors

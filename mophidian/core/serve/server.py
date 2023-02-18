@@ -10,7 +10,7 @@ import webbrowser
 from re import match
 
 from watchdog.observers import Observer
-from teddecor import TED, style, Log, LogLevel, Logger
+from saimll import SAIML, style, Log, LogLevel, Logger
 from phml import PHML
 
 from mophidian import states, CONFIG
@@ -152,7 +152,7 @@ class LiveServer:
             self.file_system.build_hierarchy()
             for page in obj.linked_files:
                 page.state = FileState.UPDATED
-                self.logger.Custom(TED.parse(f"{WATCHUPDATE} [@Fgreen$]{page.relative_url}"), label=WATCHLABEL)
+                self.logger.Custom(SAIML.parse(f"{WATCHUPDATE} [@Fgreen$]{page.relative_url}"), label=WATCHLABEL)
             self.render_pages()
 
     def update_page(self, path: str):
@@ -164,7 +164,7 @@ class LiveServer:
             obj.state = FileState.UPDATED
             self.file_system.build_hierarchy()
             self.render_pages()
-            self.logger.Custom(TED.parse(f"{WATCHUPDATE} [@Fgreen$]{obj.relative_url}"), label=WATCHLABEL)
+            self.logger.Custom(SAIML.parse(f"{WATCHUPDATE} [@Fgreen$]{obj.relative_url}"), label=WATCHLABEL)
 
     def update_component(self, path: str):
         """Update a given component and all linked pages."""
@@ -175,7 +175,7 @@ class LiveServer:
             self.phml.add((obj.cname, obj.full_path))
             for page in obj.linked_files:
                 page.state = FileState.UPDATED
-                self.logger.Custom(TED.parse(f"{WATCHUPDATE} [@Fgreen$]{page.relative_url}"), label=WATCHLABEL)
+                self.logger.Custom(SAIML.parse(f"{WATCHUPDATE} [@Fgreen$]{page.relative_url}"), label=WATCHLABEL)
             self.render_pages()
 
     def update_static(self, path: str):
@@ -189,7 +189,7 @@ class LiveServer:
         if obj is not None and isinstance(obj, Static):
             obj.state = FileState.UPDATED
             self.write_static()
-            self.logger.Custom(TED.parse(f"{WATCHUPDATE} [@Fgreen$]{obj.relative_url}"), label=WATCHLABEL)
+            self.logger.Custom(SAIML.parse(f"{WATCHUPDATE} [@Fgreen$]{obj.relative_url}"), label=WATCHLABEL)
 
     def create_layout(self, path: str):
         """Update a given layout and all linked pages."""
@@ -202,7 +202,7 @@ class LiveServer:
         
         for page in new_layout.linked_files:
             page.state = FileState.UPDATED
-            self.logger.Custom(TED.parse(f"{WATCHUPDATE} [@Fgreen$]{new_layout.relative_url})"), label=WATCHLABEL)
+            self.logger.Custom(SAIML.parse(f"{WATCHUPDATE} [@Fgreen$]{new_layout.relative_url})"), label=WATCHLABEL)
         
         self.render_pages()
 
@@ -222,7 +222,7 @@ class LiveServer:
             self.files[new_page.full_path] = new_page
             self.file_system.build_hierarchy()
             self.render_pages()
-            self.logger.Custom(TED.parse(f"{WATCHCREATE} [@Fgreen$]{new_page.relative_url}"), label=WATCHLABEL)
+            self.logger.Custom(SAIML.parse(f"{WATCHCREATE} [@Fgreen$]{new_page.relative_url}"), label=WATCHLABEL)
 
     def create_component(self, path: str):
         """Update a given component and all linked pages."""
@@ -235,7 +235,7 @@ class LiveServer:
             self.phml.add((new_component.cname, new_component.full_path))
         except Exception as error:
             self.logger.Error(str(error))
-        self.logger.Custom(TED.parse(f"{WATCHCREATE} component <[@F#6305DC$]{new_component.cname}[@F] />"), label=WATCHLABEL)
+        self.logger.Custom(SAIML.parse(f"{WATCHCREATE} component <[@F#6305DC$]{new_component.cname}[@F] />"), label=WATCHLABEL)
 
     def create_static(self, path: str):
         """Update a given static file and re-write it to dest."""
@@ -252,7 +252,7 @@ class LiveServer:
             self.statics[new_static.full_path] = new_static
 
         if new_static is not None:
-            self.logger.Custom(TED.parse(f"{WATCHCREATE} [@Fgreen$]{new_static.relative_url}"), label=WATCHLABEL)
+            self.logger.Custom(SAIML.parse(f"{WATCHCREATE} [@Fgreen$]{new_static.relative_url}"), label=WATCHLABEL)
             self.write_static()
 
     def remove_static(self, path: str):
@@ -265,7 +265,7 @@ class LiveServer:
         if obj is not None and isinstance(obj, Static):
             obj.state = FileState.DELETED
             self.write_static()
-            self.logger.Custom(TED.parse(f"{WATCHDELETE} [@Fgreen$]{obj.relative_url}"), label=WATCHLABEL)
+            self.logger.Custom(SAIML.parse(f"{WATCHDELETE} [@Fgreen$]{obj.relative_url}"), label=WATCHLABEL)
 
     def remove_layout(self, path: str):
         """Remove a given layout and update all linked pages."""
@@ -275,7 +275,7 @@ class LiveServer:
         if obj is not None and isinstance(obj, Layout):
             for page in obj.linked_files:
                 page.state = FileState.UPDATED
-                self.logger.Custom(TED.parse(f"{WATCHDELETE} [@Fgreen$]{page.relative_url}"), label=WATCHLABEL)
+                self.logger.Custom(SAIML.parse(f"{WATCHDELETE} [@Fgreen$]{page.relative_url}"), label=WATCHLABEL)
             self.file_system.remove(obj.full_path)
             self.file_system.build_hierarchy()
             self.render_pages()
@@ -288,7 +288,7 @@ class LiveServer:
         if obj is not None and isinstance(obj, Renderable):
             obj.state = FileState.DELETED
             self.render_pages()
-            self.logger.Custom(TED.parse(f"{WATCHDELETE} [@Fgreen$]{obj.relative_url}"), label=WATCHLABEL)
+            self.logger.Custom(SAIML.parse(f"{WATCHDELETE} [@Fgreen$]{obj.relative_url}"), label=WATCHLABEL)
 
     def remove_component(self, path: str):
         """Remove a given component and update linked pages."""
@@ -296,10 +296,10 @@ class LiveServer:
         obj = self.components.pop(path, None)
 
         if obj is not None and isinstance(obj, Component):
-            self.logger.Custom(TED.parse(f"{WATCHDELETE} component <[@F#6305DC$]{obj.cname}[@F] />"), label=WATCHLABEL)
+            self.logger.Custom(SAIML.parse(f"{WATCHDELETE} component <[@F#6305DC$]{obj.cname}[@F] />"), label=WATCHLABEL)
             for page in obj.linked_files:
                 page.state = FileState.UPDATED
-                self.logger.Custom(TED.parse(f"{WATCHUPDATE} [@Fgreen$]{page.relative_url}"), label=WATCHLABEL)
+                self.logger.Custom(SAIML.parse(f"{WATCHUPDATE} [@Fgreen$]{page.relative_url}"), label=WATCHLABEL)
             self.phml.remove(obj.cname)
             self.component_files.remove(obj.full_path)
             self.render_pages()
@@ -442,8 +442,8 @@ class Server(ThreadingHTTPServer):
         network_message = f"use {style('--host', fg='yellow')} to expose"
         if self.expose_host:
             network_message = (
-                f"{TED.parse(f'[@Fyellow~{network_ip}]{network_ip}')}\n"
-                + f"{' '*17}{TED.parse(f'[@Fyellow~{network_host_name}]{network_host_name}')}"
+                f"{SAIML.parse(f'[@Fyellow~{network_ip}]{network_ip}')}\n"
+                + f"{' '*17}{SAIML.parse(f'[@Fyellow~{network_host_name}]{network_host_name}')}"
             )
         (
             self.logger.custom(
@@ -454,7 +454,7 @@ class Server(ThreadingHTTPServer):
             )
             .message()
             .message(
-                f"{' '*6}▍ {style('Local', fg='cyan')}:   {TED.parse(f'[@Fyellow~{url}]{url}')}"
+                f"{' '*6}▍ {style('Local', fg='cyan')}:   {SAIML.parse(f'[@Fyellow~{url}]{url}')}"
             )
             .message(f"{' '*6}▍ {style('Network', fg='cyan')}: {network_message}")
             .Message()
