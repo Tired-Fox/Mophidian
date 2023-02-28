@@ -6,7 +6,11 @@
     padding: 0;
 }
 
-html {font-size: 100%;} /*16px*/
+html {
+    font-size: 100%; /*16px*/
+    scroll-behavior: smooth;
+    scroll-padding: 5.1rem;
+}
 
 body {
     font-weight: 400;

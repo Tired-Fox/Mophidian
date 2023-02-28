@@ -1,3 +1,7 @@
 {
-    "python.analysis.typeCheckingMode": "basic"
+    "python.analysis.typeCheckingMode": "basic",
+    "python.linting.pylintEnabled": true,
+    "python.linting.mypyEnabled": false,
+    "python.linting.prospectorEnabled": false,
+    "python.linting.enabled": true
 }

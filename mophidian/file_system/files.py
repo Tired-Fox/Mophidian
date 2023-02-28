@@ -654,8 +654,8 @@ class Static(File):
             dest_dir: The root dir to place the file into.
         """
 
-        dest = Path(dest_dir).joinpath(self._dest)
-        original = Path(self.root).joinpath(self.path)
+        dest = Path(dest_dir).joinpath(self._dest.strip("/"))
+        original = Path(self.root).joinpath(self.path.strip("/"))
 
         dest.parent.mkdir(parents=True, exist_ok=True)
 
@@ -692,7 +692,7 @@ class Layout(File, Linker):
 
         # Start with <Slot /> element and replace the <Slot /> element with each inherited layout
         for layout in layouts:
-            layout_ast = phml.load(Path(self.root).joinpath(layout.path)).ast
+            layout_ast = phml.load(Path(self.root).joinpath(layout.path.strip("/"))).ast
 
             # If it quacks like a full page, then it's a full page
             if query(layout_ast, "html") or query(layout_ast, "body"):

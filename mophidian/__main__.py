@@ -1,39 +1,36 @@
 #!/usr/bin/env python
 from __future__ import annotations
 from pathlib import Path
-import click
 from shutil import rmtree
+import click
 
 from saimll import SAIML, Logger, LogLevel
 
 from mophidian import states, DestState, __version__
 from mophidian.cli.styles import generate_highlight
-from mophidian.config import CONFIG, build_config
-from mophidian.core import (
-    Server,
-    LiveServer,
-    build as full_build,
-    generate_sitemaps,
-    generate_rss
-)
+from mophidian.config import CONFIG
+from mophidian.core import Server, LiveServer, build as full_build, generate_sitemaps, generate_rss
 
 
 @click.group(invoke_without_command=True)
 @click.option("-v", "--version", flag_value=True, help="Version of mophidian", default=False)
 def cli(version: bool = False):
     '''Pythonic Static Site Generator CLI.'''
-    
+
     if version:
         click.echo(f"Mophidian v{__version__}")
         exit()
+
 
 @click.option("--debug", flag_value=True, help="Enable debug logs", default=False)
 @click.option(
     "--dirty",
     flag_value=True,
     help="Force write files even if the rendered file already exists",
-    default=False
+    default=False,
 )
+
+
 @cli.command(name="build", help=f"Compile and build the website to {CONFIG.site.dest!r}")
 def build_command(debug: bool, dirty: bool):
     """Build the website in the specified dest directory."""
@@ -45,15 +42,16 @@ def build_command(debug: bool, dirty: bool):
         rmtree("out/")
 
     states["dest"] = DestState.PREVIEW
-    file_system, static, _, _ = full_build(dirty=dirty)
+    file_system, _, _, _ = full_build(dirty=dirty)
 
     if CONFIG.build.sitemap.enabled:
         generate_sitemaps(file_system)
-        
+
     if CONFIG.build.rss.enabled:
         generate_rss(file_system)
 
     Logger.flush()
+
 
 @click.argument("style", default="")
 @cli.command(name="highlight", help="Generate a pygmentize CSS file")
@@ -63,9 +61,18 @@ def code_highlight(style: str):
     """
     generate_highlight(style)
 
+
 @click.argument("name", default="")
-@click.option("-f", "--force", flag_value=True, help="force write files and directories even if they already exist", default=False)
-@click.option("-p", "--preset", flag_value=True, help="generate the project with a preset", default=False)
+@click.option(
+    "-f",
+    "--force",
+    flag_value=True,
+    help="force write files and directories even if they already exist",
+    default=False,
+)
+@click.option(
+    "-p", "--preset", flag_value=True, help="generate the project with a preset", default=False
+)
 @cli.command(name="new", help="Create a new mophidian project")
 def new(force: bool, preset: bool, name: str):
     """Stylize markdown code blocks with pygmentize. This command allows you to generate the
@@ -99,18 +106,18 @@ def new(force: bool, preset: bool, name: str):
         path.joinpath("src/components").mkdir(parents=True, exist_ok=True)
         path.joinpath("public").mkdir(parents=True, exist_ok=True)
 
-    CONFIG = build_config(".yml", {})
     CONFIG.site.name = name
-    CONFIG.save(path.joinpath("moph.yml"))
+    CONFIG.save()
 
     Logger.info(
-        SAIML.parse(
-            f"Finished! Next cd into [@Fyellow]{name!r}[@F] and use [@Fyellow]'moph build'"
-        )
+        SAIML.parse(f"Finished! Next cd into [@Fyellow]{name!r}[@F] and use [@Fyellow]'moph build'")
     )
 
+
 @click.option("-o", "--open", flag_value=True, default=False, help="open the server in the browser")
-@click.option("--host", flag_value=True, default=False, help="expose the network url for the server")
+@click.option(
+    "--host", flag_value=True, default=False, help="expose the network url for the server"
+)
 @cli.command(name="dev")
 def dev(open: bool, host: bool):
     """Serve the site; when files change, rebuild the site and reload the server."""
@@ -119,9 +126,12 @@ def dev(open: bool, host: bool):
     server.run()
     rmtree("dist", ignore_errors=True)
 
+
 @cli.command(name="preview")
 @click.option("-o", "--open", flag_value=True, default=False, help="open the server in the browser")
-@click.option("--host", flag_value=True, default=False, help="expose the network url for the server")
+@click.option(
+    "--host", flag_value=True, default=False, help="expose the network url for the server"
+)
 def preview(open: bool, host: bool):
     """Preview the project. This includes building to the websites root and launching a server.
     There are no live updates, to get that use `moph serve`.
