@@ -3,9 +3,8 @@ from pathlib import Path
 from typing import Callable, Iterator
 
 from mophidian.core.util import REGEX
-from mophidian import CONFIG
 from .base import Node
-from .files import File, Layout, Page, Markdown, Static, Renderable, Nav, Component, FileState
+from .files import File, Layout, Page, Markdown, Static, Renderable, Nav, Component
 
 __all__ = [
     "Container",

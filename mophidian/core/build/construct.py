@@ -83,6 +83,7 @@ def construct_static(path: str) -> Directory:
 def construct_file_system(path: str) -> tuple[Directory, Nav]:
     """Find all the files in the given path and construct a file structure."""
 
+    Logger.Debug("Generating file system from path:", path.lstrip('/'))
     root = Directory(path)
     for _file in Path(path).glob("**/*.*"):
         # Pages and Layouts

@@ -210,7 +210,7 @@ class File(Node):
             self.relative_url = Path(self._dest).as_posix()
 
         if self.relative_url != "./":
-            self.relative_url = "/" + self.relative_url
+            self.relative_url = "/" + self.relative_url.lstrip("/")
         else:
             self.relative_url = "/"
 

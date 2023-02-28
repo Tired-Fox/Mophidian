@@ -19,7 +19,8 @@ classifiers = [
 requires-python = ">=3.7"
 dependencies = [
     "saimll>=0.5.0",
-    "tcfg>=0.4.0"
+    "tcfg>=0.4.1",
+    "watchserver>=0.1.0"
 ]
 
 [project.optional-dependencies]
@@ -31,19 +32,27 @@ dependencies = [
 [project.scripts]
 moph = "mophidian.__main__:cli"
 
-# [project.entry-points.""]
-
-[tool.black]
-line-length = 100
-target-version = ["py37"]
-skip-string-normalization = true
-
-[tool.isort]
-profile = "black"
-line_length = 100
-
-[tool.mypy]
-ignore_missing_imports = true
-warn_unreachable = true
-no_implicit_optional = true
-show_error_codes = true
+[tool.ruff]
+selected = [
+    'E',
+    'F',
+    'W',
+    "C90",
+    "I",
+    "N",
+    "D",
+    "UP",
+    "ANN",
+    "S",
+    "A",
+    "B",
+    "COM",
+    "C4",
+    "Q",
+    "RET",
+    "SIM",
+    "TCH",
+    "PTH",
+    "PLE",
+    "RUF"
+]
