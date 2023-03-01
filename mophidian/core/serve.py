@@ -99,53 +99,65 @@ class Callbacks(LiveCallback):
             style("-", fg="red", bold=True), self.render_log_content(cmpt, path)
         )
 
-    def create(self, root: str, file: str) -> list[str]:
-        obj = None
+    def log_reload(self, *paths: str):
+        """Log a reload event."""
+        self.logger.Message(
+            style("↻", fg="magenta", bold=True),
+            ", ".join(paths)
+        )
 
+    def create(self, root: str, file: str) -> list[str]:
         if is_static(file):
-            obj = self.create_static(file)
+            self.create_static(file)
+            self.log_reload("**/*")
             return ["**"]
 
         if is_page(file):
-            obj = self.create_page(file)
-        elif is_layout(file):
-            obj = self.create_layout(file)
-        elif is_component(file):
-            obj = self.create_component(file)
+            return self.create_page(file)
 
-        return [ServerPath(obj.url).lstrip().posix()] if obj is not None else []
+        if is_layout(file):
+            return self.create_layout(file)
+
+        if is_component(file):
+            self.create_component(file)
+            self.log_reload("**/*")
+            return ["**"]
+
+        return []
 
     def update(self, root: str, file: str) -> list[str]:
-        obj = None
-
         if is_static(file):
-            obj = self.update_static(file)
+            self.update_static(file)
+            self.log_reload("**/*")
             return ["**"]
 
         if is_page(file):
-            obj = self.update_page(file)
-        elif is_layout(file):
-            obj = self.update_layout(file)
-        elif is_component(file):
-            obj = self.update_component(file)
+            return self.update_page(file)
 
-        return [ServerPath(obj.url).lstrip().posix()] if obj is not None else []
+        if is_layout(file):
+            return self.update_layout(file)
+
+        if is_component(file):
+            return self.update_component(file)
+
+        return []
 
     def remove(self, root: str, file: str) -> list[str]:
-        obj = None
-
         if is_static(file):
-            obj = self.remove_static(file)
+            self.remove_static(file)
+            self.log_reload("**/*")
             return ["**"]
 
         if is_page(file):
-            obj = self.remove_page(file)
-        elif is_layout(file):
-            obj = self.remove_layout(file)
-        elif is_component(file):
-            obj = self.remove_component(file)
+            return self.remove_page(file)
 
-        return [ServerPath(obj.url).lstrip().posix()] if obj is not None else []
+        if is_layout(file):
+            return self.remove_layout(file)
+
+        if is_component(file):
+            return self.remove_component(file)
+
+        return []
 
     def render_pages(self):
         """Re-render the site pages."""
@@ -167,15 +179,17 @@ class Callbacks(LiveCallback):
         path = path.replace("\\", "/")
         obj = self.files.get(path, None)
 
+        reload_urls = []
         if obj is not None and isinstance(obj, Layout):
             obj.state = FileState.UPDATED
             self.file_system.build_hierarchy()
             for page in obj.linked_files:
                 page.state = FileState.UPDATED
-                self.log_update(path=page.relative_url)
+                reload_urls.append(ServerPath(page.url).lstrip().posix())
             self.render_pages()
 
-        return obj
+        self.log_reload(*reload_urls)
+        return reload_urls
 
     def update_page(self, path: str):
         """Update and rerender a given page."""
@@ -188,22 +202,30 @@ class Callbacks(LiveCallback):
             self.render_pages()
             self.log_update(path=obj.relative_url)
 
-        return obj
+        reload_urls = (
+            [ServerPath(obj.url).lstrip().posix()]
+            if obj is not None
+            else []
+        )
+        self.log_reload(*reload_urls)
+        return reload_urls
 
     def update_component(self, path: str):
         """Update a given component and all linked pages."""
         path = path.replace("\\", "/")
         obj = self.components.get(path)
 
+        reload_urls = []
         if obj is not None and isinstance(obj, Component):
             self.phml.add((obj.cname, obj.full_path))
             self.log_update(cmpt=obj.cname)
             for page in obj.linked_files:
                 page.state = FileState.UPDATED
-                self.log_update(path=page.relative_url)
+                reload_urls.append(ServerPath(page.url).lstrip().posix())
             self.render_pages()
 
-        return obj
+        self.log_reload(*reload_urls)
+        return reload_urls
 
     def update_static(self, path: str):
         """Update a given static file and re-write it to dest."""
@@ -218,8 +240,6 @@ class Callbacks(LiveCallback):
             self.write_static()
             self.log_update(path=obj.relative_url)
 
-        return obj
-
     def create_layout(self, path: str):
         """Update a given layout and all linked pages."""
         path = path.replace("\\", "/")
@@ -228,13 +248,14 @@ class Callbacks(LiveCallback):
         self.file_system.add(new_layout)
         self.files[new_layout.full_path] = new_layout
         self.file_system.build_hierarchy()
+        reload_urls = []
         for page in new_layout.linked_files:
             page.state = FileState.UPDATED
-            self.log_update(path=page.relative_url)
+            reload_urls.append(ServerPath(page.url).lstrip().posix())
 
         self.render_pages()
-
-        return new_layout
+        self.log_reload(*reload_urls)
+        return reload_urls
 
     def create_page(self, path: str):
         """Update and rerender a given page."""
@@ -254,7 +275,14 @@ class Callbacks(LiveCallback):
             self.render_pages()
             self.log_create(path=new_page.relative_url)
 
-        return new_page
+        reload_urls = (
+            [ServerPath(new_page.url).lstrip().posix()]
+            if new_page is not None
+            else []
+        )
+
+        self.log_reload(*reload_urls)
+        return reload_urls
 
     def create_component(self, path: str):
         """Update a given component and all linked pages."""
@@ -268,8 +296,6 @@ class Callbacks(LiveCallback):
             self.log_create(cmpt=new_component.cname)
         except Exception as error:
             self.logger.Error(str(error))
-
-        return new_component
 
     def create_static(self, path: str):
         """Update a given static file and re-write it to dest."""
@@ -289,8 +315,6 @@ class Callbacks(LiveCallback):
             self.log_create(path=new_static.relative_url)
             self.write_static()
 
-        return new_static
-
     def remove_static(self, path: str):
         """Remove a static file and its 'rendered' file."""
         path = path.replace("\\", "/")
@@ -303,22 +327,22 @@ class Callbacks(LiveCallback):
             self.write_static()
             self.log_delete(path=obj.relative_url)
 
-        return obj
-
     def remove_layout(self, path: str):
         """Remove a given layout and update all linked pages."""
         path = path.replace("\\", "/")
         obj = self.files.pop(path, None)
 
+        reload_urls = []
         if obj is not None and isinstance(obj, Layout):
             for page in obj.linked_files:
                 page.state = FileState.UPDATED
-                self.log_update(path=page.relative_url)
+                reload_urls.append(ServerPath(page.url).lstrip().posix())
             self.file_system.remove(obj.full_path)
             self.file_system.build_hierarchy()
             self.render_pages()
 
-        return obj
+        self.log_reload(*reload_urls)
+        return reload_urls
 
     def remove_page(self, path: str):
         """Remove a given page."""
@@ -330,20 +354,29 @@ class Callbacks(LiveCallback):
             self.render_pages()
             self.log_delete(path=obj.relative_url)
 
-        return obj
+        reload_urls = (
+            [ServerPath(obj.url).lstrip().posix()]
+            if obj is not None
+            else []
+        )
+
+        self.log_reload(*reload_urls)
+        return reload_urls
 
     def remove_component(self, path: str):
         """Remove a given component and update linked pages."""
         path = path.replace("\\", "/")
         obj = self.components.pop(path, None)
 
+        reload_urls = []
         if obj is not None and isinstance(obj, Component):
             self.log_delete(cmpt=obj.cname)
             for page in obj.linked_files:
                 page.state = FileState.UPDATED
-                self.log_update(path=page.relative_url)
+                reload_urls.append(ServerPath(page.url).lstrip().posix())
             self.phml.remove(obj.cname)
             self.component_files.remove(obj.full_path)
             self.render_pages()
 
-        return obj
+        self.log_reload(*reload_urls)
+        return reload_urls
