@@ -4,6 +4,7 @@
         <link type="rss" />
     </head>
     <Slot />
+    <Footer />
 </>
 <style>
     .emojione {

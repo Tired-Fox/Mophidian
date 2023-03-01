@@ -3,7 +3,21 @@ import re
 from functools import cache
 from typing import Any, Callable
 
+from markdown import Markdown
+
 from mophidian.config import CONFIG
+# from mophidian.file_system.markdown_extensions import _RelativePathExtension
+
+
+# extensions=[
+#     _RelativePathExtension(None, None, None),
+#     *
+# ],
+
+MARKDOWN = Markdown(
+    extensions=CONFIG.markdown.extensions,
+    extension_configs=CONFIG.markdown.extension_configs,
+)
 
 def filter_sort(
     collection,

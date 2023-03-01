@@ -5,9 +5,8 @@ from functools import cached_property
 from pathlib import Path
 from shutil import copyfile, SameFileError # For copying static files
 from typing import TYPE_CHECKING, Any
-from re import match
+from re import match, sub
 
-import frontmatter # Used to rip the metadata from markdown files
 from phml import ( # Used to parse the phml content and manipulate it's ast
     AST,
     check,
@@ -26,11 +25,9 @@ from phml.core import VirtualPython # Dummy instance for subtituting elements fo
 from phml.builder import p # To create injected elements
 from saimll import SAIML, Logger # Custom logging
 
-from markdown import Markdown as MarkdownParse # For parsing markdown files into html
-
 import mophidian
 from mophidian.config import CONFIG
-from mophidian.core.util import REGEX, PAGE_IGNORE, html, title, url
+from mophidian.core.util import REGEX, PAGE_IGNORE, html, title, url, MARKDOWN
 from .markdown_extensions import _RelativePathExtension
 from .base import apply_attribute_configs, build_attributes, Node
 
@@ -455,13 +452,25 @@ class Markdown(Renderable):
     def _make_title(self) -> str:
 
         with open(self.full_path, "r", encoding="utf-8") as mfile:
-            for line in mfile.readlines():
+            lines = mfile.readlines()
+            for i, line in enumerate(lines):
                 if line.strip() != "":
-                    header_1 = match(r"\s*# ?(.+)", line)
-                    if header_1 is not None:
-                        return header_1.group(1).strip()
+                    header = match(r"(?P<hash>\s*# *.+)|(?P<block>=+)", line)
+                    if header is not None:
+                        header = header.groupdict()
+                        if (
+                            header["hash"] is not None
+                            and header["hash"].strip() != ""
+                        ):
+                            return sub(r" *# *", "", header["hash"]).strip()
+                        if (
+                            header["block"] is not None
+                            and i > 0
+                            and lines[i-1].strip() != ""
+                        ):
+                            return lines[i-1].strip()
 
-        name = Path(self._dest).parent.as_posix().split("/")[-1]
+        name = Path(self._dest).parent.as_posix().rsplit("/", 1)[-1]
         if name.strip() in ["", "."]:
             name = self.file_name
 
@@ -475,32 +484,13 @@ class Markdown(Renderable):
 
         # rip meta data from markdown file
         with open(Path(self.full_path), "r", encoding="utf-8") as markdown_file:
-            meta, content = frontmatter.parse(markdown_file.read())
-
-        # convert markdown content to html content
-        try:
-            if self.relative_path_extension is None:
-                extensions = CONFIG.markdown.extensions
-            else:
-                extensions = [self.relative_path_extension, *CONFIG.markdown.extensions]
-            md = MarkdownParse(
-                extensions=extensions,
-                extension_configs=CONFIG.markdown.extension_configs,
-            )
-        except KeyError as key_error:
-            from traceback import print_exc
-
-            print_exc()
-            SAIML.print(
-                f"*[@Fred]KeyError[@F]:[] invalid variable in extension configs [$@Fgreen]{key_error}"
-            )
-            exit()
+            content = markdown_file.read()
 
         # save meta data as locals for later
-        self.locals = meta or {}
-        content = md.reset().convert(content)
+        content = MARKDOWN.reset().convert(content)
+        self.locals = getattr(MARKDOWN, "Meta", {})
 
-        self.parse_toc(getattr(md, 'toc_tokens', []))
+        self.parse_toc(getattr(MARKDOWN, 'toc_tokens', []))
 
         # parse resulting html into phml parser
         ast = PHML().parse(content).ast
@@ -533,7 +523,15 @@ class Markdown(Renderable):
         else:
             page_ast = self.ast
 
-        addons = {**self.locals, "toc": self.toc, "title": self.locals.get("title", None) or self.title}
+        page_title = self.locals.get("title", None)
+        if page_title is not None:
+            page_title = ' '.join(page_title)
+
+        addons = {
+            **self.locals,
+            "toc": self.toc,
+            "title": page_title or self.title
+        }
 
         kwargs.update(addons)
 
