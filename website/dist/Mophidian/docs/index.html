@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="shortcut icon" href="/Mophidian/favicon.ico" type="image/x-icon" />
+        <title>Getting Started</title>
+        <style></style>
+        <link rel="stylesheet" href="/Mophidian/highlight.css" />
+        <link rel="stylesheet" href="/Mophidian/global.css" />
+        <link rel="stylesheet" href="/Mophidian/docs/style.css" />
+    </head>
+
+    <body>
+        <nav id="header">
+            <a href="/Mophidian/">
+                <h3>Mophidian</h3>
+            </a>
+            <ul>
+                <li>
+                    <a href="/Mophidian/docs/">Docs</a>
+                </li>
+                <li>
+                    <a href="/Mophidian/blog/">Blog</a>
+                </li>
+            </ul>
+        </nav>
+        <article>
+            <h1 id="getting-started">Getting Started</h1>
+            <p>
+Mophidian provides a cli tool called
+                <code>moph</code>
+to streamline the creation of your website. To start you will want to create a new mophidian project. If you ever want to know what a command does or to know what is possible, use
+                <code>moph --help</code>
+or
+                <code>moph {command} --help</code>
+            </p>
+            <p>
+For more on the cli tool see the
+                <a href="/Mophidian/docs/cli/">cli</a>
+section.
+            </p>
+            <h2 id="creating-a-project">Creating a Project</h2>
+            <div class="highlight">
+<pre><span></span><code>moph new <span class="o">{</span>project name<span class="o">}</span>
+</code></pre>
+            </div>
+            <p>This will create the project in a new directory with the same name as the project name. Mophidian has also has a preset with a page, layout, and a component. This is a good option if you want an example of how a project can be structured. To use the preset use;</p>
+            <div class="highlight">
+<pre><span></span><code>moph new <span class="o">{</span>project name<span class="o">}</span> -p<span class="p">|</span>--preset
+</code></pre>
+            </div>
+            <h2 id="development">Development</h2>
+            <p>
+Now that you have a project you can begin creating your website. The file structure is based on the
+                <a href="https://kit.svelte.dev/docs/advanced-routing">svelte kit</a>
+file structure. Each page is in it's own directory and each directory only has one layout. These are the only two pages that have limits per directory. You may write as many static and markdown files in these directories as you want.
+            </p>
+            <p>
+You may have noticed that markdown was mentioned. Each markdown file in the source directory,
+                <code>src/pages</code>
+by default, will be rendered to html. Markdown files use the closest layout file as it's base.
+            </p>
+            <p>
+Since Mophidian is a route based SSG, each page is an
+                <code>index.html</code>
+file is in it's own directory. There can be multiple markdown files in one directory, so how does that fit into this? Well each markdown files get their own directory equal to the name of the file.
+                <code>README</code>
+markdown files are treated as
+                <code>index.html</code>
+so be careful when placing page and markdown files in the same directory.
+            </p>
+            <p>
+You may only have one
+                <code>page.phml</code>
+and
+                <code>layout.phml</code>
+file per directory.
+                <code>page.phml</code>
+files look like this.
+            </p>
+            <div class="highlight">
+<pre><span></span><code><span class="cm">&lt;!-- page.phml --&gt;</span>
+
+<span class="err">&lt;</span>&gt;
+    {Your content here}
+<span class="err">&lt;</span>/&gt;
+
+<span class="cm">&lt;!--       or       --&gt;</span>
+
+<span class="err">&lt;</span>{html-tag}&gt;
+    {Your content here}
+<span class="err">&lt;</span>/{html-tag}&gt;
+</code></pre>
+            </div>
+            <p>
+while
+                <code>layout.phml</code>
+pages are similar they will require a
+                <code>&lt;Slot /&gt;</code>
+tag. They will look like this.
+            </p>
+            <div class="highlight">
+<pre><span></span><code><span class="cm">&lt;!-- layout.phml --&gt;</span>
+
+<span class="err">&lt;</span>&gt;
+    {Your content here}
+    <span class="p">&lt;</span><span class="nt">Slot</span> <span class="p">/&gt;</span>
+    {Your content here}
+<span class="err">&lt;</span>/&gt;
+
+<span class="cm">&lt;!--       or       --&gt;</span>
+
+<span class="err">&lt;</span>{html-tag}&gt;
+    {Your content here}
+    <span class="p">&lt;</span><span class="nt">Slot</span> <span class="p">/&gt;</span>
+    {Your content here}
+<span class="err">&lt;</span>/{html-tag}&gt;
+</code></pre>
+            </div>
+            <p>Markdown files are normal markdown files but you may also have frontmatter/metadata. The frontmatter should be written in yaml. This data is exposed to the layouts on page render.</p>
+            <div class="highlight">
+<pre><span></span><code>---
+title: Sample Page Title
+pubDate: Thu, 23 May 2023 UTC
+tags:
+    <span class="k">-</span> sample
+    <span class="k">-</span> docs
+    <span class="k">-</span> getting_started
+
+---
+
+<span class="gh"># Sample Page</span>
+
+Some content here
+</code></pre>
+            </div>
+            <p>
+There are also components which are in the
+                <code>src/components</code>
+directory by default. They are structure just like the
+                <code>page.phml</code>
+file. After creating a component it's filename and path are used to create the associated element tag which can be used in any
+                <code>page.phml</code>
+,
+                <code>layout.phml</code>
+, markdown, and other component files. All sub directories leading to the component are used in the name and are separated with a
+                <code>.</code>
+. So if you have a component file named
+                <code>Sample.phml</code>
+you will get a
+                <code>&lt;Sample&gt;</code>
+tag to use in all other files. If you have a component file
+                <code>nav/Navbar.phml</code>
+you will get a
+                <code>&lt;Nav.Navbar /&gt;</code>
+tag to use in all other files. If you want to use the component like a normal element and not just a self closing element you can add a
+                <code>&lt;Slot /&gt;</code>
+element where you want all the children to be placed in the component. To see more on how components work, it is recommended to read up on the
+                <a href="https://tired-fox.github.io/phml/">phml docs</a>
+as phml's default component system is what is used here in Mophidian.
+            </p>
+            <p>It may be easier to have more of an example. Suppose you have the file structure of</p>
+            <div class="highlight">
+<pre><span></span><code>src/
+├ components/
+│ └ Sample.phml
+└ pages/
+  ├ page.phml
+  ├ layout.phml
+  └ Sample.md
+</code></pre>
+            </div>
+            <p>
+With the files containing
+                <div class="highlight">
+<pre><span></span><code><span class="cm">&lt;!-- Sample.phml --&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>Component<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</code></pre>
+                </div>
+            </p>
+            <div class="highlight">
+<pre><span></span><code><span class="cm">&lt;!-- layout.phml --&gt;</span>
+
+<span class="err">&lt;</span>&gt;
+    <span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>Header<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">Slot</span> <span class="p">/&gt;</span>
+<span class="err">&lt;</span>/&gt;
+</code></pre>
+            </div>
+            <div class="highlight">
+<pre><span></span><code><span class="cm">&lt;!-- page.phml --&gt;</span>
+
+<span class="err">&lt;</span>&gt;
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Home<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">Sample</span> <span class="p">/&gt;</span>
+<span class="err">&lt;</span>&gt;
+</code></pre>
+            </div>
+            <div class="highlight">
+<pre><span></span><code><span class="gh"># Sample markdown page</span>
+
+Page content
+</code></pre>
+            </div>
+            <p>With each page inheriting from it's corresponding layout you get a built output that has the structure of</p>
+            <div class="highlight">
+<pre><span></span><code>out/
+├ index.html
+└ Sample
+  └ index.html
+</code></pre>
+            </div>
+            <p>and file with the contents of</p>
+            <div class="highlight">
+<pre><span></span><code><span class="cm">&lt;!-- out/index.html --&gt;</span>
+
+<span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+        ... <span class="cm">&lt;!-- See rendering section --&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>Header<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Home<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>Component<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre>
+            </div>
+            <div class="highlight">
+<pre><span></span><code><span class="cm">&lt;!-- out/Sample/index.html --&gt;</span>
+
+<span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+        ... <span class="cm">&lt;!-- See rendering section --&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>Header<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">article</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Sample markdown page<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Page content<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">article</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre>
+            </div>
+            <p>
+To view your changes in real time use
+                <code>moph serve</code>
+and if you want to preview your changes you can use
+                <code>moph preview</code>
+. To automatically open the website in a browser you may use the
+                <code>-o|--open</code>
+flag.
+            </p>
+            <p>
+To find out more about how the file structure works see the
+                <a href="/Mophidian/docs/file-system/">File System</a>
+section.
+            </p>
+            <h2 id="building">Building</h2>
+            <p>
+To build you project you use
+                <code>moph build</code>
+. This will incrementally build your site. This means if a rendered output of a page is the same as what was generated in the previous call of
+                <code>moph build</code>
+, the page will be skipped. You may bypass this feature with the
+                <code>--dirty</code>
+flag.
+            </p>
+            <p>
+By default the built/rendered files will be output to the
+                <code>out/</code>
+directory. These files are what you upload to your choice of site hosting.
+            </p>
+            <h2 id="summary">Summary</h2>
+            <p>
+Use
+                <code>moph new {project name}</code>
+to create a new project. Fill your newly creating project with
+                <code>page.phml</code>
+,
+                <code>layout.phml</code>
+, and markdown files. Then build your site with
+                <code>moph build</code>
+.
+            </p>
+            <p>To learn more about the in depth features of mophidian please read the rest of the documentation.</p>
+        </article>
+        <style>
+#header {
+                display: flex;
+                align-items: center;
+                position: sticky;
+                justify-content: space-between;
+                top: 0;
+                left: 0;
+
+                width: 100%;
+                padding-inline: 2rem;
+                padding-block: 1rem;
+                height: 5rem;
+                background-color: inherit;
+                box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            }
+
+            #header ul {
+                display: flex;
+                gap: 1.5rem;
+            }
+
+            #header h3, a ,p {
+                padding: 0;
+                margin: 0;
+            }
+
+            #header a, ul, li {
+                text-decoration: none;
+                list-style: none;
+            }
+
+            #header :is(a):hover {
+                text-decoration: underline;
+            }
+        </style>
+    </body>
+
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="shortcut icon" href="/Mophidian/favicon.ico" type="image/x-icon" />
+        <title>Home</title>
+        <style></style>
+        <link rel="stylesheet" href="/Mophidian/global.css" />
+        <style>
+nav {
+                display: flex;
+                width: 10rem;
+                height: 5rem;
+                align-items: center;
+                margin-inline: auto;
+                justify-content: center;
+                gap: 3rem;
+            }
+
+            figure {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin-bottom: 2.5rem;
+            }
+
+            figcaption {
+                margin-top: .2rem;
+                font-size: .65rem;
+                color: #4e506b;
+            }
+
+            figcaption > a {
+                color: #4e506b;
+            }
+
+            nav :is(h3, a, h5) {
+                margin: 0;
+                padding: 0;
+            }
+
+            nav a {
+                text-decoration: none;
+            }
+
+            a:hover {
+                text-decoration: underline;
+            }
+
+            main {
+                width: 90%;
+                max-width: 70rem;
+                height: calc(100vh - 5rem);
+                margin-inline: auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+            }
+
+            .text-center {
+                text-align: center;
+            }
+
+            .w-fit {
+                width: fit-content;
+            }
+
+            #browser-img {
+                width: 45%;
+                max-width: 20rem;
+            }
+
+            .typewriter h1 {
+                overflow: hidden; /* Ensures the content is not revealed until the animation */
+                border-right: .15em solid orange; /* The typwriter cursor */
+                white-space: nowrap; /* Keeps the content on a single line */
+                margin: 0 auto; /* Gives that scrolling effect as the typing happens */
+                letter-spacing: .15em; /* Adjust as needed */
+                animation: 
+                    typing 2.5s steps(40, end),
+                    blink-caret .75s step-end infinite;
+            }
+
+            /* The typing effect */
+            @keyframes typing {
+                from { width: 0 }
+                to { width: 100% }
+            }
+
+            /* The typewriter cursor effect */
+            @keyframes blink-caret {
+                from, to { border-color: transparent }
+                50% { border-color: orange; }
+            }
+        </style>
+    </head>
+
+    <body>
+        <nav>
+            <a href="/Mophidian/docs/">
+                <h5>Docs</h5>
+            </a>
+            <h3>Mophidian</h3>
+            <a href="/Mophidian/blog/">
+                <h5>Blog</h5>
+            </a>
+        </nav>
+        <main>
+            <div class="flex flex-col justify-center items-center w-full">
+                <figure>
+                    <img id="browser-img" src="/Mophidian/images/business-3d-browser-window-with-open-web-page.png" alt="Browser Image" />
+                    <figcaption>
+Illustration by
+                        <a href="https://icons8.com/illustrations/author/GrbQqWBEhaDS">Liam Moore</a>
+from
+                        <a href="https://icons8.com/illustrations">Ouch!</a>
+                    </figcaption>
+                </figure>
+                <p>
+                    <strong>A simple yet affective pythonic SSG</strong>
+                </p>
+            </div>
+        </main>
+    </body>
+
+</html>

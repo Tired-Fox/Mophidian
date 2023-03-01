@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="shortcut icon" href="/Mophidian/favicon.ico" type="image/x-icon" />
+        <title>Blog</title>
+        <style></style>
+        <link rel="stylesheet" href="/Mophidian/global.css" />
+        <style>
+.emojione {
+                aspect-ratio: 1/1;
+                width: 1.3rem;
+                margin-inline: .25rem;
+            }
+            
+            p {
+                display: flex;
+                align-items: center;
+            }
+
+                #posts{
+                    list-style: disc;
+                    padding-left: 2rem;
+                }
+
+                main {
+                    width: 95%;
+                    max-width: 70%;
+                    margin-inline: auto;
+                }
+
+                .mt-2 {
+                    margin-top: 2rem;
+                }
+        </style>
+        <link rel="stylesheet" href="/Mophidian/tailwind.css" />
+        <link type="application/rss+xml" rel="alternate" href="https:\tired-fox.github.io\Mophidian\feed.xml" />
+    </head>
+
+    <body>
+        <nav id="header">
+            <a href="/Mophidian/">
+                <h3>Mophidian</h3>
+            </a>
+            <ul>
+                <li>
+                    <a href="/Mophidian/docs/">Docs</a>
+                </li>
+                <li>
+                    <a href="/Mophidian/blog/">Blog</a>
+                </li>
+            </ul>
+        </nav>
+        <main class="mt-2">
+            <h1>
+Blog
+                <sup>
+                    <small>WIP</small>
+                </sup>
+            </h1>
+            <h5>Here is where you can get the latest updates for the project</h5>
+            <h3 class="mt-2">Posts</h3>
+            <ul id="posts">
+                <li>
+                    <a href="/Mophidian/blog/v0.1.0/">v0.1.0 of Mophidian</a>
+                </li>
+            </ul>
+        </main>
+        <style>
+#header {
+                display: flex;
+                align-items: center;
+                position: sticky;
+                justify-content: space-between;
+                top: 0;
+                left: 0;
+
+                width: 100%;
+                padding-inline: 2rem;
+                padding-block: 1rem;
+                height: 5rem;
+                background-color: inherit;
+                box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            }
+
+            #header ul {
+                display: flex;
+                gap: 1.5rem;
+            }
+
+            #header h3, a ,p {
+                padding: 0;
+                margin: 0;
+            }
+
+            #header a, ul, li {
+                text-decoration: none;
+                list-style: none;
+            }
+
+            #header :is(a):hover {
+                text-decoration: underline;
+            }
+        </style>
+    </body>
+
+</html>

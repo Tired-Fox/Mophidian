@@ -220,7 +220,7 @@ def dev(open: bool, host: bool, debug: bool = False):
         watch=[CONFIG.site.source, CONFIG.site.public, CONFIG.site.components],
         root="dist",
         base=CONFIG.site.root,
-        auto_open=open,
+        auto_open=CONFIG.site.root if open else None,
         suppress=True,
         live_callback=Callbacks(),
     )
@@ -253,7 +253,7 @@ def preview(open: bool, host: bool):
         root="dist",
         base=CONFIG.site.root,
         port=8081,
-        auto_open=open,
+        auto_open=CONFIG.site.root if open else None,
         suppress=True,
     )
 
