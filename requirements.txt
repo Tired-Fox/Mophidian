@@ -1,9 +1,11 @@
+# First party
+saimll
+tcfg
+watchserver
+
+# Third party
 markdown
 pymdown-extensions
 python-frontmatter
 click
 Pygments
-saimll>=0.3.0
-tcfg>=0.3.0
-watchdog==2.1.9
-# js2py

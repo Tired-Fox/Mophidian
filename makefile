@@ -1,7 +1,7 @@
 PROJECT = mophidian
 
 install:
-	pip3 install -e .
+	python3 -m pip install -e .
 
 all:
 	make install format lint
