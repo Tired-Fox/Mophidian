@@ -7,19 +7,20 @@ from shutil import copyfile, SameFileError # For copying static files
 from typing import TYPE_CHECKING, Any
 from re import match, sub
 
-from phml import ( # Used to parse the phml content and manipulate it's ast
-    AST,
+import frontmatter
+
+    
+from phml.core import AST, PHML, substitute_component
+from phml.utilities import ( # Used to parse the phml content and manipulate it's ast
     check,
     cmpt_name_from_path,
     find,
-    PHML,
-    parse_component,
     query,
     query_all,
     remove_nodes,
     replace_node,
-    substitute_component,
     tokanize_name,
+    parse_component,
 )
 from phml.core import VirtualPython # Dummy instance for subtituting elements for <Slot />
 from phml.builder import p # To create injected elements
@@ -27,7 +28,7 @@ from saimll import SAIML, Logger # Custom logging
 
 import mophidian
 from mophidian.config import CONFIG
-from mophidian.core.util import REGEX, PAGE_IGNORE, html, title, url, MARKDOWN
+from mophidian.core.util import REGEX, PAGE_IGNORE, html, title, url, MARKDOWN, filter_sort
 from .markdown_extensions import _RelativePathExtension
 from .base import apply_attribute_configs, build_attributes, Node
 
@@ -47,6 +48,12 @@ __all__ = [
     "Nav",
     "FileState"
 ]
+
+global_expose = {
+    "filter_sort": filter_sort
+}
+phml = PHML()
+phml.expose(filter_sort=filter_sort)
 
 @dataclass
 class FileState:
@@ -318,7 +325,6 @@ class Page(Renderable):
 
     @property
     def ast(self) -> AST:
-        phml = PHML()
         page_ast = phml.load(Path(self.full_path)).ast
 
         if query(page_ast, "html") or query(page_ast, "body"):
@@ -333,7 +339,7 @@ class Page(Renderable):
 
         ast = phml.parse(html(*CONFIG.site.meta_tags)).ast
         if self.layout is not None:
-            page_ast = self.layout.render(self.ast)
+            page_ast = self.layout.render(self.ast, **kwargs)
         else:
             page_ast = self.ast
 
@@ -418,7 +424,7 @@ class Markdown(Renderable):
 
     def __init__(self, path: str, ignore: str = "") -> None:
         super().__init__(path, ignore)
-        self.locals = {}
+        self.meta = self.parse_file()[0]
         self.toc = TOC()
         self.relative_path_extension = None
 
@@ -479,21 +485,19 @@ class Markdown(Renderable):
 
         return title(tokanize_name(name))
 
-    @property
-    def ast(self) -> AST:
-
-        # rip meta data from markdown file
+    def parse_file(self) -> tuple[dict, str]:
         with open(Path(self.full_path), "r", encoding="utf-8") as markdown_file:
-            content = markdown_file.read()
+            post = frontmatter.load(markdown_file)
+            return post.metadata, post.content
 
+    def ast(self, content: str) -> AST:
         # save meta data as locals for later
         content = MARKDOWN.reset().convert(content)
-        self.locals = getattr(MARKDOWN, "Meta", {})
 
         self.parse_toc(getattr(MARKDOWN, 'toc_tokens', []))
 
         # parse resulting html into phml parser
-        ast = PHML().parse(content).ast
+        ast = phml.parse(content).ast
 
         # Get the attributes for the wrapper from the config
         props: dict[str, str] = build_attributes(CONFIG.markdown.wrapper.attributes)
@@ -510,30 +514,28 @@ class Markdown(Renderable):
             phml (PHML): phml parser/compiler to user.
             **kwargs: Additional variables to expose to the phml compiler.
         """
-
+        self.meta, content = self.parse_file()
         ast = phml.parse(html(*CONFIG.site.meta_tags)).ast
 
         self.relative_path_extension = _RelativePathExtension(self, page_files, static_files)
 
         self._make_title()
+        page_title = self.meta.get("title", None)
+
+        print(self.meta)
+        addons = {
+            **self.meta,
+            "toc": self.toc,
+            "title": page_title or self.title,
+        }
+        kwargs.update(addons)
 
         # meta data layout name? then grab layout
         if self.layout is not None:
-            page_ast = self.layout.render(self.ast)
+            page_ast = self.layout.render(self.ast(content), **kwargs)
         else:
-            page_ast = self.ast
+            page_ast = self.ast(content)
 
-        page_title = self.locals.get("title", None)
-        if page_title is not None:
-            page_title = ' '.join(page_title)
-
-        addons = {
-            **self.locals,
-            "toc": self.toc,
-            "title": page_title or self.title
-        }
-
-        kwargs.update(addons)
 
         headers = query_all(page_ast, "head")
 
@@ -623,6 +625,11 @@ Use `moph highlight` to create that file."
         phml.ast = ast
         return phml.render(**kwargs)
 
+    def __repr__(self) -> str:
+        next = self.next.relative_url if self.next is not None else "None"
+        prev = self.prev.relative_url if self.prev is not None else "None"
+        return f"{self.__class__.__name__}(path={self.path!r}, url={self.relative_url!r}, prev={prev!r}, next={next!r}, meta={self.meta})"
+
 
 class Static(File):
     """Static file representation. These files are not rendered but are still moved to the
@@ -682,9 +689,7 @@ class Layout(File, Linker):
             parent = parent.parent
         return list(reversed(lyts))
 
-    @property
-    def ast(self) -> AST:
-        phml = PHML()
+    def ast(self, **kwargs) -> AST:
         layouts = self.__fetch_layouts()
         ast = phml.parse("<Slot/>").ast
 
@@ -703,10 +708,16 @@ class Layout(File, Linker):
                 return ast
 
             # Replace the <Slot /> element in the parent with the next layout
-            substitute_component(ast.tree, ("Slot", component), VirtualPython())
+            substitute_component(
+                ast.tree, 
+                ("Slot", component),
+                VirtualPython(),
+                **global_expose,
+                **kwargs
+            )
         return ast
 
-    def render(self, page: AST) -> AST:
+    def render(self, page: AST, **kwargs) -> AST:
         """Render a page given this layouts phml AST.
 
         Args:
@@ -718,10 +729,16 @@ class Layout(File, Linker):
         Note:
             The ast is still not a full html ast at this point.
         """
-        ast = self.ast
+        ast = self.ast(**kwargs)
         component: dict = parse_component(page)
 
-        substitute_component(ast.tree, ("Slot", component), VirtualPython())
+        substitute_component(
+            ast.tree,
+            ("Slot", component),
+            VirtualPython(),
+            **global_expose,
+            **kwargs,
+        )
         return ast
 
 
@@ -822,6 +839,13 @@ class Nav:
     def pages(self) -> list[Renderable]:
         """List of all renderable pages in the nav."""
         return [page for page in self.children if isinstance(page, Renderable)]
+
+    @property
+    def all_pages(self) -> list[Renderable]:
+        pages = self.pages
+        for nav in self.navs:
+            pages.extend(nav.all_pages)
+        return pages    
     
     @property
     def navs(self) -> list[Nav]:
