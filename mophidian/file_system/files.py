@@ -522,7 +522,6 @@ class Markdown(Renderable):
         self._make_title()
         page_title = self.meta.get("title", None)
 
-        print(self.meta)
         addons = {
             **self.meta,
             "toc": self.toc,
