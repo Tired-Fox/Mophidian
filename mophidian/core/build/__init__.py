@@ -2,6 +2,7 @@ from saimll import SAIML, Logger
 from phml import PHML
 
 from mophidian import CONFIG, states
+from mophidian.core.util import filter_sort
 from .context import Mophidian
 from .construct import *
 from .render import *
@@ -22,7 +23,7 @@ def build(dirty: bool = False):
 
     # ? Init phml parser/compiler with globally exposed variables
     phml = PHML()
-    phml.expose(mophidian=Mophidian())
+    phml.expose(mophidian=Mophidian(), filter_sort=filter_sort)
 
     Logger.Debug("Discovering files and components")
 

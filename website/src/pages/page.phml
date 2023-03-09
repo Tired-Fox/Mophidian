@@ -57,10 +57,16 @@
         text-decoration: underline;
     }
 
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100svh;
+    }
+
     main {
         width: 90%;
         max-width: 70rem;
-        height: calc(100vh - 5rem);
+        flex: 1;
         margin-inline: auto;
         display: flex;
         justify-content: center;

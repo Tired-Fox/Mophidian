@@ -48,7 +48,7 @@ def render_pages(
 ):
     """Render all the pages with their layouts to their destination file."""
 
-    global_vars = {"url": url, "title_case": title, "nav": nav, "filter_sort": filter_sort}
+    global_vars = {"url": url, "title_case": title, "nav": nav}
 
     epoch = time.time()
     # Render pages
@@ -100,6 +100,7 @@ def write_static_files(root: Directory, static: Directory, out: str, dirty: bool
             dirty and file.state != FileState.DELETED
         ):
             file.write(out)
+            FileState.NULL
         elif file.state == FileState.DELETED:
             dest = file.dest(out)
             root.remove(file.full_path)

@@ -3,7 +3,7 @@ from pathlib import Path
 import time
 
 from saimll import SAIML, Logger
-from phml import PHML, Formats
+from phml.core import PHML, Formats
 
 from mophidian import CONFIG
 from mophidian.file_system import Directory, Component, Nav, Static, Layout, Page, Markdown, Renderable

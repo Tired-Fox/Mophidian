@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>404 Not Found</title>
+    </head>
+    <body>
+        <div class="flex flex-col items-center justify-center h-100">
+            <h1 class="mb-1">
+                <span id="error-code">404</span>
+
+                <span id="error-message">Not Found</span>
+            </h1>
+            <p>Oops it looks like the page you are trying to reach doesn't exist</p>
+            <a class="mt-2" href="/Mophidian/">Back to Home</a>
+        </div>
+        <style>
+            @import url("https://fonts.googleapis.com/css?family=Poppins:400");
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                font-family: "Poppins", sans-serif;
+                background-color: #282a3a;
+                color: #dcd7c9;
+                height: 100vh;
+            }
+            #error-code {
+                color: #E94560;
+            }
+            #error-message {
+                color: #80849e;
+            }
+            .flex {
+                display: flex;
+            }
+            .flex-col {
+                flex-direction: column;
+            }
+            .items-center {
+                align-items: center;
+            }
+            .justify-center {
+                justify-content: center;
+            }
+            .h-100 {
+                height: 100%;
+            }
+            a {
+                color: inherit;
+                text-underline-offset: .25rem;
+            }
+            .mt-2 {
+                margin-top: 2rem;
+            }
+            .mb-1 {
+                margin-bottom: 1rem;
+            }
+
+            #header {
+                width: 100%;
+                height: 5rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #header h3 {
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+    </body>
+</html>

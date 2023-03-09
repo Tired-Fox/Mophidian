@@ -100,7 +100,7 @@ def html(*meta: str) -> str:
 <html lang="en">
 
     <head>{addons}{links}
-        <title>{{title or ''}}</title>
+        <title>{{{{title or ''}}}}</title>
         <style></style>
     </head>
 
