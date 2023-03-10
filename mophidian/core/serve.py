@@ -101,7 +101,7 @@ class Callbacks(LiveCallback):
 
     def log_reload(self, *paths: str):
         """Log a reload event."""
-        self.logger.Message(
+        self.logger.Debug(
             style("↻", fg="magenta", bold=True),
             ", ".join(paths)
         )
@@ -268,8 +268,9 @@ class Callbacks(LiveCallback):
             new_page = Markdown(path, ignore=CONFIG.site.source)
 
         if new_page is not None:
-            new_page.state = FileState.UPDATED
             self.file_system.add(new_page)
+            for file in self.file_system.renderable():
+                file.state = FileState.UPDATED
             self.files[new_page.full_path] = new_page
             self.file_system.build_hierarchy()
             self.render_pages()
@@ -281,8 +282,8 @@ class Callbacks(LiveCallback):
             else []
         )
 
-        self.log_reload(*reload_urls)
-        return reload_urls
+        self.log_reload("**/*")
+        return ["**"]
 
     def create_component(self, path: str):
         """Update a given component and all linked pages."""
@@ -350,6 +351,8 @@ class Callbacks(LiveCallback):
         obj = self.files.pop(path, None)
 
         if obj is not None and isinstance(obj, Renderable):
+            for file in self.file_system.renderable():
+                file.state = FileState.UPDATED
             obj.state = FileState.DELETED
             self.render_pages()
             self.log_delete(path=obj.relative_url)
@@ -360,8 +363,8 @@ class Callbacks(LiveCallback):
             else []
         )
 
-        self.log_reload(*reload_urls)
-        return reload_urls
+        self.log_reload("**/*")
+        return ["**"]
 
     def remove_component(self, path: str):
         """Remove a given component and update linked pages."""

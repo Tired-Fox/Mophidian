@@ -60,9 +60,9 @@ class FileState:
     """File's state
 
     States:
-        (0) DEFAULT: Already up to date and doesn't need to be rendered
+        (0) NULL: Already up to date and doesn't need to be rendered
         (1) UPDATED: New file or file has been modified and needs to be rendered
-        (2) DELETE : File no longer exists so delete it
+        (2) DELETED : File no longer exists so delete it
     """
     NULL: int = 0
     UPDATED: int = 1
