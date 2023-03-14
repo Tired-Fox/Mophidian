@@ -219,7 +219,7 @@ def dev(open: bool, host: bool, debug: bool = False):
     server = LiveServer(
         watch=[CONFIG.site.source, CONFIG.site.public, CONFIG.site.components],
         root="dist",
-        base=CONFIG.site.root,
+        errors=CONFIG.site.root,
         auto_open=CONFIG.site.root if open else None,
         suppress=True,
         live_callback=Callbacks(),
@@ -251,7 +251,7 @@ def preview(open: bool, host: bool):
     server = LiveServer(
         watch=["dist/"],
         root="dist",
-        base=CONFIG.site.root,
+        errors=CONFIG.site.root,
         port=8081,
         auto_open=CONFIG.site.root if open else None,
         suppress=True,

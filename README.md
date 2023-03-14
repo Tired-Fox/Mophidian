@@ -100,192 +100,242 @@ ___
 
 ___
 
-### Page generation and configuration
+### File Structure
 
-Important file structure:
-- ***Directories***
-  - **components**
-  - **pages**
-  - **content**
-  - **static**
-  - **layouts**
+Mophidian uses a custom language called [`phml`](https://github.com/Tired-Fox/phml). This language was inspired by javascript frameworks similar to Vue.js. The language support python blocks inside `<python>` tags and inline python for conditions and in replacements. With this phml also has a built in component system. This works how you think it would in other javascript languages. You just need to load the component into the compiler then you can use the component anywhere in your phml code.
 
-- ***Files***
-  - Content is written in `.md` (markdown)
-  - Layouts and components are written html files. They use the [Jinja2](https://palletsprojects.com/p/jinja/) templating language to inject data.
-  - Non-compiled assets, assets that won't be transformed, should go into the static folder. This is a 1-1 translation to the final file structure. Nothing is changed just copied over.
-  - The pages are written in html(jinja2) or markdown.
-
-Files in pages get their own directory where possible. This is more to follow file based routing and how most hosting services automatically load the index.html file when given a directory. So `pages/about/me.md` == `pages/about/me/index.html` when compiled. `index.md`, `readme.md`, `README.md`, and `index.html` all compile to a index.html file. A `index.html` file would take priority and all other files would be ignored. You can also specify the index.html file outside of the directory and have it compile into that directory. It is easier to show so here are the before and after:
-    
-**Before compiling:**
-```plaintext
-pages
-    - about.md
-    - about/
-      - me.md
-    - index.html
-```
-
-**After compiling:**
-```plaintext
-pages
-    - about/
-      - index.html
-      - me/
-        - index.html
-    - index.html
-```
-
-**Url's**
-```plaintext
-website/
-website/about/
-website/about/me/
-```
-
-Since the compiler is already filtering, transforming, and working it's magic, it will also automatically generate a sitemap.xml, sitemap.xml.gz, and rss.xml along with providing the url's as data to each template.
-
-**GOAL: All data relevant from website generation and user specification is provided to each template.**
-
-Framework provided information:
-- ***Pre rendered / Computed*** *(Nested information accessed with `{{ <variable>. }}`)*
-  - **site**: This is the site information like name, url, uri, description, etc. (`{{ site.name }}`)
-  - **env** : This is the global variables the user wants to make available to every templates. (`{{ env.socials.github }}`)
-  - **meta**: The meta data that is retrieved from frontmatter in a markdown file. (`{{ meta.tags }}`)
-  - **pages**: Gives access to the information for each page defined in the `content/` and `pages/` directories. (`{{ pages['recipes/chocolage_cake'].description }}`)
-  - **content**: The rendered html from a markdown file
-
-- ***Computed during site generation***
-  - **hooks**: *(Maybe not possible with jinja2)* Idea is a work in progress. Some sort of way of including methods or functions then allowing the user to specify that they want to retrieve that data. (`{{ hook.get_weather() }}`)
-  - **components**: This is the list of all components specified in the components folder. (`{% include components.dropdown %}`)
-  - **layouts**: Gives access to all user, and internally defined layouts. (`{% include layouts.nav %}`) or (`{% extend layouts.base_template %}`)
-  
-
-- Users may also include other templates as needed using a string. Ex. `{% include "../path/some_template" %}`.
-
-When using markdown files in the pages directory a user must specify a layout in the frontmatter or a default layout in the config. If neither is chosen a basic built-in layout will be used.
-
-HTML files in the pages directory are automatically processed as full page layouts. As in, somewhere in the file, it must include the html tags/elements; `<!DOCTYPE html>`, `<html></html>`, and `<body></body>`. The framework will provide the same information as mentioned above.
-
-Framework provides built in `[slug]` and `[...slug]` features which are "catch all" files. `[slug]` is a catch all for files in a directory while `[...slug]` is a catch all for recursive directories.
-
-- `pages/articles/[slug].html` would map to any file in the `content/articles/` directory (`content/articles/*.md`)
-- `pages/articles/[...slug].html` would map to any file and directory of `content/articles` (`content/articles/**/*.md`)
-- 
----
-
-### Workflow
-
-Begin by creating a new project. Right now you need to manually create all the files.
-A valid file structure will look like the text below. You can add any other folders and files outside of this structure; they will most likely be ignored.
-
-```plaintext
-project
-├ components/
-│ └ */**/.html
-├ content/
-│ └ */**/*.html
-├ layouts/
-│ └ */**/*.html
-├ pages/
-│ ├ */**/*.md
-│ └ */**/*.html
-└ static/
-  └ */**/*.*
-```
-
-When you build or serve the project you will get a `site/` folder added. This is all the files compiled together. These are also the files you can host on a server.
-
-Eventually, when there is an automated way of creating a new project, you will also get example files in the main folders. There will be example layouts, components, content, dynamic routes, pages, and static assets.
-
-Enjoy the use of a live reloading server that incrementally builds your changes that can be seen immediately. 
-
-**File Layout**
-
-Here I will attempt to describe what can be in each file and what a good format may be.
-
-* Lets start with components.
- 
-Components are html files. I chose this format because most text editors have great language support and highlighting for html. Components are meant to be small reusable snippets that you want in your website. The components filename is converted to the name of the component so that is what you use to access it in your layouts and templates.
-
-Because of the nature of HTML and CSS you can include specific styling in a `<style>` tag at the root level of the component. this means you could make a component that looks like this.
+A simple phml page may look something like this.
 
 ```html
-<div id="header">
-    <a href="/">Home</a>
-    <div id="nav">
-        <a href="/blog">blog</a>
-        <a href="/news">news</a>
-    <div>
-</div>
+<!-- index.phml -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Example</title>
+  </head>
+
+  <body>
+    <h1>Hello World</h1>
+  </body>
+</html
+```
+
+Which ends up looking exactly the same when it is compiled to html. Phml allows users to pass in extra variables into the compiler which will be exposed to the phml file as it is being compiled/rendered. You can compare this to something similar to [Jinja2](https://jinja.palletsprojects.com/en/3.1.x/) and how it handles data.
+
+Here is an example of how Jinja2 handles variables and how it uses them. 
+
+```python
+from jinja2 import Environment
+env = Environment()
+template = env.get_template("sample.html")
+template.render(variables="go", here=True, errors=["er1", "er2"])
+```
+
+```html
+<!-- sample.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ variables }}</title>
+  </head>
+  <body>
+    {% if here %}
+      <p>Right here</p>
+    {% else %}
+      <p>Not Here</p>
+    {% endif %}
+    <ul>
+      {% for error in errors %}
+      <li>{{ error }}</li>  
+      {% endfor %}
+    </ul>
+  </body>
+</html>
+```
+
+Phml is similar in some way. Below is how the same example is written in phml.
+
+```python
+from phml import PHML
+
+phml = PHML()
+
+phml.load("sample.phml")
+phml.render(variables="go", here=True, errors=["er1", "er2"])
+
+# or with shorthand
+phml.load("sample.phml").render(variables="go", here=True, errors=["er1", "er2"])
+```
+
+```html
+<!-- sample.phml -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ variables }}</title>
+  </head>
+  <body>
+    <p @if="here">Right here</p>
+    <p @else>Not Here</p>
+    <ul>
+      <For :each="error in errors">
+        <li>{{ error }}</li>  
+      </For>
+    </ul>
+  </body>
+</html>
+```
+
+As seen above both are very similar while phml is simplier to write. Phml also has the benifit of using python itself instead of a python like syntax. Also loops retain context so any nested loop using a value from the outer scope won't break.
+
+If you want to know more about phml check out it's [documentation](https://tired-fox.github.io/phml/phml.html)
+
+Mophidian also has built in markdown support. Markdown plugins can be added and modified through Mophidian's configuration file. On top of the plugins Mophidian allows for use of phml components and the use of frontmatter.
+
+Frontmatter is yaml at the start of the file. The parsed values are passed to the markdown pages layout and can be used in rendering a page.
+
+```markdown
+---
+title: Sample Markdown Page
+tags: ['markdown', 'example']
+---
+
+# Example Markdown
+
+hello world
+```
+
+This above example will use title for the page title. If it isn't present then it will parse the h1 element, `# Example Markdown`, and finally if that is also missing, the markdown file name is used.
+
+You may have noticed that it was mentioned that markdown files use layout pages. These are pages named `layout.phml`. These layouts are expected to be structured like a phml component and it must contain a `<Slot />` component. Any file that uses this layout will have it's context placed in place of the `<Slot />` component.
+
+```html
+<!-- layout.phml -->
+<>
+  <h1>{{ title }}</h1>
+  <Slot />
+</>
+```
+
+Pages inside of mophidian are similar to layouts where they are phml components. This allows for pages to be placed inside of layouts and layout can be placed inside of other layouts. All pages have the name of `page.phml` with an optional layout name seen as `page@{layout}.phml`. See the [File System](#file_system) section to see how this works.
+
+```html
+<!-- page.phml -->
+<python>
+  # Any python code goes here. Indentation is based on the first line with text
+  message = "Hello World"
+</python>
+
+<!-- The wrapping component can be an empty tag or any 
+other element but there must be only one content element -->
+<>
+  <p>Hello World</p>
+  <a href="/">Home</>
+</>
+
+<script>
+// Any script logic here
+</script>
+
 <style>
-    * {
-        box-sizing: border-box;
-    }
-
-    #header {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
-
-        padding-block: 1rem;
-        padding-inline: 5rem;
-    }
-
-    #header a{
-        color: black;
-        text-decoration: none;
-    }
-
-    #header a:hover {
-        text-decoration: underline;
-    }
+  /* Any css styles here */
 </style>
 ```
 
-After this component is created in the `components/` directory, you can use it in any html template file with `{% include cmpt.header %}`.
-
-**Other html template files**
-
-I recommend reading the [Template Designer Documentation](https://jinja.palletsprojects.com/en/3.1.x/templates/) from Jinja2 as that is the full power of what you can do. You follow the same rules and logic, with added ease of use with mophidian giving access to your components and layouts without having to type in the path. However that is an option too, even though it is not recommended.
-
-Say that you created a template/layout named base.html in the `layouts/` directory. You can do the following to extend a template/layout:
-
-```html[some_layout.html]
-{% extend lyt.base %}
-<head>
-    {%- block header}
-    {{ super() }}
-    <link rel="stylesheet" href="/css/header.css">
-    {%- endblock %}
-</head>
-{%- block content %}
-    {{ content }}
-{%- endblock %}
+At the root of rendering a page in Mophidian there is a base layout which fills in the structure of an html page. ```html
+<!-- base.phml -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- default meta tags see docs for more info -->
+    <title>{{ title or '' }}</title>
+  </head>
+  <body>
+    <Slot />
+  </body>
+</html>
 ```
 
-Or if you implemented the `base.html` file somewhere else you can do something like this.
+All nested layouts and the page are put into their appropriate slot and then eventually placed in the `<Slot />` element in the base layout. To add any other element to the `<head />` tag just use the head tag again in a layout or page. Mophidian will take all elements from these duplicate head tags and put them in the base tag. All duplicate tags are ignored. Special tags like title are replace when they are duplicated.
 
-```html[some_layout.html]
-{% extend "path/to/layout/base.html" %}
-<!-- ... Override blocks here ... -->
+```html
+<!-- page.phml -->
+<>
+  <head>
+    <title>Example</title>
+  </head>
+  <p>This is a sample page</p>
+</>
 ```
 
-**Markdown files**
+### File System
 
-Markdown files are the easiest. If you want data variables from the file you can use frontmatter. 
+The file system is structured based on javascript libraries like [Astro.js](https://astro.build/). It looks something like this.
 
-It will look a little like this:
-
-```yaml
----
-title: Some Title Goes Here
-readTime: 3 min
-.
-.
-.
----
+```
+project
+├ moph.yml 
+├ public/
+│ └ */**/*.*
+└ src/
+  ├ components/
+  │ └ */**/.phml
+  └ pages/
+    ├ */**/*.md
+    ├ */**/page.phml
+    └ */**/layout.phml
 ```
 
-This framework then opens these variables up to you with a variable called `meta`. You can call it directly for a layout page that is for a markdown file. Otherwise, if you decide to access the meta file form one of the pages/contents variables you can do `pgs[idx].meta` or `cnt[idx].meta`.
+As you can see above there are three primary objects in the root project directory. `moph.yml` is used for the Mophidian configuration. `public/` is where static assets are placed. All files and directories are one-to-one to the root of the server. `src/` is where all pages, components, layouts, and additional static files are placed.
+
+Components are placed into their own subdirectory, `src/components/` and each file is a phml component. All components file names are used for the component name. For example, if you have a file named `Callout.phml` the component can be used with `<Callout />`. Components in subdirectories have their parent directories appended to the name recursively with each name being seperated with a dot. This can look something like this, `header/Nav.phml`, which will expose a component to use that looks like this, `<Header.Nav />`.
+
+Page, layout, and markdown files are placed into the `src/pages` directory. There can only be one `layout.phml` and `page.phml` per directory. There can be any number of markdown files per directory, with `README.md` being equivelant to a `page.phml` page. Any layout in the same directory as a `page.phml` or markdown file with be used for that file. If there is a layout missing from the current directory, then the next parent directories layout is used. This is recursive up until the base layout. 
+
+Mophidian supports groups. These are directories with the syntax of `(group name)`. This is a psuedo directory and is used to name a layout that is in that directory. The layout inside the root of a group inherits it's name. All other files and directories are treated as if they are located in the next parent directory. With the layout inheriting the groups name, all `page.phml` and markdown files can skip it's default assigned layout and use a specific layout. For example if you have the following file structure.
+
+```
+...
+└ src/
+  └ pages/
+    ├ (blog)
+    │ ├ layout.phml
+    │ └ page.phml
+    └ about/ 
+      └ page@blog.phml
+```
+
+The `page.phml` file inside the `about/` directory with use the layout from the `(blog)` group. The file structure is treated like it looks like this.
+```
+...
+└ src/
+  └ pages/
+    ├ layout.phml < has a layout name of blog
+    ├ page.phml
+    └ about/ 
+      └ page@blog.phml
+```
+
+This file system logic is heavily inspired by [Svelte Kit](https://kit.svelte.dev/docs/advanced-routing#advanced-layouts-group). More about how this all works is in the Mophidian documentation.
+
+### Features
+
+Mophidian comes with many quality of life features with more on the way. Some of notable features include: helper methods, value shorthands, live reloading, and a CLI tool.
+
+#### Helper Methods
+- `blank(value)`: Checks if the value is `None`, `False`, or empty. Currently support lists, sets, tuples, and dicts for checking if empty
+- `classnames`: Works the same as Vue.js built in [classlist attribute](https://vuejs.org/guide/essentials/class-and-style.html#binding-html-classes). It allows for conditional classes, and listing classes. Example `classnames('red', {'bold': is_bold}, ['underline', {'left-0': lalign}])`
+- `filter_sort(collection, filter, key)`: Both filters and sorts a list without calling multiple methods. Uses pythons built in `filter` and `sorted` methods. First it will filter by the passed filter argument, then it will sort the collection by the passed key argument.
+
+#### Value Shorthands
+- `@` at the start of `src` and `href` html attributes. The `@` is replaced with the servers root so you don't have to type it out every time.
+
+#### Live Reloading
+Mophidian uses a custom library call `watchserver` which is built to automatically handle live reloading pages. It works by determining if it is serving an html page. If it is then it inserts a script that polls the server on a specific endpoint and checks if the current page should be refreshed. The endpoint either response with a truthy response or a falsy one. The server determines if a page should be reloaded based on if it's path fits a file pattern created by a file watch event. I recommend looking at the [watchserver documentation](https://github.com/Tired-Fox/watchserver) for more information on how this works. 
+
+#### CLI Tool
+
+Mophidian comes with a cli tool called `moph`. This tool comes with the ability to: create a new project, build a project, build and serve a project, build and preview a project, and generate pygmentize css.
+
+
+For more information about Mophidian, check out the [documentation](https://tired-fox.github.io/Mophidian/)
