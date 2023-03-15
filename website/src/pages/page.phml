@@ -1,13 +1,13 @@
 <>
   <nav>
-    <a href="/docs/"><h5>Docs</h5></a>
+    <a href="@/docs/"><h5>Docs</h5></a>
     <h3>Mophidian</h3>
-    <a href="/blog/"><h5>Blog</h5></a>
+    <a href="@/blog/"><h5>Blog</h5></a>
   </nav>
   <main>
     <div class="flex flex-col justify-center items-center w-full">
         <figure>
-            <img id="browser-img" src="/images/business-3d-browser-window-with-open-web-page.png" alt="Browser Image" />
+            <img id="browser-img" src="@/images/business-3d-browser-window-with-open-web-page.png" alt="Browser Image" />
             <figcaption>Illustration by <a href="https://icons8.com/illustrations/author/GrbQqWBEhaDS">Liam Moore</a> from <a href="https://icons8.com/illustrations">Ouch!</a></figcaption>
         </figure>
         <p><strong>A simple yet affective pythonic SSG</strong></p>

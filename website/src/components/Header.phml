@@ -1,8 +1,8 @@
 <nav id="header">
-    <a href="/"><h3>Mophidian</h3></a>
+    <a href="@"><h3>Mophidian</h3></a>
     <ul>
-        <li><a href="/docs/">Docs</a></li>
-        <li><a href="/blog/">Blog</a></li>
+        <li><a href="@/docs/">Docs</a></li>
+        <li><a href="@/blog/">Blog</a></li>
     </ul>
 </nav>
 <style>

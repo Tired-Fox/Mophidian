@@ -400,12 +400,13 @@ class Page(Renderable):
                     "href": Path(CONFIG.site.base_url).joinpath(CONFIG.site.root, "feed.xml")
                 })
 
-        # Fix href and src links
+        # Append root to href and src links
         root = "/" + CONFIG.site.root.strip("/")
         for link_type in ["href", "src", "xlink:href"]:
-            for node in query_all(ast, f"[{link_type}^=/]"):
+            for node in query_all(ast, f"[{link_type}^=@]"):
                 if not node[link_type].startswith(root):
-                    node[link_type] = root + node[link_type]
+                    new_link = node[link_type].lstrip("@").replace('\\', '/').lstrip('/')
+                    node[link_type] = f"{root}/{new_link}"
 
         phml.ast = ast
 
@@ -617,9 +618,10 @@ Use `moph highlight` to create that file."
         # Fix href and src links
         root = "/" + CONFIG.site.root.strip("/")
         for link_type in ["href", "src", "xlink:href"]:
-            for node in query_all(ast, f"[{link_type}^=/]"):
+            for node in query_all(ast, f"[{link_type}^=@]"):
                 if not node[link_type].startswith(root):
-                    node[link_type] = root + node[link_type]
+                    new_link = node[link_type].lstrip("@").replace('\\', '/').lstrip('/')
+                    node[link_type] = f"{root}/{new_link}"
         
         phml.ast = ast
         return phml.render(**kwargs)
