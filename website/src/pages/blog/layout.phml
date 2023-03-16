@@ -1,19 +1,17 @@
 <>
     <head>
-        <link rel="stylesheet" href="/tailwind.css">
+        <link rel="stylesheet" href="@/tailwind.css">
+        <link rel="stylesheet" href="@/blog/blog.css">
         <link type="rss" />
     </head>
+    <Header />
+    <div class="article-tag-list">
+        <div>
+            <For :each="tag in tags" @if="not blank(tags)">
+                <div class="article-tag">{{tag}}</div>
+            </For>
+        </div>
+    </div>
     <Slot />
+    <div class="spacer"></div>
 </>
-<style>
-    .emojione {
-        aspect-ratio: 1/1;
-        width: 1.3rem;
-        margin-inline: .25rem;
-    }
-    
-    p {
-        display: flex;
-        align-items: center;
-    }
-</style>

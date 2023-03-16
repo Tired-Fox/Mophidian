@@ -5,32 +5,30 @@ from functools import cached_property
 from pathlib import Path
 from shutil import copyfile, SameFileError # For copying static files
 from typing import TYPE_CHECKING, Any
-from re import match
+from re import match, sub
 
-import frontmatter # Used to rip the metadata from markdown files
-from phml import ( # Used to parse the phml content and manipulate it's ast
-    AST,
+import frontmatter
+
+    
+from phml.core import AST, PHML, substitute_component
+from phml.utilities import ( # Used to parse the phml content and manipulate it's ast
     check,
     cmpt_name_from_path,
     find,
-    PHML,
-    parse_component,
     query,
     query_all,
     remove_nodes,
     replace_node,
-    substitute_component,
     tokanize_name,
+    parse_component,
 )
 from phml.core import VirtualPython # Dummy instance for subtituting elements for <Slot />
 from phml.builder import p # To create injected elements
 from saimll import SAIML, Logger # Custom logging
 
-from markdown import Markdown as MarkdownParse # For parsing markdown files into html
-
 import mophidian
 from mophidian.config import CONFIG
-from mophidian.core.util import REGEX, PAGE_IGNORE, html, title, url
+from mophidian.core.util import REGEX, PAGE_IGNORE, html, title, url, MARKDOWN, filter_sort
 from .markdown_extensions import _RelativePathExtension
 from .base import apply_attribute_configs, build_attributes, Node
 
@@ -51,14 +49,20 @@ __all__ = [
     "FileState"
 ]
 
+global_expose = {
+    "filter_sort": filter_sort
+}
+phml = PHML()
+phml.expose(filter_sort=filter_sort)
+
 @dataclass
 class FileState:
     """File's state
 
     States:
-        (0) DEFAULT: Already up to date and doesn't need to be rendered
+        (0) NULL: Already up to date and doesn't need to be rendered
         (1) UPDATED: New file or file has been modified and needs to be rendered
-        (2) DELETE : File no longer exists so delete it
+        (2) DELETED : File no longer exists so delete it
     """
     NULL: int = 0
     UPDATED: int = 1
@@ -210,7 +214,7 @@ class File(Node):
             self.relative_url = Path(self._dest).as_posix()
 
         if self.relative_url != "./":
-            self.relative_url = "/" + self.relative_url
+            self.relative_url = "/" + self.relative_url.lstrip("/")
         else:
             self.relative_url = "/"
 
@@ -321,7 +325,6 @@ class Page(Renderable):
 
     @property
     def ast(self) -> AST:
-        phml = PHML()
         page_ast = phml.load(Path(self.full_path)).ast
 
         if query(page_ast, "html") or query(page_ast, "body"):
@@ -336,7 +339,7 @@ class Page(Renderable):
 
         ast = phml.parse(html(*CONFIG.site.meta_tags)).ast
         if self.layout is not None:
-            page_ast = self.layout.render(self.ast)
+            page_ast = self.layout.render(self.ast, **kwargs)
         else:
             page_ast = self.ast
 
@@ -397,12 +400,13 @@ class Page(Renderable):
                     "href": Path(CONFIG.site.base_url).joinpath(CONFIG.site.root, "feed.xml")
                 })
 
-        # Fix href and src links
+        # Append root to href and src links
         root = "/" + CONFIG.site.root.strip("/")
         for link_type in ["href", "src", "xlink:href"]:
-            for node in query_all(ast, f"[{link_type}^=/]"):
+            for node in query_all(ast, f"[{link_type}^=@]"):
                 if not node[link_type].startswith(root):
-                    node[link_type] = root + node[link_type]
+                    new_link = node[link_type].lstrip("@").replace('\\', '/').lstrip('/')
+                    node[link_type] = f"{root}/{new_link}"
 
         phml.ast = ast
 
@@ -421,7 +425,7 @@ class Markdown(Renderable):
 
     def __init__(self, path: str, ignore: str = "") -> None:
         super().__init__(path, ignore)
-        self.locals = {}
+        self.meta = self.parse_file()[0]
         self.toc = TOC()
         self.relative_path_extension = None
 
@@ -455,13 +459,25 @@ class Markdown(Renderable):
     def _make_title(self) -> str:
 
         with open(self.full_path, "r", encoding="utf-8") as mfile:
-            for line in mfile.readlines():
+            lines = mfile.readlines()
+            for i, line in enumerate(lines):
                 if line.strip() != "":
-                    header_1 = match(r"\s*# ?(.+)", line)
-                    if header_1 is not None:
-                        return header_1.group(1).strip()
+                    header = match(r"(?P<hash>\s*# *.+)|(?P<block>=+)", line)
+                    if header is not None:
+                        header = header.groupdict()
+                        if (
+                            header["hash"] is not None
+                            and header["hash"].strip() != ""
+                        ):
+                            return sub(r" *# *", "", header["hash"]).strip()
+                        if (
+                            header["block"] is not None
+                            and i > 0
+                            and lines[i-1].strip() != ""
+                        ):
+                            return lines[i-1].strip()
 
-        name = Path(self._dest).parent.as_posix().split("/")[-1]
+        name = Path(self._dest).parent.as_posix().rsplit("/", 1)[-1]
         if name.strip() in ["", "."]:
             name = self.file_name
 
@@ -470,40 +486,19 @@ class Markdown(Renderable):
 
         return title(tokanize_name(name))
 
-    @property
-    def ast(self) -> AST:
-
-        # rip meta data from markdown file
+    def parse_file(self) -> tuple[dict, str]:
         with open(Path(self.full_path), "r", encoding="utf-8") as markdown_file:
-            meta, content = frontmatter.parse(markdown_file.read())
+            post = frontmatter.load(markdown_file)
+            return post.metadata, post.content
 
-        # convert markdown content to html content
-        try:
-            if self.relative_path_extension is None:
-                extensions = CONFIG.markdown.extensions
-            else:
-                extensions = [self.relative_path_extension, *CONFIG.markdown.extensions]
-            md = MarkdownParse(
-                extensions=extensions,
-                extension_configs=CONFIG.markdown.extension_configs,
-            )
-        except KeyError as key_error:
-            from traceback import print_exc
-
-            print_exc()
-            SAIML.print(
-                f"*[@Fred]KeyError[@F]:[] invalid variable in extension configs [$@Fgreen]{key_error}"
-            )
-            exit()
-
+    def ast(self, content: str) -> AST:
         # save meta data as locals for later
-        self.locals = meta or {}
-        content = md.reset().convert(content)
+        content = MARKDOWN.reset().convert(content)
 
-        self.parse_toc(getattr(md, 'toc_tokens', []))
+        self.parse_toc(getattr(MARKDOWN, 'toc_tokens', []))
 
         # parse resulting html into phml parser
-        ast = PHML().parse(content).ast
+        ast = phml.parse(content).ast
 
         # Get the attributes for the wrapper from the config
         props: dict[str, str] = build_attributes(CONFIG.markdown.wrapper.attributes)
@@ -520,22 +515,27 @@ class Markdown(Renderable):
             phml (PHML): phml parser/compiler to user.
             **kwargs: Additional variables to expose to the phml compiler.
         """
-
+        self.meta, content = self.parse_file()
         ast = phml.parse(html(*CONFIG.site.meta_tags)).ast
 
         self.relative_path_extension = _RelativePathExtension(self, page_files, static_files)
 
         self._make_title()
+        page_title = self.meta.get("title", None)
+
+        addons = {
+            **self.meta,
+            "toc": self.toc,
+            "title": page_title or self.title,
+        }
+        kwargs.update(addons)
 
         # meta data layout name? then grab layout
         if self.layout is not None:
-            page_ast = self.layout.render(self.ast)
+            page_ast = self.layout.render(self.ast(content), **kwargs)
         else:
-            page_ast = self.ast
+            page_ast = self.ast(content)
 
-        addons = {**self.locals, "toc": self.toc, "title": self.locals.get("title", None) or self.title}
-
-        kwargs.update(addons)
 
         headers = query_all(page_ast, "head")
 
@@ -618,12 +618,18 @@ Use `moph highlight` to create that file."
         # Fix href and src links
         root = "/" + CONFIG.site.root.strip("/")
         for link_type in ["href", "src", "xlink:href"]:
-            for node in query_all(ast, f"[{link_type}^=/]"):
+            for node in query_all(ast, f"[{link_type}^=@]"):
                 if not node[link_type].startswith(root):
-                    node[link_type] = root + node[link_type]
+                    new_link = node[link_type].lstrip("@").replace('\\', '/').lstrip('/')
+                    node[link_type] = f"{root}/{new_link}"
         
         phml.ast = ast
         return phml.render(**kwargs)
+
+    def __repr__(self) -> str:
+        next = self.next.relative_url if self.next is not None else "None"
+        prev = self.prev.relative_url if self.prev is not None else "None"
+        return f"{self.__class__.__name__}(path={self.path!r}, url={self.relative_url!r}, prev={prev!r}, next={next!r}, meta={self.meta})"
 
 
 class Static(File):
@@ -654,8 +660,8 @@ class Static(File):
             dest_dir: The root dir to place the file into.
         """
 
-        dest = Path(dest_dir).joinpath(self._dest)
-        original = Path(self.root).joinpath(self.path)
+        dest = Path(dest_dir).joinpath(self._dest.strip("/"))
+        original = Path(self.root).joinpath(self.path.strip("/"))
 
         dest.parent.mkdir(parents=True, exist_ok=True)
 
@@ -684,15 +690,13 @@ class Layout(File, Linker):
             parent = parent.parent
         return list(reversed(lyts))
 
-    @property
-    def ast(self) -> AST:
-        phml = PHML()
+    def ast(self, **kwargs) -> AST:
         layouts = self.__fetch_layouts()
         ast = phml.parse("<Slot/>").ast
 
         # Start with <Slot /> element and replace the <Slot /> element with each inherited layout
         for layout in layouts:
-            layout_ast = phml.load(Path(self.root).joinpath(layout.path)).ast
+            layout_ast = phml.load(Path(self.root).joinpath(layout.path.strip("/"))).ast
 
             # If it quacks like a full page, then it's a full page
             if query(layout_ast, "html") or query(layout_ast, "body"):
@@ -705,10 +709,16 @@ class Layout(File, Linker):
                 return ast
 
             # Replace the <Slot /> element in the parent with the next layout
-            substitute_component(ast.tree, ("Slot", component), VirtualPython())
+            substitute_component(
+                ast.tree, 
+                ("Slot", component),
+                VirtualPython(),
+                **global_expose,
+                **kwargs
+            )
         return ast
 
-    def render(self, page: AST) -> AST:
+    def render(self, page: AST, **kwargs) -> AST:
         """Render a page given this layouts phml AST.
 
         Args:
@@ -720,10 +730,16 @@ class Layout(File, Linker):
         Note:
             The ast is still not a full html ast at this point.
         """
-        ast = self.ast
+        ast = self.ast(**kwargs)
         component: dict = parse_component(page)
 
-        substitute_component(ast.tree, ("Slot", component), VirtualPython())
+        substitute_component(
+            ast.tree,
+            ("Slot", component),
+            VirtualPython(),
+            **global_expose,
+            **kwargs,
+        )
         return ast
 
 
@@ -824,6 +840,13 @@ class Nav:
     def pages(self) -> list[Renderable]:
         """List of all renderable pages in the nav."""
         return [page for page in self.children if isinstance(page, Renderable)]
+
+    @property
+    def all_pages(self) -> list[Renderable]:
+        pages = self.pages
+        for nav in self.navs:
+            pages.extend(nav.all_pages)
+        return pages    
     
     @property
     def navs(self) -> list[Nav]:

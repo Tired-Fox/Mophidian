@@ -1,0 +1,19 @@
+Markdown:
+    - [PyMdown](https://facelessuser.github.io/pymdown-extensions/#overview)
+    - [Sup](https://github.com/jambonrose/markdown_superscript_extension)
+    - [Sub](https://github.com/jambonrose/markdown_subscript_extension)
+    - [Del and Ins](https://github.com/honzajavorek/markdown-del-ins)
+    - [Katex math](https://gitlab.com/mbarkhau/markdown-katex)
+    - **Built In** (markdown.extenxions...)
+      - Extra (.extra)
+        - Abbreviations (.abbr)
+        - Attribute List (.attr_list)
+        - Definition List (.def_list)
+        - Footnotes (.footnotes)
+        - Markdown in HTML (.md_in_html)
+        - Tables (.tables)
+      - New Line to Break (.nl2br)
+      - SmartyPants (.smarty)
+      - Wiki Links (.wikilinks)
+    - **Custom to add copy button and filename to code blocks?**
+    - Add fontawesome webfont and the icons plugin to allow users to insert fontawesome icons

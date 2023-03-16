@@ -3,35 +3,22 @@
 </python>
 
 <>
-    <Header />
     <main class="mt-2">
         <h1>Blog<sup><small>WIP</small></sup></h1>
         <h5>Here is where you can get the latest updates for the project</h5>
+
         <h3 class="mt-2">Posts</h3>
         <ul id="posts">
-            <For each={ post in filter_sort(nav.section('blog').pages, Markdown, key='title') /}>
+            <For :each="post in filter_sort(nav.section('blog').all_pages, Markdown, key='title')">
                 <li>
-                    <a :href="post.url">{post.title}</a>
+                    <a :href="post.url">{{ post.title }}</a>
+                    <div>
+                      <For :each="tag in post.meta['tags']" @if="'tags' in post.meta">
+                        <small>{{ tag }}</small>
+                      </For>
+                    </div>
                 </li>
             </For>
-            
         </ul>
     </main>
 </>
-
-<style>
-    #posts{
-        list-style: disc;
-        padding-left: 2rem;
-    }
-
-    main {
-        width: 95%;
-        max-width: 70%;
-        margin-inline: auto;
-    }
-
-    .mt-2 {
-        margin-top: 2rem;
-    }
-</style>

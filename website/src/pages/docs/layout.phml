@@ -1,7 +1,4 @@
 <>
-    <head>
-        <link rel="stylesheet" href="/docs/style.css">
-    </head>
 	<Header />
-    <Slot />
+  <Slot />
 </>

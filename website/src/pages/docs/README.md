@@ -1,7 +1,3 @@
----
-title: Getting Started
----
-
 # Getting Started
 
 Mophidian provides a cli tool called `moph` to streamline the creation of your website. To start you will want to create a new mophidian project. If you ever want to know what a command does or to know what is possible, use `moph --help` or `moph {command} --help`

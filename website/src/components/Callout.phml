@@ -1,13 +1,15 @@
 <python>
     Props = {
+        "type": "info",
         "message": ""
     }
 </python>
 
 <div class="callout">
+    <strong>{{type}}</strong>
     <div><!-- icon --></div>
     <div>
-        {message}
-        <Slot />
+        <p @if="not blank(message)">{{message}}</p>
+        <Slot @else />
     </div>
 </div>

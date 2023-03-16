@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Callable, Iterator
 
 from mophidian.core.util import REGEX
-from mophidian import CONFIG
 from .base import Node
 from .files import File, Layout, Page, Markdown, Static, Renderable, Nav, Component, FileState
 
@@ -268,7 +267,7 @@ class Container(Node):
         nav = Nav("home")
         nav_indexes = {"nav_pages": []}
 
-        pages = self.renderable()
+        pages = [page for page in self.renderable() if page.state != FileState.DELETED]
         for page in pages:
             if not page.unique:
                 current = nav_indexes

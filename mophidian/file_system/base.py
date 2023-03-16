@@ -1,6 +1,7 @@
 from pathlib import Path
 from re import sub
-from phml import query, AST
+from phml.core import AST
+from phml.utilities import query
 
 from mophidian.config import CONFIG
 from mophidian.core.util import REGEX

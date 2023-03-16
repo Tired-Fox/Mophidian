@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mophidian"
-version = "0.1.0"
+version = "0.2.4"
 description = "Static websites with python"
 readme = "README.md"
 license = "MIT"
@@ -18,8 +18,18 @@ classifiers = [
 ]
 requires-python = ">=3.7"
 dependencies = [
-    "saimll>=0.3.0",
-    "tcfg>=0.3.0"
+    # External in house
+    "phml>=0.2.1",
+    "tcfg>=0.4.3",
+    "watchserver>=0.1.9",
+    "saimll>=0.5.0",
+
+    # Third party
+    "click",
+    "python-frontmatter",
+    "markdown",
+    "pymdown-extensions",
+    "Pygments",
 ]
 
 [project.optional-dependencies]
@@ -31,19 +41,27 @@ dependencies = [
 [project.scripts]
 moph = "mophidian.__main__:cli"
 
-# [project.entry-points.""]
-
-[tool.black]
-line-length = 100
-target-version = ["py37"]
-skip-string-normalization = true
-
-[tool.isort]
-profile = "black"
-line_length = 100
-
-[tool.mypy]
-ignore_missing_imports = true
-warn_unreachable = true
-no_implicit_optional = true
-show_error_codes = true
+[tool.ruff]
+selected = [
+    'E',
+    'F',
+    'W',
+    "C90",
+    "I",
+    "N",
+    "D",
+    "UP",
+    "ANN",
+    "S",
+    "A",
+    "B",
+    "COM",
+    "C4",
+    "Q",
+    "RET",
+    "SIM",
+    "TCH",
+    "PTH",
+    "PLE",
+    "RUF"
+]
