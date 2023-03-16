@@ -1,104 +1,27 @@
----
-title: 'M-Ophidian'
-description: 'A python based static site generator (SSG). Inspired from mkDocs, next.js, vue.js, nuxt.js, mynt, astro, and just about every other SSG.'
-img: 'https://wallpaperaccess.com/full/344618.jpg'
-tags: [Python, SSG, Jinja2, Live-Server, Website, M-Ophidian]
----
-
 # Mophidian - A python based SSG
 Use markdown to create websites
 
-## Ideas:
+## Notes
+Mophidian has markdown code highlighting with the markdown.codehilite plugin  and pygmentize. In the background mophidian runs a command similar to `pygmentize -S <theme> -f html -a .highlight > styles/highlight.css` which build the specified theme into a css file. Use `moph highlight <theme>` to generate a theme or `moph highlight` to get a list of available themes.
 
-**Inspiration**
-  - [MkDocs](https://www.mkdocs.org/getting-started/) *Python based*
-  - [mynt](https://mynt.uhnomoli.com/docs/quickstart/) *Python based*
-  - [Hyde](http://hyde.github.io/) base on jekyll *Python based*
-  - [Cactus](https://github.com/eudicots/Cactus) used Django templating *Python based*
-  - [Hugo](https://gohugo.io/)
-  - [Docusarous](https://docusaurus.io/)
-  - [Astro](https://astro.build/)
-  - [SvelteKit](https://kit.svelte.dev/)
-  - [mdBook](https://rust-lang.github.io/mdBook/) *Rust based*
- 
-  - [Highlight.js](https://highlightjs.org/)
-  - [Markdown](https://pypi.org/project/Markdown/) [docs](https://python-markdown.github.io/reference/)
-    - [Plugins](https://python-markdown.github.io/extensions/)
-  
-Code highlight done with CodeHilite plugin with `pygmentize -S <theme> -f html -a .highlight > styles/highlight.css` setting the theme. `pygmentize -L style` for list of themes.
+The core ideas behind this SSG/framework is the same as all the large Javascript frameworks. So in a way, if you used any type of Javascript framework, then this project should be fairly easy to learn.
 
-Add font awesome support by downloading the webfonts and adding css files. https://fontawesome.com/docs/web/setup/host-yourself/webfonts. Add an integration for this.
-
-The core ideas behind this SSG/framework is the same as all the large Javascript frameworks. So in a way, if you used any type of Javascript framework, then this project should be fairly easy to use.
-
-While this project strives to reach something that can create a doc's page on the level of mkDocs it also strives to be a generic website generator as well.
-
-File Structure and Workflow:
-- pages
-  - Can be normal html
-  - Can be md files
-  - Each named file gets it's own dir. index and README files stay put but override duplicates
-- components
-  - Each one a Jinja2 snippet
-  - Unique importer to retrieve components and put them in templates
-- layouts
-  - Jinja2 templates, meant to be a layout for the page.
-- static 
-  - assets that will remain untouched. files and directories are translated to the root of the server
-- config.toml or config.yml
-  - Site name
-  - Site navigation
-  - Global variables
-  - Environment variables
-  - Toggle Features
-  - Override styling
-  - Global toggles
-
-There will be guides for:
-- Jinja templating and how it can be used in this SSG
-- Markdown-it and how to add plugins for this SSG
-- Live Server
+The documentation includes guides for:
+- Basic phml templating. Refer to the [phml](https://tired-fox.github.io/phml/phml.html) documentation for more in depth guides.
+- Python's markdown module and how it is integrated with Mophidian 
+- How the live reload server works and what to expect
 - Markdown flavor guide (Specific to the default markdown plugins in this SSG)
 
-Minimal viable product would be the ability to take markdown files and generate them to a static website with auto generated or predefined navigation.
-
-Stretch goals include the ability to customize the css, use sass, live-server, components, custom templates, python based tailwindcss clone, searching, default component injection into markdown similar to @nuxt/content(v1 and v2), and much more.
-
-Features:
+### Planned Features:
   * site-map
-  * live-server
+  * live reloading server
   * components
   * templating
-  * custom tailwindcss clone/bootstrap??
   * searching
-  * Inject custom components into markdown. Requires custom python-markdown plugins/manipulation
-  * Themes are just predefined named templates/layouts
-
-Markdown:
-    - [PyMdown](https://facelessuser.github.io/pymdown-extensions/#overview)
-    - [Sup](https://github.com/jambonrose/markdown_superscript_extension)
-    - [Sub](https://github.com/jambonrose/markdown_subscript_extension)
-    - [Del and Ins](https://github.com/honzajavorek/markdown-del-ins)
-    - [Katex math](https://gitlab.com/mbarkhau/markdown-katex)
-    - **Built In** (markdown.extenxions...)
-      - Extra (.extra)
-        - Abbreviations (.abbr)
-        - Attribute List (.attr_list)
-        - Definition List (.def_list)
-        - Footnotes (.footnotes)
-        - Markdown in HTML (.md_in_html)
-        - Tables (.tables)
-      - New Line to Break (.nl2br)
-      - SmartyPants (.smarty)
-      - Wiki Links (.wikilinks)
-    - **Custom to add copy button and filename to code blocks?**
-    - Add fontawesome webfont and the icons plugin to allow users to insert fontawesome icons
-
-___
+  * presets
+  * tool to build codehilite themes
 
 ## Rules and how things work
-
-___
 
 ### File Structure
 
