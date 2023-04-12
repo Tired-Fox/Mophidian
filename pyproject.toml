@@ -18,7 +18,7 @@ classifiers = [
 ]
 requires-python = ">=3.7"
 dependencies = [
-    # External in house
+    # First Party - by Tired-Fox
     "phml>=0.3.1",
     "tcfg>=0.4.4",
     "watchserver>=0.1.9",
