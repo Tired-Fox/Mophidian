@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from tcfg import Path, cfg
+from tcfg import TypePath, cfg
 
 __all__ = ["Pygmentize", "MarkdownWrapper", "Markdown", "Site", "Build", "Config"]
 
@@ -128,18 +128,18 @@ class Site(cfg):
     version: str = "1.0"
     """The version of the site `ex`: 0.1 or 1. Defaults to `1.0`"""
 
-    source: str = Path("src/pages/")
+    source: str = TypePath("src/pages/")
     """The directory to use for the source files."""
 
-    components: str = Path("src/components/")
+    components: str = TypePath("src/components/")
     """The directory to use for the component files."""
 
-    public: str = Path("public/")
+    public: str = TypePath("public/")
 
-    dest: str = Path("out/")
+    dest: str = TypePath("out/")
     """The directory to put the built files into. Defaults to `site/`"""
 
-    root: str = Path("")
+    root: str = TypePath("")
     """Root directory of the website. Used for links.
     Ex: `https://user.github.io/project/` where `project/` is the directory of
     the website. Defaults to ``
@@ -229,7 +229,7 @@ class Build(cfg):
     # rss: RSS
     # """Mophidian.build.rss configuration"""
 
-    favicon: str = Path("/favicon.ico")
+    favicon: str = TypePath("/favicon.ico")
     """Path to the favicon from website root."""
 
     body: dict[str, str | list[str]]
