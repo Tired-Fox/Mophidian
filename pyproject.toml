@@ -19,7 +19,7 @@ classifiers = [
 requires-python = ">=3.7"
 dependencies = [
     # External in house
-    "phml>=0.2.1",
+    "phml>=0.3.1",
     "tcfg>=0.4.3",
     "watchserver>=0.1.9",
     "saimll>=0.5.0",
