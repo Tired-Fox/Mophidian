@@ -63,7 +63,8 @@ class Callbacks(LiveCallback):
         # Build website
         self.logger.Custom("Building website...", label="▮", clr="cyan")
         (self.file_system, self.static_files, self.component_files, self.phml) = build(
-            True
+            True,
+            scripts
         )
 
         # Map for fast indexing and logic checking of existing files
