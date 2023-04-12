@@ -89,10 +89,10 @@ def html(*meta: str) -> str:
     """Construct the base html string based on additional tags and flags."""
 
     new_line = '\n        '
-    meta = [META[tag] for tag in meta if tag in META]
+    _meta = [META[tag] for tag in meta if tag in META]
 
     new_line = "\n"
-    addons = f'{new_line + new_line.join(meta) + new_line if len(meta) > 0 else ""}'
+    addons = f'{new_line + new_line.join(_meta) + new_line if len(_meta) > 0 else ""}'
     links = "\n" + f'<link rel="shortcut icon" href="{url(CONFIG.build.favicon)}" type="image/x-icon">'
 
     return f"""\
@@ -102,6 +102,7 @@ def html(*meta: str) -> str:
     <head>{addons}{links}
         <title>{{{{title or ''}}}}</title>
         <style></style>
+        <script></script>
     </head>
 
     <body>

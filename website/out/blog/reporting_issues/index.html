@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta
+      http-equiv="X-UA-Compatible"
+      content="IE=edge"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <link
+      rel="shortcut icon"
+      href="/Mophidian/favicon.ico"
+      type="image/x-icon"
+    />
+    <title>Reporting Issues</title>
+    <style>
+      [data-phml-cmpt-scope='Footer~-5190266117458259105'] footer {
+          text-align: center;
+          margin-top: 4rem;
+          margin-bottom: .5rem;
+      }
+      #header {
+          display: flex;
+          align-items: center;
+          position: sticky;
+          justify-content: space-between;
+          top: 0;
+          left: 0;
+
+          width: 100%;
+          padding-inline: 2rem;
+          padding-block: 1rem;
+          height: 5rem;
+          background-color: inherit;
+          box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+      }
+
+      #header ul {
+          display: flex;
+          gap: 1.5rem;
+      }
+
+      #header h3, a ,p {
+          padding: 0;
+          margin: 0;
+      }
+
+      #header a, ul, li {
+          text-decoration: none;
+          list-style: none;
+      }
+
+      #header :is(a):hover {
+          text-decoration: underline;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="/Mophidian/highlight.css"
+    />
+    <script>
+
+    </script>
+    <link
+      rel="stylesheet"
+      href="/Mophidian/global.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/Mophidian/tailwind.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/Mophidian/blog/blog.css"
+    />
+    <link type="rss"/>
+  </head>
+  <body>
+    <div data-phml-cmpt-scope="Header~2426376081520869947">
+      <nav id="header">
+        <a href="/Mophidian/">
+          <h3>Mophidian</h3>
+        </a>
+        <ul>
+          <li>
+            <a href="/Mophidian/api">API</a>
+          </li>
+          <li>
+            <a href="/Mophidian/docs">Docs</a>
+          </li>
+          <li>
+            <a href="/Mophidian/blog">Blog</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    <div class="article-tag-list">
+
+    </div>
+    <article>
+      <h1 id="reporting-issues">Reporting Issues</h1>
+      <p>
+        This project is in constant development by a single developer. There are also four total first party repositories
+        being used. So if there are issues found by users it would be a huge help if they were reported in github issues.
+      </p>
+      <h2 id="first-party-repositories">First party repositories</h2>
+      <p>
+        This project uses three other first party repositories to handle things like: typed configuration objects,
+        colored ansi terminal output, and a live reloading server.
+      </p>
+      <h3 id="tcfg">TCFG</h3>
+      <p>
+        To handle typed configuration objects Mophidian utilizes a python library called
+        <a href="https://github.com/Tired-Fox/tcfg/">tcfg</a>
+        , which stands for typed configuration. It supports
+        <code>yaml</code>
+        ,
+        <code>json</code>
+        , and
+        <code>toml</code>
+        out of the box and is customizable.
+        The point of using this is to load a configuration and automatically fill in defaults. It will also automatically
+        give detailed exceptions when a configuration type is an invalid type. There is an added bonus of being able to access
+        config values as attributes on an object. If the configuration gets large or requires multiple files and/or multiple
+        configuration types the library allows this without any additional setup. I encourage python developers to check out
+        the library if they are interested.
+      </p>
+      <p>
+        To report an issue or error involving tcfg please create a github issue to the
+        <a href="https://github.com/Tired-Fox/tcfg/issues">tcfg repo</a>
+      </p>
+    </article>
+    <div class="spacer">
+
+    </div>
+    <div data-phml-cmpt-scope="Footer~-5190266117458259105">
+      <footer>
+        <small>&copy; 2023 Zachary Boehm; All rights reserved</small>
+      </footer>
+    </div>
+  </body>
+</html>

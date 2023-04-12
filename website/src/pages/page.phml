@@ -13,7 +13,7 @@
         <p><strong>A simple yet affective pythonic SSG</strong></p>
     </div>
   </main>
-</>
+</> 
 <style>
     nav {
         display: flex;

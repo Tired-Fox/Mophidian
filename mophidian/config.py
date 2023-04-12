@@ -122,7 +122,7 @@ class Site(cfg):
     description: str = ""
     """The websites description."""
 
-    base_url: str = ""
+    url: str = ""
     """Base url for the website. Example: https://{user}.github.io/"""
 
     version: str = "1.0"
@@ -161,64 +161,73 @@ class Site(cfg):
     """
 
 
-class RSSImage(cfg):
-    """Mophidian.build.rss.image configuration."""
+# class RSSImage(cfg):
+#     """Mophidian.build.rss.image configuration."""
 
-    title: str = ""
-    """Image title"""
-    url: str = ""
-    """Image url"""
-    width: int = 31
-    """Image width. Max of 144"""
-    height: int = 88
-    """Image height. Max of 400"""
-
-
-class RSS(cfg):
-    """Mophidian.build.rss configuration."""
-
-    enabled: bool = False
-    """Toggle to generate a rss feed on build and expose the link to the pages.
-    """
-
-    paths: list[str]
-    """Paths of what markdown files to use for the rss feed. If no paths are
-    specified then all rendered markdown files are added to the rss feed."""
-
-    image: RSSImage
-    """Mophidian.build.rss.image configuration"""
-
-    language: str = "en-us"
-    """(str) The language associated with the rss feed. Example: en-us."""
+#     title: str = ""
+#     """Image title"""
+#     url: str = ""
+#     """Image url"""
+#     width: int = 31
+#     """Image width. Max of 144"""
+#     height: int = 88
+#     """Image height. Max of 400"""
 
 
-class Sitemap(cfg):
-    """Mophidian.build.sitemap configuration."""
+# class RSS(cfg):
+#     """Mophidian.build.rss configuration."""
 
-    enabled: bool = False
-    """Toggle to generate a sitemap on build."""
+#     enabled: bool = False
+#     """Toggle to generate a rss feed on build and expose the link to the pages.
+#     """
 
-    patterns: list[str]
-    """If you have a large site you may specify patters to apply. Each pattern
-    is computed into it's own sitemap and referenced in a sitemap index. If no
-    patterns are specified then a single sitemap is generated for all rendered
-    pages.
-    """
+#     paths: list[str]
+#     """Paths of what markdown files to use for the rss feed. If no paths are
+#     specified then all rendered markdown files are added to the rss feed."""
 
+#     image: RSSImage
+#     """Mophidian.build.rss.image configuration"""
+
+#     language: str = "en-us"
+#     """(str) The language associated with the rss feed. Example: en-us."""
+
+
+# class Sitemap(cfg):
+#     """Mophidian.build.sitemap configuration."""
+
+#     enabled: bool = False
+#     """Toggle to generate a sitemap on build."""
+
+#     patterns: list[str]
+#     """If you have a large site you may specify patters to apply. Each pattern
+#     is computed into it's own sitemap and referenced in a sitemap index. If no
+#     patterns are specified then a single sitemap is generated for all rendered
+#     pages.
+#     """
+
+class Scripts(cfg):
+    """Mophidian.build.scripts configuration"""
+
+    pre: list[str]
+    """List of commands to run, in cwd, before the initial build process."""
+
+    post: list[str]
+    """List of commands to run, in cwd, after the initial build process."""
 
 class Build(cfg):
-    """Mohpidian.build configuration."""
+    """Mophidian.build configuration."""
 
     refresh_delay: float = 2.0
     """The delay until the live server reloads the browser after a file change
     is detected. Defaults to `2.0`.
     """
 
-    sitemap: Sitemap
-    """Mophidian.build.sitemap configuration"""
+    scripts: Scripts
+    # sitemap: Sitemap
+    # """Mophidian.build.sitemap configuration"""
 
-    rss: RSS
-    """Mophidian.build.rss configuration"""
+    # rss: RSS
+    # """Mophidian.build.rss configuration"""
 
     favicon: str = Path("/favicon.ico")
     """Path to the favicon from website root."""

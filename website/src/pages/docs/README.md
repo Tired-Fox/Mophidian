@@ -29,15 +29,17 @@ You may only have one `page.phml` and `layout.phml` file per directory. `page.ph
 ```html
 <!-- page.phml -->
 
+<!-- Root elements can be wrapped in a single root wrapper element -->
 <>
     {Your content here}
 </>
 
-<!--       or       -->
+<!-- Or a file can have as many root elements as you like -->
 
-<{html-tag}>
-    {Your content here}
-</{html-tag}>
+<{html-tag}>{content}</{html-tag}>
+.
+.
+.
 ```
 
 while `layout.phml` pages are similar they will require a `<Slot />` tag. They will look like this.
@@ -46,18 +48,16 @@ while `layout.phml` pages are similar they will require a `<Slot />` tag. They w
 <!-- layout.phml -->
 
 <>
-    {Your content here}
-    <Slot />
-    {Your content here}
+  {Other content goes here}
+  <Slot />
+  {Or here}
 </>
 
 <!--       or       -->
 
-<{html-tag}>
-    {Your content here}
-    <Slot />
-    {Your content here}
-</{html-tag}>
+{Other content goes here}
+<Slot />
+{Or here}
 ```
 
 Markdown files are normal markdown files but you may also have frontmatter/metadata. The frontmatter should be written in yaml. This data is exposed to the layouts on page render.
@@ -118,6 +118,8 @@ With the files containing
 ```
 
 ```markdown
+<!-- Sample.md -->
+
 # Sample markdown page
 
 Page content
@@ -132,7 +134,7 @@ out/
   └ index.html
 ```
 
-and file with the contents of
+and files with the contents of
 
 ```html
 <!-- out/index.html -->

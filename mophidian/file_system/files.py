@@ -3,34 +3,41 @@ from dataclasses import dataclass
 from functools import cached_property
 
 from pathlib import Path
-from shutil import copyfile, SameFileError # For copying static files
+from shutil import copyfile, SameFileError  # For copying static files
 from typing import TYPE_CHECKING, Any
 from re import match, sub
 
 import frontmatter
 
-    
-from phml.core import AST, PHML, substitute_component
-from phml.utilities import ( # Used to parse the phml content and manipulate it's ast
+
+from phml import HypertextManager
+from phml.components import tokenize_name, ComponentManager
+from phml.nodes import AST
+
+from phml.utilities import (  # Used to parse the phml content and manipulate it's ast
     check,
-    cmpt_name_from_path,
     find,
     query,
     query_all,
     remove_nodes,
     replace_node,
-    tokanize_name,
-    parse_component,
 )
-from phml.core import VirtualPython # Dummy instance for subtituting elements for <Slot />
-from phml.builder import p # To create injected elements
-from saimll import SAIML, Logger # Custom logging
+
+from phml.builder import p  # To create injected elements
+from saimll import SAIML, Logger  # Custom logging
 
 import mophidian
 from mophidian.config import CONFIG
-from mophidian.core.util import REGEX, PAGE_IGNORE, html, title, url, MARKDOWN, filter_sort
+from mophidian.core.util import (
+    REGEX,
+    PAGE_IGNORE,
+    html,
+    title,
+    url,
+    MARKDOWN,
+)
 from .markdown_extensions import _RelativePathExtension
-from .base import apply_attribute_configs, build_attributes, Node
+from .base import apply_attribute_configs, build_attributes, Node, phml
 
 if TYPE_CHECKING:
     from .containers import Directory
@@ -46,14 +53,9 @@ __all__ = [
     "TOC",
     "Anchor",
     "Nav",
-    "FileState"
+    "FileState",
 ]
 
-global_expose = {
-    "filter_sort": filter_sort
-}
-phml = PHML()
-phml.expose(filter_sort=filter_sort)
 
 @dataclass
 class FileState:
@@ -64,10 +66,12 @@ class FileState:
         (1) UPDATED: New file or file has been modified and needs to be rendered
         (2) DELETED : File no longer exists so delete it
     """
+
     NULL: int = 0
     UPDATED: int = 1
     DELETED: int = 2
-    
+
+
 class Anchor:
     """Link representation of a header tag."""
 
@@ -102,6 +106,7 @@ class Anchor:
     def __repr__(self) -> str:
         return f"{self.name}({self.link!r}, {self.level})"
 
+
 class TOC:
     """Contains a list of links. Each anchor has a level representing the header level."""
 
@@ -132,12 +137,13 @@ class TOC:
     def __repr__(self) -> str:
         return f"[{', '.join([repr(child) for child in self._children])}]"
 
+
 class Linker:
     """Base class defining logic for linking pages to other objects."""
 
     linked_files: list[Renderable]
     """List of pages using this class. Includes nested pages deep in linked tree."""
-    
+
     def __init__(self) -> None:
         self.linked_files = []
 
@@ -161,6 +167,7 @@ class Linker:
         """Sets all linked pages state to updated."""
         for page in self.linked_files:
             page.state = FileState.UPDATED
+
 
 class File(Node):
     """File representation in the file system."""
@@ -207,7 +214,7 @@ class File(Node):
         self._dest = self.src
         self.build_dest()
 
-         # Page url
+        # Page url
         if not self.unique:
             self.relative_url = Path(self._dest).parent.as_posix() + "/"
         else:
@@ -236,7 +243,9 @@ class File(Node):
         # Replace the file name with index.html
         if self.file_name not in PAGE_IGNORE:
             self._dest = (
-                Path("/".join(self._dest.split("/")[:-1])).joinpath("index.html").as_posix()
+                Path("/".join(self._dest.split("/")[:-1]))
+                .joinpath("index.html")
+                .as_posix()
             )
         else:
             self._dest = Path(self._dest).with_name(self.file_name + ".html").as_posix()
@@ -279,7 +288,7 @@ class Renderable(File):
 
     title: str
     """Title of the page based on the file name."""
-    
+
     components: list[Component]
     """List of used components. For live updates only."""
 
@@ -290,7 +299,7 @@ class Renderable(File):
         self.title = self._make_title()
         self.next = None
         self.prev = None
-        
+
     def delete(self):
         layout = self.layout
 
@@ -309,9 +318,9 @@ class Renderable(File):
         if name == "page":
             name = "home"
 
-        return title(tokanize_name(name))
+        return title(tokenize_name(name))
 
-    def render(self, phml: PHML, **kwargs) -> str:
+    def render(self, phml: HypertextManager, **kwargs) -> str:
         """Render the given file to it's appropriate html."""
         raise Exception("Do not use base class Renderable's render function")
 
@@ -319,6 +328,7 @@ class Renderable(File):
         next = self.next.relative_url if self.next is not None else "None"
         prev = self.prev.relative_url if self.prev is not None else "None"
         return f"{self.__class__.__name__}(path={self.path!r}, url={self.relative_url!r}, prev={prev!r}, next={next!r})"
+
 
 class Page(Renderable):
     """Page representation of a File."""
@@ -328,89 +338,98 @@ class Page(Renderable):
         page_ast = phml.load(Path(self.full_path)).ast
 
         if query(page_ast, "html") or query(page_ast, "body"):
-            Logger.warning(f"<{SAIML.parse(f'[@Fgreen]{self.full_path!r}')}> Page must be a component not full pages")
+            Logger.warning(
+                f"<{SAIML.parse(f'[@Fgreen]{self.full_path!r}')}> Page must be a component not full pages"
+            )
 
         return page_ast
 
-    def render(self, phml: PHML, component_files: Directory, **kwargs) -> str:
+    def render(self, phml: HypertextManager, component_files: Directory, **kwargs) -> str:
         # Remove unwanted kwargs
         kwargs.pop("static_files", None)
         kwargs.pop("page_files", None)
 
         ast = phml.parse(html(*CONFIG.site.meta_tags)).ast
         if self.layout is not None:
-            page_ast = self.layout.render(self.ast, **kwargs)
+            page_ast = self.layout.render(self.ast)
         else:
             page_ast = self.ast
 
         headers = query_all(page_ast, "head")
 
-        remove_nodes(page_ast, {"tag": "head"}, strict=False)
+        remove_nodes(page_ast, "head", strict=False)
         head_children = []
         for head in headers:
-            head_children.extend(head.children)
+            head_children.extend(head.children or [])
 
         head = query(ast, "head")
 
         if head is not None:
             for node in head_children:
                 node.parent = head
-                exist = '[{}]'
-                exist_equal = '[{}={}]'
+                exist = "[{}]"
+                exist_equal = "[{}={}]"
                 if check(node, "element") and node.tag in ["meta", "title"]:
                     old_tag = query(
                         head,
                         f"{node.tag}{''.join(exist.format(key) for key in node.properties.keys())}",
                     )
                     if node is not None:
-                        replace_node(head, lambda n, i, p: n == old_tag, node)
+                        replace_node(head, lambda n: n == old_tag, node)
                     else:
-                        head.children.append(node)
+                        head.append(node)
                 elif check(node, "element") and node.tag not in ["style", "script"]:
                     if (
                         query(
                             head,
                             f"{node.tag}\
-{''.join(exist_equal.format(key, value) for key, value in node.properties.items())}",
+{''.join(exist_equal.format(key, value) for key, value in node.attributes.items())}",
                         )
                         is None
                     ):
-                        head.children.append(node)
+                        head.append(node)
                 else:
                     # replace or append
-                    head.children.append(node)
-            replace_node(ast.tree, {"tag": "head"}, head)
-        replace_node(ast.tree, {"tag": "Slot"}, page_ast.children)
+                    head.append(node)
+            replace_node(ast, "head", head)
+        replace_node(ast, "Slot", page_ast.children)
 
         # Find all components
         for component in component_files.components():
-            if find(ast, {"tag": component.cname}) is not None:
+            if find(ast, component.cname) is not None:
                 component.link_file(self)
                 self.components.append(component)
 
         ast = apply_attribute_configs(ast)
         ast = phml.compile(**kwargs)
 
-        if CONFIG.build.rss:
-            rss_link = query(ast, "link[type*=rss]")
-            if rss_link is not None:
-                rss_link.properties.update({
-                    "type": "application/rss+xml",
-                    "rel": "alternate",
-                    "href": Path(CONFIG.site.base_url).joinpath(CONFIG.site.root, "feed.xml")
-                })
+        # TODO: Create new rss system
+
+        # if CONFIG.build.rss:
+        #     rss_link = query(ast, "link[type*=rss]")
+        #     if rss_link is not None:
+        #         rss_link.properties.update(
+        #             {
+        #                 "type": "application/rss+xml",
+        #                 "rel": "alternate",
+        #                 "href": Path(CONFIG.site.base_url).joinpath(
+        #                     CONFIG.site.root, "feed.xml"
+        #                 ),
+        #             }
+        #         )
 
         # Append root to href and src links
-        root = "/" + CONFIG.site.root.strip("/")
-        for link_type in ["href", "src", "xlink:href"]:
-            for node in query_all(ast, f"[{link_type}^=@]"):
-                if not node[link_type].startswith(root):
-                    new_link = node[link_type].lstrip("@").replace('\\', '/').lstrip('/')
-                    node[link_type] = f"{root}/{new_link}"
+        # root = "/" + CONFIG.site.root.strip("/")
+        # for link_type in ["href", "src", "xlink:href"]:
+        #     for node in query_all(ast, f"[{link_type}^=@]"):
+        #         if not node[link_type].startswith(root):
+        #             new_link = (
+        #                 node[link_type].lstrip("@").replace("\\", "/").lstrip("/")
+        #             )
+        #             node[link_type] = f"{root}/{new_link}"
 
-        phml.ast = ast
+        return phml.render(_ast=ast, **kwargs)
 
-        return phml.render(**kwargs)
 
 class Markdown(Renderable):
     """Markdown file representation. These files are rendered with the markdown module
@@ -433,11 +452,17 @@ class Markdown(Renderable):
         if "readme" in Path(self._dest).name.lower():
             # Replace the file name with index.html
             self._dest = (
-                Path("/".join(self._dest.split("/")[:-1])).joinpath("index.html").as_posix()
+                Path("/".join(self._dest.split("/")[:-1]))
+                .joinpath("index.html")
+                .as_posix()
             )
         else:
             # Add file name as a directory and make the file index.html in that dir
-            self._dest = Path(self._dest).parent.joinpath(self.file_name, "index.html").as_posix()
+            self._dest = (
+                Path(self._dest)
+                .parent.joinpath(self.file_name, "index.html")
+                .as_posix()
+            )
 
     def parse_toc(self, toc: list):
         """Parse the toc structure from the markdown parser and construct a toc object."""
@@ -457,7 +482,6 @@ class Markdown(Renderable):
         self.toc = result
 
     def _make_title(self) -> str:
-
         with open(self.full_path, "r", encoding="utf-8") as mfile:
             lines = mfile.readlines()
             for i, line in enumerate(lines):
@@ -465,17 +489,14 @@ class Markdown(Renderable):
                     header = match(r"(?P<hash>\s*# *.+)|(?P<block>=+)", line)
                     if header is not None:
                         header = header.groupdict()
-                        if (
-                            header["hash"] is not None
-                            and header["hash"].strip() != ""
-                        ):
+                        if header["hash"] is not None and header["hash"].strip() != "":
                             return sub(r" *# *", "", header["hash"]).strip()
                         if (
                             header["block"] is not None
                             and i > 0
-                            and lines[i-1].strip() != ""
+                            and lines[i - 1].strip() != ""
                         ):
-                            return lines[i-1].strip()
+                            return lines[i - 1].strip()
 
         name = Path(self._dest).parent.as_posix().rsplit("/", 1)[-1]
         if name.strip() in ["", "."]:
@@ -484,7 +505,7 @@ class Markdown(Renderable):
         if name == "page":
             name = "home"
 
-        return title(tokanize_name(name))
+        return title(tokenize_name(name))
 
     def parse_file(self) -> tuple[dict, str]:
         with open(Path(self.full_path), "r", encoding="utf-8") as markdown_file:
@@ -495,18 +516,27 @@ class Markdown(Renderable):
         # save meta data as locals for later
         content = MARKDOWN.reset().convert(content)
 
-        self.parse_toc(getattr(MARKDOWN, 'toc_tokens', []))
-
-        # parse resulting html into phml parser
-        ast = phml.parse(content).ast
+        self.parse_toc(getattr(MARKDOWN, "toc_tokens", []))
 
         # Get the attributes for the wrapper from the config
         props: dict[str, str] = build_attributes(CONFIG.markdown.wrapper.attributes)
 
-        ast.tree = p(None, p(CONFIG.markdown.wrapper.tag, props, *ast.tree.children))
-        return ast
+        return p(
+            p(
+                CONFIG.markdown.wrapper.tag,
+                props,
+                *phml.parse(content).ast.children
+            )
+        ) 
 
-    def render(self, phml: PHML, page_files: Directory, static_files: Directory, component_files: Directory, **kwargs):
+    def render(
+        self,
+        phml: HypertextManager,
+        page_files: Directory,
+        static_files: Directory,
+        component_files: Directory,
+        **kwargs,
+    ):
         """Render the markdown file into a full html page. Apply the plugins
         and configurations from the config. All markdown file meta data is exposed
         to the compiler.
@@ -518,35 +548,37 @@ class Markdown(Renderable):
         self.meta, content = self.parse_file()
         ast = phml.parse(html(*CONFIG.site.meta_tags)).ast
 
-        self.relative_path_extension = _RelativePathExtension(self, page_files, static_files)
+        self.relative_path_extension = _RelativePathExtension(
+            self, page_files, static_files
+        )
 
         self._make_title()
         page_title = self.meta.get("title", None)
 
         addons = {
-            **self.meta,
-            "toc": self.toc,
             "title": page_title or self.title,
+            "toc": self.toc,
+            **self.meta,
         }
         kwargs.update(addons)
 
         # meta data layout name? then grab layout
         if self.layout is not None:
-            page_ast = self.layout.render(self.ast(content), **kwargs)
+            page_ast = self.layout.render(self.ast(content))
         else:
             page_ast = self.ast(content)
 
-
         headers = query_all(page_ast, "head")
 
-        remove_nodes(page_ast, {"tag": "head"}, strict=False)
+        remove_nodes(page_ast, "head", strict=False)
 
         head_children = []
         for head in headers:
-            head_children.extend(head.children)
+            head_children.extend(head.children or [])
 
         head = query(ast, "head")
         if head is not None:
+            # !PERF: Extract this
             if CONFIG.markdown.pygmentize.highlight:
                 if (
                     page_files.find(CONFIG.markdown.pygmentize.path) is None
@@ -563,12 +595,15 @@ Use `moph highlight` to create that file."
                         -1,
                         p(
                             "link",
-                            {"rel": "stylesheet", "href": url(CONFIG.markdown.pygmentize.path)},
+                            {
+                                "rel": "stylesheet",
+                                "href": url(CONFIG.markdown.pygmentize.path),
+                            },
                         ),
                     )
             for node in head_children:
                 node.parent = head
-                exist = '[{}]'
+                exist = "[{}]"
                 exist_equal = '[{}="{}"]'
                 if check(node, "element") and node.tag in ["meta", "title"]:
                     old_tag = query(
@@ -576,9 +611,9 @@ Use `moph highlight` to create that file."
                         f"{node.tag}{''.join(exist.format(key) for key in node.properties.keys())}",
                     )
                     if node is not None:
-                        replace_node(head, lambda n, i, p: n == old_tag, node)
+                        replace_node(head, lambda n: n == old_tag, node)
                     else:
-                        head.children.append(node)
+                        head.append(node)
                 elif check(node, "element") and node.tag not in ["style", "script"]:
                     if (
                         query(
@@ -588,43 +623,50 @@ Use `moph highlight` to create that file."
                         )
                         is None
                     ):
-                        head.children.append(node)
+                        head.append(node)
                 else:
                     # replace or append
-                    head.children.append(node)
-            replace_node(ast.tree, {"tag": "head"}, head)
-
-        replace_node(ast.tree, {"tag": "Slot"}, page_ast.children)
+                    head.append(node)
+            replace_node(ast, "head", head)
+        replace_node(ast, "Slot", page_ast.children)
 
         # Find all components
         for component in component_files.components():
-            if find(ast, {"tag": component.cname}) is not None:
+            if find(ast, component.cname) is not None:
                 component.link_file(self)
                 self.components.append(component)
 
         ast = apply_attribute_configs(ast)
         ast = phml.compile(**kwargs)
 
-        
-        if CONFIG.build.rss:
-            rss_link = query(ast, "link[type*=rss]")
-            if rss_link is not None:
-                rss_link.properties.update({
-                    "type": "application/rss+xml",
-                    "rel": "alternate",
-                    "href": Path(CONFIG.site.base_url).joinpath(CONFIG.site.root, "feed.xml")
-                })
+        # TODO: Rewrite rss system
 
-        # Fix href and src links
-        root = "/" + CONFIG.site.root.strip("/")
-        for link_type in ["href", "src", "xlink:href"]:
-            for node in query_all(ast, f"[{link_type}^=@]"):
-                if not node[link_type].startswith(root):
-                    new_link = node[link_type].lstrip("@").replace('\\', '/').lstrip('/')
-                    node[link_type] = f"{root}/{new_link}"
-        
-        phml.ast = ast
-        return phml.render(**kwargs)
+        # if CONFIG.build.rss:
+        #     rss_link = query(ast, "link[type*=rss]")
+        #     if rss_link is not None:
+        #         rss_link.properties.update(
+        #             {
+        #                 "type": "application/rss+xml",
+        #                 "rel": "alternate",
+        #                 "href": Path(CONFIG.site.base_url).joinpath(
+        #                     CONFIG.site.root, "feed.xml"
+        #                 ),
+        #             }
+        #         )
+
+        # # Fix href and src links
+        # root = "/" + CONFIG.site.root.strip("/")
+        # for link_type in ["href", "src", "xlink:href"]:
+        #     for node in query_all(ast, f"[{link_type}^=@]"):
+        #         if not node[link_type].startswith(root):
+        #             new_link = (
+        #                 node[link_type].lstrip("@").replace("\\", "/").lstrip("/")
+        #             )
+        #             node[link_type] = f"{root}/{new_link}"
+
+        # phml.ast = ast
+
+        return phml.render(_ast=ast, **kwargs)
 
     def __repr__(self) -> str:
         next = self.next.relative_url if self.next is not None else "None"
@@ -636,6 +678,7 @@ class Static(File):
     """Static file representation. These files are not rendered but are still moved to the
     appropriate directory.
     """
+
     def __init__(self, path: str, ignore: str = "") -> None:
         super().__init__(path, ignore, True)
 
@@ -670,6 +713,7 @@ class Static(File):
         except SameFileError:
             pass
 
+
 class Layout(File, Linker):
     """Layout representation of a file."""
 
@@ -690,7 +734,7 @@ class Layout(File, Linker):
             parent = parent.parent
         return list(reversed(lyts))
 
-    def ast(self, **kwargs) -> AST:
+    def ast(self) -> AST:
         layouts = self.__fetch_layouts()
         ast = phml.parse("<Slot/>").ast
 
@@ -700,25 +744,21 @@ class Layout(File, Linker):
 
             # If it quacks like a full page, then it's a full page
             if query(layout_ast, "html") or query(layout_ast, "body"):
-                Logger.warning(f"<{SAIML.parse(f'[@Fgreen]{self.full_path!r}')}> Layout must be a component not a full pages")
+                Logger.warning(
+                    f"<{SAIML.parse(f'[@Fgreen]{self.full_path!r}')}> Layout must be a component not a full page"
+                )
                 return ast
 
-            component: dict = parse_component(layout_ast)
-            if query(component["component"], "Slot") is None:
-                Logger.warning(f"<{SAIML.parse(f'[@Fgreen]*{self.full_path!r}')}> Layout must contain a {SAIML.parse('*<[@F#6305DC]Slot[@F] />')} element")
+            if query(layout_ast, "Slot") is None:
+                Logger.warning(
+                    f"<{SAIML.parse(f'[@Fgreen]*{self.full_path!r}')}> Layout must contain a {SAIML.parse('*<[@F#6305DC]Slot[@F] />')} element"
+                )
                 return ast
 
-            # Replace the <Slot /> element in the parent with the next layout
-            substitute_component(
-                ast.tree, 
-                ("Slot", component),
-                VirtualPython(),
-                **global_expose,
-                **kwargs
-            )
+            replace_node(ast, "Slot", layout_ast.children)
         return ast
 
-    def render(self, page: AST, **kwargs) -> AST:
+    def render(self, page: AST) -> AST:
         """Render a page given this layouts phml AST.
 
         Args:
@@ -730,28 +770,20 @@ class Layout(File, Linker):
         Note:
             The ast is still not a full html ast at this point.
         """
-        ast = self.ast(**kwargs)
-        component: dict = parse_component(page)
 
-        substitute_component(
-            ast.tree,
-            ("Slot", component),
-            VirtualPython(),
-            **global_expose,
-            **kwargs,
-        )
+        ast = self.ast()
+        replace_node(ast, "Slot", page.children)
         return ast
 
 
 class Component(File, Linker):
     """Represents a phml component file."""
-    
+
     def __init__(self, path: str, ignore: str = "", unique: bool = False) -> None:
         File.__init__(self, path, ignore, unique)
         Linker.__init__(self)
-        self.cname = cmpt_name_from_path(self.path)
+        self.cname = ComponentManager.generate_name(path, ignore=CONFIG.site.components)
 
-    
 class Nav:
     def __init__(self, name: str) -> None:
         self.children = []
@@ -773,10 +805,11 @@ class Nav:
         """Get a specific page or sub nav based on it's url."""
         segments = [segment for segment in url.strip("/").split("/") if segment != ""]
 
-        def recurse_get(segments: list[str], context: Nav, url: str) -> Renderable | Nav | None:
-
-            pages = context.pages()
-            navs = context.navs()
+        def recurse_get(
+            segments: list[str], context: Nav, url: str
+        ) -> Renderable | Nav | None:
+            pages = context.pages
+            navs = context.navs
             new_seg = segments[0] if len(segments) > 0 else ""
             for page in pages:
                 if Path(url).joinpath(new_seg).as_posix() + "/" == page.relative_url:
@@ -792,7 +825,7 @@ class Nav:
             return None
 
         if len(segments) == 0:
-            for page in self.pages():
+            for page in self.pages:
                 if page.relative_url == "/":
                     return page
             return self
@@ -805,7 +838,10 @@ class Nav:
         if isinstance(item, Renderable):
             # TODO: recursive check url with sub navs
             for i, child in enumerate(self.children):
-                if isinstance(child, Renderable) and item.relative_url == child.relative_url:
+                if (
+                    isinstance(child, Renderable)
+                    and item.relative_url == child.relative_url
+                ):
                     index = i
                     break
             error_message = f"Invalid page url {item.relative_url!r}"
@@ -846,8 +882,8 @@ class Nav:
         pages = self.pages
         for nav in self.navs:
             pages.extend(nav.all_pages)
-        return pages    
-    
+        return pages
+
     @property
     def navs(self) -> list[Nav]:
         """List of all sub navs in the nav."""
@@ -858,8 +894,8 @@ class Nav:
         based on their url's. Next it will iterate over the sub navs in alphabetical order based on
         sub nav name.
         """
-        pages = self.pages()
-        navs = self.navs()
+        pages = self.pages
+        navs = self.navs
 
         pages.sort(key=lambda p: p.url)
         navs.sort(key=lambda n: n.name)

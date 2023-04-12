@@ -1,7 +1,7 @@
 <footer>
     <small>&copy; 2023 Zachary Boehm; All rights reserved</small>
 </footer>
-<style>
+<style scoped>
     footer {
         text-align: center;
         margin-top: 4rem;

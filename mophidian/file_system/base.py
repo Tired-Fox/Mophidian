@@ -1,10 +1,12 @@
 from pathlib import Path
 from re import sub
-from phml.core import AST
+
+from phml.nodes import AST
+from phml import HypertextManager
 from phml.utilities import query
 
 from mophidian.config import CONFIG
-from mophidian.core.util import REGEX
+from mophidian.core.util import REGEX, filter_sort
 
 __all__ = [
     "Node"
@@ -29,10 +31,10 @@ def apply_attribute_configs(ast: AST) -> AST:
     body = query(ast, "body")
 
     if html is not None:
-        html.properties.update(build_attributes(CONFIG.build.html))
+        html.attributes.update(build_attributes(CONFIG.build.html))
 
     if body is not None:
-        body.properties.update(build_attributes(CONFIG.build.body))
+        body.attributes.update(build_attributes(CONFIG.build.body))
 
     return ast
 
@@ -75,3 +77,6 @@ class Node:
             for child in list(self.children):
                 out += "\n" + child.print(4)
         return out
+
+phml = HypertextManager()
+phml.expose(filter_sort=filter_sort)

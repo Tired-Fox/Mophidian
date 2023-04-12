@@ -56,7 +56,7 @@ def is_component(path) -> bool:
 class Callbacks(LiveCallback):
     """Live server callback and file management."""
 
-    def __init__(self) -> None:
+    def __init__(self, scripts: bool = True) -> None:
         # Initialize the logger to only log warnings or custom logs.
         self.logger = Log(level=LogLevel.WARNING)
 
@@ -217,7 +217,7 @@ class Callbacks(LiveCallback):
 
         reload_urls = []
         if obj is not None and isinstance(obj, Component):
-            self.phml.add((obj.cname, obj.full_path))
+            self.phml.add(obj.full_path, name=obj.cname)
             self.log_update(cmpt=obj.cname)
             for page in obj.linked_files:
                 page.state = FileState.UPDATED
@@ -293,7 +293,7 @@ class Callbacks(LiveCallback):
         self.component_files.add(new_component)
         self.components[new_component.full_path] = new_component
         try:
-            self.phml.add((new_component.cname, new_component.full_path))
+            self.phml.add(new_component.full_path, name=new_component.cname)
             self.log_create(cmpt=new_component.cname)
         except Exception as error:
             self.logger.Error(str(error))

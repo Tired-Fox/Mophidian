@@ -1,13 +1,12 @@
 from pathlib import Path
 from shutil import rmtree
 from os import remove
-import string
 import time
 
-from phml import PHML
+from phml import HypertextManager
 
 from mophidian import states, CONFIG
-from mophidian.core.util import title, url, filter_sort
+from mophidian.core.util import title, url
 from mophidian.file_system import Directory, Nav, FileState, File
 
 
@@ -41,7 +40,7 @@ def render_pages(
     static_files: Directory,
     component_files: Directory,
     out: str,
-    phml: PHML,
+    phml: HypertextManager,
     nav: Nav = Nav(""),
     *,
     dirty: bool = False,
@@ -56,10 +55,10 @@ def render_pages(
         if page.state == FileState.UPDATED:
             page_vars = {"title": page.title}
 
-            if CONFIG.build.rss:
-                page_vars["rss_feed"] = (
-                    Path(CONFIG.site.base_url).joinpath(CONFIG.site.root, "feed.xml").as_posix()
-                )
+            # if CONFIG.build.rss:
+            #     page_vars["rss_feed"] = (
+            #         Path(CONFIG.site.base_url).joinpath(CONFIG.site.root, "feed.xml").as_posix()
+            #     )
 
             # Ensure path to file
             page.dest(out).parent.mkdir(parents=True, exist_ok=True)

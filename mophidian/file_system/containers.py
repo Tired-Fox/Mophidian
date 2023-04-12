@@ -1,16 +1,23 @@
 from __future__ import annotations
 from pathlib import Path
-from typing import Callable, Iterator
+from typing import Any, Callable, Iterator
 
 from mophidian.core.util import REGEX
 from .base import Node
-from .files import File, Layout, Page, Markdown, Static, Renderable, Nav, Component, FileState
+from .files import (
+    File,
+    Layout,
+    Page,
+    Markdown,
+    Static,
+    Renderable,
+    Nav,
+    Component,
+    FileState,
+)
 
-__all__ = [
-    "Container",
-    "Group",
-    "Directory"
-]
+__all__ = ["Container", "Group", "Directory"]
+
 
 def get_group_name(group: str) -> str:
     """Get the group name from the format `(name)`."""
@@ -18,6 +25,7 @@ def get_group_name(group: str) -> str:
     if name is not None:
         return name.group(1)
     return ""
+
 
 def first(condition: Callable, collection: list | dict | tuple) -> Any:
     """Find the first match given the condition.
@@ -34,6 +42,7 @@ def first(condition: Callable, collection: list | dict | tuple) -> Any:
             if condition(value):
                 return value
     return None
+
 
 class Container(Node):
     """Directory/Group representation of a file system node."""
@@ -58,6 +67,7 @@ class Container(Node):
         Raises:
             Exception: When no file is found that matches the full path.
         """
+
         def iterate_children(container: Container) -> bool:
             for child in container.children:
                 if isinstance(child, File) and child.full_path == full_path:
@@ -86,7 +96,7 @@ class Container(Node):
         """
 
         path = path.strip().strip("/")
-        
+
         result = None
         for file in self:
             if file.full_path.strip("/") == path:
@@ -97,7 +107,7 @@ class Container(Node):
                 return file
 
         return result
-    
+
     def static_by_name(self, name: str) -> File | None:
         """Get a file based on name. Returns the first matching static file.
 
@@ -109,7 +119,7 @@ class Container(Node):
         """
 
         static_files = self.static()
-        
+
         best_match = None
         for file in static_files:
             if file.file_name == name:
@@ -136,7 +146,10 @@ class Container(Node):
             for child in current.children:
                 if isinstance(child, Container) and child.name == node:
                     current = child
-                    result = first(lambda l: isinstance(l, Layout), current.children) or result
+                    result = (
+                        first(lambda l: isinstance(l, Layout), current.children)
+                        or result
+                    )
                     break
 
         return result
@@ -166,7 +179,8 @@ class Container(Node):
         pages = self.pages()
 
         result = first(
-            lambda l: sub(r"/?index.html", "", l._dest).strip("/") == path.strip(), list(pages)
+            lambda l: sub(r"/?index.html", "", l._dest).strip("/") == path.strip(),
+            list(pages),
         )
 
         if result is not None:
@@ -213,26 +227,33 @@ class Container(Node):
         current = self
         path = [item.root, *[i for i in item.path.split("/") if i.strip() != ""]]
         for i, segment in enumerate(path):
-            if Path('/'.join(path[: i + 1])).is_file():
-                if len([
-                    c for c in current.children
-                    if isinstance(c, File)
-                    and c.full_path == item.full_path
-                ]) > 0:
+            if Path("/".join(path[: i + 1])).is_file():
+                if (
+                    len(
+                        [
+                            c
+                            for c in current.children
+                            if isinstance(c, File) and c.full_path == item.full_path
+                        ]
+                    )
+                    > 0
+                ):
                     raise Exception(f"Duplicate file at path {item.full_path!r}")
 
                 current.children.append(item)
-            elif '/'.join(path[: i + 1]) != item.root:
-                new_path = Path(item.root).joinpath(*path[1: i + 1])
+            elif "/".join(path[: i + 1]) != item.root:
+                new_path = Path(item.root).joinpath(*path[1 : i + 1])
                 if REGEX["group"]["name"].match(segment) is not None:
                     found = False
                     if current.path.strip("/") == new_path.as_posix():
                         found = True
                     else:
                         for group in [
-                            child for child in current.children if isinstance(child, Group)
+                            child
+                            for child in current.children
+                            if isinstance(child, Group)
                         ]:
-                            if group.path == '/'.join(path[1 : i + 1]) + "/":
+                            if group.path == "/".join(path[1 : i + 1]) + "/":
                                 current = group
                                 found = True
                                 break
@@ -249,9 +270,11 @@ class Container(Node):
                         found = True
                     else:
                         for directory in [
-                            child for child in current.children if isinstance(child, Directory)
+                            child
+                            for child in current.children
+                            if isinstance(child, Directory)
                         ]:
-                            if directory.path.strip("/") == '/'.join(path[1 : i + 1]):
+                            if directory.path.strip("/") == "/".join(path[1 : i + 1]):
                                 current = directory
                                 found = True
                                 break
@@ -271,7 +294,9 @@ class Container(Node):
         for page in pages:
             if not page.unique:
                 current = nav_indexes
-                for node in [node for node in page.relative_url.split("/") if node != ""]:
+                for node in [
+                    node for node in page.relative_url.split("/") if node != ""
+                ]:
                     if REGEX["file"]["name"].match(node) is not None:
                         break
                     else:
@@ -312,10 +337,14 @@ class Container(Node):
             ]
 
             # Directories and Groups
-            _containers = [cont for cont in current.children if isinstance(cont, Container)]
+            _containers = [
+                cont for cont in current.children if isinstance(cont, Container)
+            ]
 
             if len(_layouts) > 1:
-                raise Exception(f"More than one layout for directory or group: {current.path}")
+                raise Exception(
+                    f"More than one layout for directory or group: {current.path}"
+                )
 
             # If layout is in current directory assign as current parent layout
             _layout = parent
@@ -337,7 +366,9 @@ class Container(Node):
             _pages = [page for page in current.children if isinstance(page, Renderable)]
 
             # Directories and Groups
-            _containers = [cont for cont in current.children if isinstance(cont, Container)]
+            _containers = [
+                cont for cont in current.children if isinstance(cont, Container)
+            ]
 
             for page in _pages:
                 if page.inherits:
@@ -357,7 +388,6 @@ class Container(Node):
 
         iterate_layouts(self)
         iterate_pages(self)
-                
 
     def files(self, ext: str | list[str] | None = None) -> list[File]:
         """List of all files in file system.
@@ -416,7 +446,7 @@ class Container(Node):
         for file in self:
             if isinstance(file, Markdown):
                 yield file
- 
+
     def components(self) -> Iterator[Component]:
         """Iterator of only component files in the file system."""
         for file in self:
@@ -425,9 +455,7 @@ class Container(Node):
 
     def print(self, depth: int = 0) -> str:
         """Colored terminal representation of the container."""
-        out = (
-            f"{' ' * depth}\x1b[34m{self.__class__.__name__}\x1b[0m > \x1b[32m{self.name!r}\x1b[0m"
-        )
+        out = f"{' ' * depth}\x1b[34m{self.__class__.__name__}\x1b[0m > \x1b[32m{self.name!r}\x1b[0m"
         if isinstance(self.children, list):
             for child in list(self.children):
                 out += "\n" + child.print(depth + 4)
@@ -435,7 +463,7 @@ class Container(Node):
 
     def __len__(self) -> int:
         return len(list(self))
-    
+
     def __iter__(self):
         def iterate_children(container: Container):
             for child in container.children:
@@ -443,7 +471,7 @@ class Container(Node):
                     yield child
                 else:
                     yield from iterate_children(child)
-            
+
         yield from iterate_children(self)
 
 
@@ -452,9 +480,9 @@ class Group(Container):
 
     def __init__(self, path: str, ignore: str = "") -> None:
         super().__init__(
-            path, 
-            get_group_name([node for node in path.split("/") if node != ""][-1]), 
-            ignore
+            path,
+            get_group_name([node for node in path.split("/") if node != ""][-1]),
+            ignore,
         )
 
 

@@ -1,6 +1,7 @@
 <nav id="header">
-    <a href="@"><h3>Mophidian</h3></a>
+    <a href="@/"><h3>Mophidian</h3></a>
     <ul>
+        <li><a href="@/api/">API</a></li>
         <li><a href="@/docs/">Docs</a></li>
         <li><a href="@/blog/">Blog</a></li>
     </ul>

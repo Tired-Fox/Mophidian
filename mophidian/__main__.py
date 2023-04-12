@@ -14,8 +14,6 @@ from mophidian.cli.styles import generate_highlight
 from mophidian.config import CONFIG
 from mophidian.core import (
     build as full_build,
-    generate_sitemaps,
-    generate_rss,
     Callbacks,
 )
 
@@ -96,10 +94,16 @@ def cli(version: bool = False):
     help="Force write files even if the rendered file already exists",
     default=False,
 )
+@click.option(
+    "--no-scripts",
+    flag_value=True,
+    default=False,
+    help="don't run pre build and post build scripts",
+)
 @cli.command(
     name="build", help=f"Compile and build the website to {CONFIG.site.dest!r}"
 )
-def build_command(debug: bool, dirty: bool):
+def build_command(debug: bool, dirty: bool, no_scripts: bool = False):
     """Build the website in the specified dest directory."""
 
     if debug:
@@ -108,14 +112,14 @@ def build_command(debug: bool, dirty: bool):
     if dirty:
         rmtree("out/")
 
-    states["dest"] = DestState.PREVIEW
-    file_system, _, _, _ = full_build(dirty=dirty)
+    states["dest"] = DestState.FINAL
+    file_system, _, _, _ = full_build(dirty=dirty, scripts=not no_scripts)
 
-    if CONFIG.build.sitemap.enabled:
-        generate_sitemaps(file_system)
+    # if CONFIG.build.sitemap.enabled:
+    #     generate_sitemaps(file_system)
 
-    if CONFIG.build.rss.enabled:
-        generate_rss(file_system)
+    # if CONFIG.build.rss.enabled:
+    #     generate_rss(file_system)
 
     Logger.flush()
 
@@ -209,8 +213,20 @@ def new(force: bool, preset: bool, name: str):
     default=False,
     help="expose the network url for the server",
 )
+@click.option(
+    "--host",
+    flag_value=True,
+    default=False,
+    help="expose the network url for the server",
+)
+@click.option(
+    "--no-scripts",
+    flag_value=True,
+    default=False,
+    help="don't run pre build and post build scripts",
+)
 @cli.command(name="dev")
-def dev(open: bool, host: bool, debug: bool = False):
+def dev(open: bool, host: bool, debug: bool = False, no_scripts: bool = False):
     """Serve the site; when files change, rebuild the site and reload the server."""
 
     if debug:
@@ -222,11 +238,15 @@ def dev(open: bool, host: bool, debug: bool = False):
         errors=CONFIG.site.root,
         auto_open=CONFIG.site.root if open else None,
         suppress=True,
-        live_callback=Callbacks(),
+        live_callback=Callbacks(not no_scripts),
     )
 
-    run_server(server, host)
-    rmtree("dist", ignore_errors=True)
+    try:
+        run_server(server, host)
+    except Exception as exc:
+        raise exc
+    finally:
+        rmtree("dist", ignore_errors=True)
 
 
 @cli.command(name="preview")
@@ -243,7 +263,13 @@ def dev(open: bool, host: bool, debug: bool = False):
     default=False,
     help="expose the network url for the server",
 )
-def preview(open: bool, host: bool):
+@click.option(
+    "--no-scripts",
+    flag_value=True,
+    default=False,
+    help="don't run pre build and post build scripts",
+)
+def preview(open: bool, host: bool, no_scripts: bool = False):
     """Preview the project. This includes building to the websites root and launching a server.
     There are no live updates, to get that use `moph serve`.
     """
@@ -257,8 +283,14 @@ def preview(open: bool, host: bool):
         suppress=True,
     )
 
-    run_server(server, host)
-    rmtree("dist", ignore_errors=True)
+    try:
+        full_build(True, no_scripts)
+
+        run_server(server, host)
+    except Exception as exc:
+        raise exc
+    finally:
+        rmtree("dist", ignore_errors=True)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,9 @@
+import os
 from saimll import SAIML, Logger
-from phml import PHML
+from phml import HypertextManager
 
 from mophidian import CONFIG, states
+from mophidian.compile_steps import init_steps
 from mophidian.core.util import filter_sort
 from .context import Mophidian
 from .construct import *
@@ -11,18 +13,23 @@ __all__ = [
     "build",
     "render_pages",
     "write_static_files",
-    "generate_sitemaps",
-    "generate_rss",
 ]
 
+init_steps()
 
-def build(dirty: bool = False):
+def build(dirty: bool = False, scripts: bool = False):
     """Take the components and files and render and write them to the given output directory."""
+
+    if scripts:
+        Logger.Debug("Running pre build commands")
+        for command in CONFIG.build.scripts.pre:
+            Logger.Debug(command)
+            os.system(command)
 
     Logger.Debug("Building pages")
 
     # ? Init phml parser/compiler with globally exposed variables
-    phml = PHML()
+    phml = HypertextManager()
     phml.expose(mophidian=Mophidian(), filter_sort=filter_sort)
 
     Logger.Debug("Discovering files and components")
@@ -33,10 +40,8 @@ def build(dirty: bool = False):
     public = construct_static(CONFIG.site.public)
 
     # ? Add components to phml compiler
-    phml.add(
-        *[(cmpt.cname, cmpt.full_path) for cmpt in components.components()],
-        strip=CONFIG.site.components,
-    )  # type: ignore
+    for cmpt in components.components():
+        phml.add(cmpt.full_path, ignore=CONFIG.site.components)
 
     # ? Render all the pages
     dest = states["dest"]
@@ -47,4 +52,11 @@ def build(dirty: bool = False):
     write_static_files(file_system, public, out=dest, dirty=dirty)
 
     Logger.Debug("Finished building pages")
+
+    if scripts:
+        Logger.Debug("Running post build commands")
+        for command in CONFIG.build.scripts.post:
+            Logger.Debug(command)
+            os.system(command)
+
     return file_system, public, components, phml

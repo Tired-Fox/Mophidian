@@ -1,4 +1,2 @@
-<>
-	<Header />
-  <Slot />
-</>
+<Header />
+<Slot />

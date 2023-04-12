@@ -1,17 +1,15 @@
-<>
-    <head>
-        <link rel="stylesheet" href="@/tailwind.css">
-        <link rel="stylesheet" href="@/blog/blog.css">
-        <link type="rss" />
-    </head>
-    <Header />
-    <div class="article-tag-list">
-        <div>
-            <For :each="tag in tags" @if="not blank(tags)">
-                <div class="article-tag">{{tag}}</div>
-            </For>
-        </div>
+<head>
+    <link rel="stylesheet" href="@/tailwind.css">
+    <link rel="stylesheet" href="@/blog/blog.css">
+    <link type="rss" />
+</head>
+<Header />
+<div class="article-tag-list">
+    <div @if="not blank(tags)">
+        <For :each="tag in tags">
+            <div class="article-tag">{{tag}}</div>
+        </For>
     </div>
-    <Slot />
-    <div class="spacer"></div>
-</>
+</div>
+<Slot />
+<div class="spacer"></div>
