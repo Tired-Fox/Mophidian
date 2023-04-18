@@ -57,6 +57,9 @@
 
             </li>
             <li>
+                    <a class="function" href="#warn_markdown_code_highlight">warn_markdown_code_highlight</a>
+            </li>
+            <li>
                     <a class="function" href="#init_phml">init_phml</a>
             </li>
     </ul>
@@ -82,37 +85,53 @@ mophidian    </h1>
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.2.4&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span> <span class="nn">phml</span> <span class="kn">import</span> <span class="n">HypertextManager</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">CONFIG</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="nd">@dataclass</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="k">class</span> <span class="nc">DestState</span><span class="p">:</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="n">FINAL</span> <span class="o">=</span> <span class="s2">&quot;out&quot;</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="sd">&quot;&quot;&quot;Compile files to `out` folder.&quot;&quot;&quot;</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="n">DEV</span> <span class="o">=</span> <span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;dist&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">CONFIG</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">root</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="sd">&quot;&quot;&quot;Compile files to `dist/{root}` folder.&quot;&quot;&quot;</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="k">class</span> <span class="nc">State</span><span class="p">:</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="n">markdown_code_highlight_warned</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="n">dest</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DestState</span><span class="o">.</span><span class="n">DEV</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="n">STATE</span> <span class="o">=</span> <span class="n">State</span><span class="p">()</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="k">def</span> <span class="nf">init_phml</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">HypertextManager</span><span class="p">:</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="kn">from</span> <span class="nn">.core.util</span> <span class="kn">import</span> <span class="n">filter_sort</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="kn">from</span> <span class="nn">.core.build.context</span> <span class="kn">import</span> <span class="n">Mophidian</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="n">phml</span> <span class="o">=</span> <span class="n">HypertextManager</span><span class="p">()</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="n">phml</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="n">mophidian</span><span class="o">=</span><span class="n">Mophidian</span><span class="p">(),</span> <span class="n">filter_sort</span><span class="o">=</span><span class="n">filter_sort</span><span class="p">)</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>    
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">python</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;**/*.py&quot;</span><span class="p">):</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>        <span class="n">phml</span><span class="o">.</span><span class="n">add_module</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span> <span class="n">ignore</span><span class="o">=</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">python</span><span class="p">)</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="k">return</span> <span class="n">phml</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">cache</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="kn">from</span> <span class="nn">phml</span> <span class="kn">import</span> <span class="n">HypertextManager</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">CONFIG</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="nd">@dataclass</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="k">class</span> <span class="nc">DestState</span><span class="p">:</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="n">FINAL</span> <span class="o">=</span> <span class="s2">&quot;out&quot;</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="sd">&quot;&quot;&quot;Compile files to `out` folder.&quot;&quot;&quot;</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="n">DEV</span> <span class="o">=</span> <span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;dist&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">CONFIG</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">root</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="sd">&quot;&quot;&quot;Compile files to `dist/{root}` folder.&quot;&quot;&quot;</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="k">class</span> <span class="nc">State</span><span class="p">:</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="n">markdown_code_highlight_warned</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="n">dest</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DestState</span><span class="o">.</span><span class="n">DEV</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="nd">@cache</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="k">def</span> <span class="nf">warn_markdown_code_highlight</span><span class="p">():</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="kn">from</span> <span class="nn">saimll</span> <span class="kn">import</span> <span class="n">Logger</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>    <span class="n">Logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>        <span class="s2">&quot;Markdown code highlighting requires a pygmentize css file. </span><span class="se">\</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="s2">Use `moph highlight` to create that file.&quot;</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="p">)</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>
 </span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="n">phml</span> <span class="o">=</span> <span class="n">init_phml</span><span class="p">()</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="n">STATE</span> <span class="o">=</span> <span class="n">State</span><span class="p">()</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="k">def</span> <span class="nf">init_phml</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">HypertextManager</span><span class="p">:</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>    <span class="kn">from</span> <span class="nn">.core.util</span> <span class="kn">import</span> <span class="n">filter_sort</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>    <span class="kn">from</span> <span class="nn">.core.build.context</span> <span class="kn">import</span> <span class="n">Mophidian</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>    <span class="n">phml</span> <span class="o">=</span> <span class="n">HypertextManager</span><span class="p">()</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>    <span class="n">phml</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="n">mophidian</span><span class="o">=</span><span class="n">Mophidian</span><span class="p">(),</span> <span class="n">filter_sort</span><span class="o">=</span><span class="n">filter_sort</span><span class="p">)</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">python</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;**/*.py&quot;</span><span class="p">):</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>        <span class="n">phml</span><span class="o">.</span><span class="n">add_module</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span> <span class="n">ignore</span><span class="o">=</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">python</span><span class="p">)</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="k">return</span> <span class="n">phml</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a><span class="n">phml</span> <span class="o">=</span> <span class="n">init_phml</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -129,12 +148,12 @@ mophidian    </h1>
 
     </div>
     <a class="headerlink" href="#DestState"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DestState-10"><a href="#DestState-10"><span class="linenos">10</span></a><span class="nd">@dataclass</span>
-</span><span id="DestState-11"><a href="#DestState-11"><span class="linenos">11</span></a><span class="k">class</span> <span class="nc">DestState</span><span class="p">:</span>
-</span><span id="DestState-12"><a href="#DestState-12"><span class="linenos">12</span></a>    <span class="n">FINAL</span> <span class="o">=</span> <span class="s2">&quot;out&quot;</span>
-</span><span id="DestState-13"><a href="#DestState-13"><span class="linenos">13</span></a>    <span class="sd">&quot;&quot;&quot;Compile files to `out` folder.&quot;&quot;&quot;</span>
-</span><span id="DestState-14"><a href="#DestState-14"><span class="linenos">14</span></a>    <span class="n">DEV</span> <span class="o">=</span> <span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;dist&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">CONFIG</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">root</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
-</span><span id="DestState-15"><a href="#DestState-15"><span class="linenos">15</span></a>    <span class="sd">&quot;&quot;&quot;Compile files to `dist/{root}` folder.&quot;&quot;&quot;</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DestState-12"><a href="#DestState-12"><span class="linenos">12</span></a><span class="nd">@dataclass</span>
+</span><span id="DestState-13"><a href="#DestState-13"><span class="linenos">13</span></a><span class="k">class</span> <span class="nc">DestState</span><span class="p">:</span>
+</span><span id="DestState-14"><a href="#DestState-14"><span class="linenos">14</span></a>    <span class="n">FINAL</span> <span class="o">=</span> <span class="s2">&quot;out&quot;</span>
+</span><span id="DestState-15"><a href="#DestState-15"><span class="linenos">15</span></a>    <span class="sd">&quot;&quot;&quot;Compile files to `out` folder.&quot;&quot;&quot;</span>
+</span><span id="DestState-16"><a href="#DestState-16"><span class="linenos">16</span></a>    <span class="n">DEV</span> <span class="o">=</span> <span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;dist&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">CONFIG</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">root</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+</span><span id="DestState-17"><a href="#DestState-17"><span class="linenos">17</span></a>    <span class="sd">&quot;&quot;&quot;Compile files to `dist/{root}` folder.&quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -190,9 +209,9 @@ mophidian    </h1>
 
     </div>
     <a class="headerlink" href="#State"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="State-17"><a href="#State-17"><span class="linenos">17</span></a><span class="k">class</span> <span class="nc">State</span><span class="p">:</span>
-</span><span id="State-18"><a href="#State-18"><span class="linenos">18</span></a>    <span class="n">markdown_code_highlight_warned</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="State-19"><a href="#State-19"><span class="linenos">19</span></a>    <span class="n">dest</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DestState</span><span class="o">.</span><span class="n">DEV</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="State-20"><a href="#State-20"><span class="linenos">20</span></a><span class="k">class</span> <span class="nc">State</span><span class="p">:</span>
+</span><span id="State-21"><a href="#State-21"><span class="linenos">21</span></a>    <span class="n">markdown_code_highlight_warned</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="State-22"><a href="#State-22"><span class="linenos">22</span></a>    <span class="n">dest</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DestState</span><span class="o">.</span><span class="n">DEV</span>
 </span></pre></div>
 
 
@@ -211,6 +230,31 @@ mophidian    </h1>
 
                             </div>
                 </section>
+                <section id="warn_markdown_code_highlight">
+                            <input id="warn_markdown_code_highlight-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+                    <div class="decorator">@cache</div>
+
+        <span class="def">def</span>
+        <span class="name">warn_markdown_code_highlight</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="warn_markdown_code_highlight-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#warn_markdown_code_highlight"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="warn_markdown_code_highlight-25"><a href="#warn_markdown_code_highlight-25"><span class="linenos">25</span></a><span class="nd">@cache</span>
+</span><span id="warn_markdown_code_highlight-26"><a href="#warn_markdown_code_highlight-26"><span class="linenos">26</span></a><span class="k">def</span> <span class="nf">warn_markdown_code_highlight</span><span class="p">():</span>
+</span><span id="warn_markdown_code_highlight-27"><a href="#warn_markdown_code_highlight-27"><span class="linenos">27</span></a>    <span class="kn">from</span> <span class="nn">saimll</span> <span class="kn">import</span> <span class="n">Logger</span>
+</span><span id="warn_markdown_code_highlight-28"><a href="#warn_markdown_code_highlight-28"><span class="linenos">28</span></a>    <span class="n">Logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+</span><span id="warn_markdown_code_highlight-29"><a href="#warn_markdown_code_highlight-29"><span class="linenos">29</span></a>        <span class="s2">&quot;Markdown code highlighting requires a pygmentize css file. </span><span class="se">\</span>
+</span><span id="warn_markdown_code_highlight-30"><a href="#warn_markdown_code_highlight-30"><span class="linenos">30</span></a><span class="s2">Use `moph highlight` to create that file.&quot;</span>
+</span><span id="warn_markdown_code_highlight-31"><a href="#warn_markdown_code_highlight-31"><span class="linenos">31</span></a>    <span class="p">)</span>
+</span></pre></div>
+
+
+    
+
+                </section>
                 <section id="init_phml">
                             <input id="init_phml-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -222,16 +266,17 @@ mophidian    </h1>
 
     </div>
     <a class="headerlink" href="#init_phml"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="init_phml-23"><a href="#init_phml-23"><span class="linenos">23</span></a><span class="k">def</span> <span class="nf">init_phml</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">HypertextManager</span><span class="p">:</span>
-</span><span id="init_phml-24"><a href="#init_phml-24"><span class="linenos">24</span></a>    <span class="kn">from</span> <span class="nn">.core.util</span> <span class="kn">import</span> <span class="n">filter_sort</span>
-</span><span id="init_phml-25"><a href="#init_phml-25"><span class="linenos">25</span></a>    <span class="kn">from</span> <span class="nn">.core.build.context</span> <span class="kn">import</span> <span class="n">Mophidian</span>
-</span><span id="init_phml-26"><a href="#init_phml-26"><span class="linenos">26</span></a>    <span class="n">phml</span> <span class="o">=</span> <span class="n">HypertextManager</span><span class="p">()</span>
-</span><span id="init_phml-27"><a href="#init_phml-27"><span class="linenos">27</span></a>    <span class="n">phml</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="n">mophidian</span><span class="o">=</span><span class="n">Mophidian</span><span class="p">(),</span> <span class="n">filter_sort</span><span class="o">=</span><span class="n">filter_sort</span><span class="p">)</span>
-</span><span id="init_phml-28"><a href="#init_phml-28"><span class="linenos">28</span></a>    
-</span><span id="init_phml-29"><a href="#init_phml-29"><span class="linenos">29</span></a>    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">python</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;**/*.py&quot;</span><span class="p">):</span>
-</span><span id="init_phml-30"><a href="#init_phml-30"><span class="linenos">30</span></a>        <span class="n">phml</span><span class="o">.</span><span class="n">add_module</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span> <span class="n">ignore</span><span class="o">=</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">python</span><span class="p">)</span>
-</span><span id="init_phml-31"><a href="#init_phml-31"><span class="linenos">31</span></a>
-</span><span id="init_phml-32"><a href="#init_phml-32"><span class="linenos">32</span></a>    <span class="k">return</span> <span class="n">phml</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="init_phml-37"><a href="#init_phml-37"><span class="linenos">37</span></a><span class="k">def</span> <span class="nf">init_phml</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">HypertextManager</span><span class="p">:</span>
+</span><span id="init_phml-38"><a href="#init_phml-38"><span class="linenos">38</span></a>    <span class="kn">from</span> <span class="nn">.core.util</span> <span class="kn">import</span> <span class="n">filter_sort</span>
+</span><span id="init_phml-39"><a href="#init_phml-39"><span class="linenos">39</span></a>    <span class="kn">from</span> <span class="nn">.core.build.context</span> <span class="kn">import</span> <span class="n">Mophidian</span>
+</span><span id="init_phml-40"><a href="#init_phml-40"><span class="linenos">40</span></a>
+</span><span id="init_phml-41"><a href="#init_phml-41"><span class="linenos">41</span></a>    <span class="n">phml</span> <span class="o">=</span> <span class="n">HypertextManager</span><span class="p">()</span>
+</span><span id="init_phml-42"><a href="#init_phml-42"><span class="linenos">42</span></a>    <span class="n">phml</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="n">mophidian</span><span class="o">=</span><span class="n">Mophidian</span><span class="p">(),</span> <span class="n">filter_sort</span><span class="o">=</span><span class="n">filter_sort</span><span class="p">)</span>
+</span><span id="init_phml-43"><a href="#init_phml-43"><span class="linenos">43</span></a>
+</span><span id="init_phml-44"><a href="#init_phml-44"><span class="linenos">44</span></a>    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">Path</span><span class="p">(</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">python</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;**/*.py&quot;</span><span class="p">):</span>
+</span><span id="init_phml-45"><a href="#init_phml-45"><span class="linenos">45</span></a>        <span class="n">phml</span><span class="o">.</span><span class="n">add_module</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span> <span class="n">ignore</span><span class="o">=</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">python</span><span class="p">)</span>
+</span><span id="init_phml-46"><a href="#init_phml-46"><span class="linenos">46</span></a>
+</span><span id="init_phml-47"><a href="#init_phml-47"><span class="linenos">47</span></a>    <span class="k">return</span> <span class="n">phml</span>
 </span></pre></div>
 
 

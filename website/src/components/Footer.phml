@@ -1,10 +1,36 @@
+<python>
+  from .data import socials
+</python>
 <footer>
-    <small>&copy; 2023 Zachary Boehm; All rights reserved</small>
+    <small class="copyright">&copy; 2023 Zachary Boehm; All rights reserved</small>
+    <div class="socials">
+      <For :each="key, value in socials.items()">
+        <a :href="value['link']" :title="key">{{ value['icon'] }}</a>
+      </For>
+    </div>
 </footer>
 <style scoped>
+    .copyright {
+        min-width: 50%;
+    }
     footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+
         text-align: center;
         margin-top: 4rem;
         margin-bottom: .5rem;
+        margin-inline: 3rem;
+    }
+
+    .socials {
+      display: flex;
+      justify-content: center;
+      gap: .25rem;
+      flex: 1;
+      width: 100%;
     }
 </style>

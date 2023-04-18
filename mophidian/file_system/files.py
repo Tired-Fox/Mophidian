@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from functools import cached_property, cache
+from functools import cached_property
 
 from pathlib import Path
 from shutil import copyfile, SameFileError  # For copying static files
@@ -197,7 +197,7 @@ class File(Node):
         super().__init__(path, ignore)
         self.unique = unique
         self.epoch = 0.0
-        self._hash_ = hash(path) + hash(ignore) + hash(unique)
+        self._hash_ = hash(path)
 
         # file name
         file_info = REGEX["file"]["name"].search(path)
@@ -562,12 +562,7 @@ class Markdown(Renderable):
                     page_files.find(CONFIG.markdown.pygmentize.path) is None
                     and static_files.find(CONFIG.markdown.pygmentize.path) is None
                 ):
-                    if not mophidian.STATE.markdown_code_highlight_warned:
-                        Logger.warning(
-                            "Markdown code highlighting requires a pygmentize css file. \
-Use `moph highlight` to create that file."
-                        )
-                        mophidian.STATE.markdown_code_highlight_warned = True
+                    mophidian.warn_markdown_code_highlight()
                 else:
                     head.insert(
                         -1,
@@ -676,7 +671,6 @@ class Layout(File, Linker):
         Linker.__init__(self)
         self.parent: Layout | None = None
         self.linked_files = []
-        self._hash_ = hash(path) + hash(ignore)
 
     def __fetch_layouts(self) -> list[Layout]:
         lyts = [self]
@@ -687,9 +681,8 @@ class Layout(File, Linker):
         return list(reversed(lyts))
 
     def __hash__(self) -> int:
-        return self._hash_ + len(self.linked_files)
+        return self._hash_ + hash(self.parent)
 
-    @cache
     def ast(self) -> AST:
         layouts = self.__fetch_layouts()
         ast = mophidian.phml.parse("<Slot/>").ast
