@@ -1,10 +1,26 @@
 from __future__ import annotations
 
-from typing import Literal
-
-from tcfg import TypePath, cfg
+from tcfg import PathType, cfg, new, Option
 
 __all__ = ["Pygmentize", "MarkdownWrapper", "Markdown", "Site", "Build", "Config"]
+
+def merge(dest: dict, source: dict):
+    """Merge a dictionary into another dictionary. Only adding keys that don't already exist. It
+    will only replace the deepest keys.
+
+    Note:
+        The method mutates the destination dict.
+    """
+    for key, value in source.items():
+        if key in dest:
+            if type(value) != type(dest[key]):
+                dest[key] = value
+            elif not isinstance(value, dict):
+                dest[key] = value
+            elif isinstance(value, dict):
+                merge(dest[key], value)
+        else:
+            dest[key] = value
 
 default_extensions = {
     "abbr",
@@ -75,7 +91,7 @@ class Markdown(cfg):
     configs. If True then only use what is provided in the config.
     """
 
-    extensions: list[str] = [
+    extensions: set[str] = {
         "abbr",
         "admonition",
         "attr_list",
@@ -95,7 +111,7 @@ class Markdown(cfg):
         "pymdownx.tabbed",
         "pymdownx.tasklist",
         "pymdownx.tilde",
-    ]
+    }
     """The markdown extensions that are to be used for every markdown file."""
 
     extension_configs: dict[str, dict] = {
@@ -116,40 +132,45 @@ https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, I
 class Site(cfg):
     """Mophidian.site configuration."""
 
-    name: str = ""
+    name: str
     """The name of the site. Defaults to `Mophidian`"""
 
-    description: str = ""
+    description: str
     """The websites description."""
 
-    url: str = ""
+    url: str
     """Base url for the website. Example: https://{user}.github.io/"""
 
     version: str = "1.0"
     """The version of the site `ex`: 0.1 or 1. Defaults to `1.0`"""
 
-    source: str = TypePath("src/pages/")
+    source: PathType[True] = new("src/pages/")
     """The directory to use for the source files."""
 
-    components: str = TypePath("src/components/")
+    components: PathType[True] = new("src/components/")
     """The directory to use for the component files."""
 
-    public: str = TypePath("public/")
+    public: PathType[True] = new("public/")
+    """The directory where all static/public files go. These files are never transformed."""
 
-    dest: str = TypePath("out/")
+    python: PathType[True] = new("src/python/")
+    """The directory where exposed python modules are located. Each file is exposed as a local
+    module i.e. `.<file_name>`. All data inside these modules can be imported and accessed"""
+
+    dest: PathType[True] = new("out/")
     """The directory to put the built files into. Defaults to `site/`"""
 
-    root: str = TypePath("")
+    root: PathType
     """Root directory of the website. Used for links.
     Ex: `https://user.github.io/project/` where `project/` is the directory of
     the website. Defaults to ``
     """
 
-    meta_tags: list[Literal["charset", "http_equiv", "viewport"]] = [
+    meta_tags: set[Option["charset", "http_equiv", "viewport"]] = {
         "charset",
         "http_equiv",
         "viewport",
-    ]
+    }
     """Which default meta tags should mophidian include
     in the base page head tag.
 
@@ -159,51 +180,6 @@ class Site(cfg):
         'viewport': `<meta name="viewport" content="width=device-width,
             initial-scale=1.0">`
     """
-
-
-# class RSSImage(cfg):
-#     """Mophidian.build.rss.image configuration."""
-
-#     title: str = ""
-#     """Image title"""
-#     url: str = ""
-#     """Image url"""
-#     width: int = 31
-#     """Image width. Max of 144"""
-#     height: int = 88
-#     """Image height. Max of 400"""
-
-
-# class RSS(cfg):
-#     """Mophidian.build.rss configuration."""
-
-#     enabled: bool = False
-#     """Toggle to generate a rss feed on build and expose the link to the pages.
-#     """
-
-#     paths: list[str]
-#     """Paths of what markdown files to use for the rss feed. If no paths are
-#     specified then all rendered markdown files are added to the rss feed."""
-
-#     image: RSSImage
-#     """Mophidian.build.rss.image configuration"""
-
-#     language: str = "en-us"
-#     """(str) The language associated with the rss feed. Example: en-us."""
-
-
-# class Sitemap(cfg):
-#     """Mophidian.build.sitemap configuration."""
-
-#     enabled: bool = False
-#     """Toggle to generate a sitemap on build."""
-
-#     patterns: list[str]
-#     """If you have a large site you may specify patters to apply. Each pattern
-#     is computed into it's own sitemap and referenced in a sitemap index. If no
-#     patterns are specified then a single sitemap is generated for all rendered
-#     pages.
-#     """
 
 class Scripts(cfg):
     """Mophidian.build.scripts configuration"""
@@ -223,13 +199,9 @@ class Build(cfg):
     """
 
     scripts: Scripts
-    # sitemap: Sitemap
-    # """Mophidian.build.sitemap configuration"""
+    """User defined commands to run before and after a build."""
 
-    # rss: RSS
-    # """Mophidian.build.rss configuration"""
-
-    favicon: str = TypePath("/favicon.ico")
+    favicon: PathType[True] = new("/favicon.ico")
     """Path to the favicon from website root."""
 
     body: dict[str, str | list[str]]
@@ -253,16 +225,13 @@ class Config(cfg):
     build: Build
     """Build configuration."""
 
-    data: str = "\x1b[33m"
-
-
 CONFIG = Config()
 
 if CONFIG.markdown.extensions != default_extensions:
     for extension in CONFIG.markdown.extensions:
         default_extensions.add(extension)
-    CONFIG.markdown.extensions = list(default_extensions)
+    CONFIG.markdown.extensions = default_extensions
 
 if CONFIG.markdown.extension_configs != default_extension_configs:
-    default_extension_configs.update(CONFIG.markdown.extension_configs)
+    merge(default_extension_configs, CONFIG.markdown.extension_configs)
     CONFIG.markdown.extension_configs = default_extension_configs
