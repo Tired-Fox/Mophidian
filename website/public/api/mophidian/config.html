@@ -91,6 +91,12 @@
                                 <a class="variable" href="#Site.components">components</a>
                         </li>
                         <li>
+                                <a class="variable" href="#Site.public">public</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Site.python">python</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#Site.dest">dest</a>
                         </li>
                         <li>
@@ -107,6 +113,9 @@
                             <ul class="memberlist">
                         <li>
                                 <a class="variable" href="#Build.refresh_delay">refresh_delay</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Build.scripts">scripts</a>
                         </li>
                         <li>
                                 <a class="variable" href="#Build.favicon">favicon</a>
@@ -158,272 +167,241 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">from</span> <span class="nn">tcfg</span> <span class="kn">import</span> <span class="n">PathType</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">new</span><span class="p">,</span> <span class="n">Option</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span> <span class="nn">tcfg</span> <span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">cfg</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Pygmentize&quot;</span><span class="p">,</span> <span class="s2">&quot;MarkdownWrapper&quot;</span><span class="p">,</span> <span class="s2">&quot;Markdown&quot;</span><span class="p">,</span> <span class="s2">&quot;Site&quot;</span><span class="p">,</span> <span class="s2">&quot;Build&quot;</span><span class="p">,</span> <span class="s2">&quot;Config&quot;</span><span class="p">]</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Pygmentize&quot;</span><span class="p">,</span> <span class="s2">&quot;MarkdownWrapper&quot;</span><span class="p">,</span> <span class="s2">&quot;Markdown&quot;</span><span class="p">,</span> <span class="s2">&quot;Site&quot;</span><span class="p">,</span> <span class="s2">&quot;Build&quot;</span><span class="p">,</span> <span class="s2">&quot;Config&quot;</span><span class="p">]</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="n">default_extensions</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>    <span class="s2">&quot;abbr&quot;</span><span class="p">,</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a>    <span class="s2">&quot;admonition&quot;</span><span class="p">,</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>    <span class="s2">&quot;attr_list&quot;</span><span class="p">,</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>    <span class="s2">&quot;def_list&quot;</span><span class="p">,</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>    <span class="s2">&quot;footnotes&quot;</span><span class="p">,</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>    <span class="s2">&quot;md_in_html&quot;</span><span class="p">,</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a>    <span class="s2">&quot;tables&quot;</span><span class="p">,</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>    <span class="s2">&quot;toc&quot;</span><span class="p">,</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>    <span class="s2">&quot;wikilinks&quot;</span><span class="p">,</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>    <span class="s2">&quot;codehilite&quot;</span><span class="p">,</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>    <span class="s2">&quot;pymdownx.betterem&quot;</span><span class="p">,</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>    <span class="s2">&quot;pymdownx.caret&quot;</span><span class="p">,</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>    <span class="s2">&quot;pymdownx.details&quot;</span><span class="p">,</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>    <span class="s2">&quot;pymdownx.mark&quot;</span><span class="p">,</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>    <span class="s2">&quot;pymdownx.smartsymbols&quot;</span><span class="p">,</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>    <span class="s2">&quot;pymdownx.superfences&quot;</span><span class="p">,</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>    <span class="s2">&quot;pymdownx.tabbed&quot;</span><span class="p">,</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>    <span class="s2">&quot;pymdownx.tasklist&quot;</span><span class="p">,</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>    <span class="s2">&quot;pymdownx.tilde&quot;</span><span class="p">,</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="p">}</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="n">default_extension_configs</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>    <span class="s2">&quot;footnotes&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>        <span class="s2">&quot;BACKLINK_TEXT&quot;</span><span class="p">:</span> <span class="s1">&#39;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 384 512&quot; </span><span class="se">\</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="s1">class=&quot;fn-backlink&quot; style=&quot;width: .75rem; height: .75rem;&quot; fill=&quot;currentColor&quot;&gt;&lt;!--! </span><span class="se">\</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="s1">Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - </span><span class="se">\</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="s1">https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --&gt;</span><span class="se">\</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="s1">&lt;path d=&quot;M32 448c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c53 0 96-43 96-96l0-306.7 73.4 73.4c12.5 </span><span class="se">\</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="s1">12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-12.5 </span><span class="se">\</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="s1">12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 109.3 160 416c0 17.7-14.3 32-32 32l-96 0z&quot;/&gt;&lt;/svg&gt;&#39;</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>    <span class="p">},</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>    <span class="s2">&quot;codehilite&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;css_class&quot;</span><span class="p">:</span> <span class="s2">&quot;highlight&quot;</span><span class="p">},</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="p">}</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="k">class</span> <span class="nc">Pygmentize</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.markdown.pygmentize configuration.&quot;&quot;&quot;</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>    <span class="n">highlight</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>    <span class="sd">&quot;&quot;&quot;Whether to include the highlight css in the head.&quot;&quot;&quot;</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;highlight.css&quot;</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>    <span class="sd">&quot;&quot;&quot;Path of where to generate the pygmentize css file.&quot;&quot;&quot;</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="k">class</span> <span class="nc">MarkdownWrapper</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.markdown.wrapper configuration.&quot;&quot;&quot;</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;article&quot;</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="sd">&quot;&quot;&quot;Tag of the element that wraps the markdown.&quot;&quot;&quot;</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="n">dest</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>    <span class="sd">&quot;&quot;&quot;Merge a dictionary into another dictionary. Only adding keys that don&#39;t already exist. It</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="sd">    will only replace the deepest keys.</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="sd">    Note:</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="sd">        The method mutates the destination dict.</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dest</span><span class="p">:</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a>            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">dest</span><span class="p">[</span><span class="n">key</span><span class="p">]):</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>                <span class="n">dest</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>                <span class="n">dest</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>                <span class="n">merge</span><span class="p">(</span><span class="n">dest</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">value</span><span class="p">)</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>            <span class="n">dest</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="n">default_extensions</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>    <span class="s2">&quot;abbr&quot;</span><span class="p">,</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>    <span class="s2">&quot;admonition&quot;</span><span class="p">,</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>    <span class="s2">&quot;attr_list&quot;</span><span class="p">,</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>    <span class="s2">&quot;def_list&quot;</span><span class="p">,</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>    <span class="s2">&quot;footnotes&quot;</span><span class="p">,</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>    <span class="s2">&quot;md_in_html&quot;</span><span class="p">,</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>    <span class="s2">&quot;tables&quot;</span><span class="p">,</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>    <span class="s2">&quot;toc&quot;</span><span class="p">,</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>    <span class="s2">&quot;wikilinks&quot;</span><span class="p">,</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>    <span class="s2">&quot;codehilite&quot;</span><span class="p">,</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>    <span class="s2">&quot;pymdownx.betterem&quot;</span><span class="p">,</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>    <span class="s2">&quot;pymdownx.caret&quot;</span><span class="p">,</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>    <span class="s2">&quot;pymdownx.details&quot;</span><span class="p">,</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>    <span class="s2">&quot;pymdownx.mark&quot;</span><span class="p">,</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>    <span class="s2">&quot;pymdownx.smartsymbols&quot;</span><span class="p">,</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>    <span class="s2">&quot;pymdownx.superfences&quot;</span><span class="p">,</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>    <span class="s2">&quot;pymdownx.tabbed&quot;</span><span class="p">,</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>    <span class="s2">&quot;pymdownx.tasklist&quot;</span><span class="p">,</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>    <span class="s2">&quot;pymdownx.tilde&quot;</span><span class="p">,</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="p">}</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="n">default_extension_configs</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>    <span class="s2">&quot;footnotes&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>        <span class="s2">&quot;BACKLINK_TEXT&quot;</span><span class="p">:</span> <span class="s1">&#39;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 384 512&quot; </span><span class="se">\</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="s1">class=&quot;fn-backlink&quot; style=&quot;width: .75rem; height: .75rem;&quot; fill=&quot;currentColor&quot;&gt;&lt;!--! </span><span class="se">\</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a><span class="s1">Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - </span><span class="se">\</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="s1">https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --&gt;</span><span class="se">\</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="s1">&lt;path d=&quot;M32 448c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c53 0 96-43 96-96l0-306.7 73.4 73.4c12.5 </span><span class="se">\</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="s1">12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-12.5 </span><span class="se">\</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="s1">12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 109.3 160 416c0 17.7-14.3 32-32 32l-96 0z&quot;/&gt;&lt;/svg&gt;&#39;</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="p">},</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>    <span class="s2">&quot;codehilite&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;css_class&quot;</span><span class="p">:</span> <span class="s2">&quot;highlight&quot;</span><span class="p">},</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="p">}</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
 </span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>    <span class="n">attributes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>    <span class="sd">&quot;&quot;&quot;The attributes to apply to the markdown wrapper element.&quot;&quot;&quot;</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="k">class</span> <span class="nc">Pygmentize</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.markdown.pygmentize configuration.&quot;&quot;&quot;</span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="k">class</span> <span class="nc">Markdown</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.markdown configuration.&quot;&quot;&quot;</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    <span class="n">wrapper</span><span class="p">:</span> <span class="n">MarkdownWrapper</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="n">highlight</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>    <span class="sd">&quot;&quot;&quot;Whether to include the highlight css in the head.&quot;&quot;&quot;</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;highlight.css&quot;</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>    <span class="sd">&quot;&quot;&quot;Path of where to generate the pygmentize css file.&quot;&quot;&quot;</span>
 </span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>    <span class="n">pygmentize</span><span class="p">:</span> <span class="n">Pygmentize</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>    <span class="n">override_defaults</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>    <span class="sd">&quot;&quot;&quot;Flag for overriding default extensions and extension configs. Default</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="sd">    allows adding to extensions list and overriding existing default extension</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">    configs. If True then only use what is provided in the config.</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>    <span class="n">extensions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>        <span class="s2">&quot;abbr&quot;</span><span class="p">,</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>        <span class="s2">&quot;admonition&quot;</span><span class="p">,</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>        <span class="s2">&quot;attr_list&quot;</span><span class="p">,</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>        <span class="s2">&quot;def_list&quot;</span><span class="p">,</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>        <span class="s2">&quot;footnotes&quot;</span><span class="p">,</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>        <span class="s2">&quot;md_in_html&quot;</span><span class="p">,</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>        <span class="s2">&quot;tables&quot;</span><span class="p">,</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>        <span class="s2">&quot;toc&quot;</span><span class="p">,</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>        <span class="s2">&quot;wikilinks&quot;</span><span class="p">,</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="s2">&quot;codehilite&quot;</span><span class="p">,</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>        <span class="s2">&quot;pymdownx.betterem&quot;</span><span class="p">,</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>        <span class="s2">&quot;pymdownx.caret&quot;</span><span class="p">,</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>        <span class="s2">&quot;pymdownx.details&quot;</span><span class="p">,</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>        <span class="s2">&quot;pymdownx.mark&quot;</span><span class="p">,</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>        <span class="s2">&quot;pymdownx.smartsymbols&quot;</span><span class="p">,</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>        <span class="s2">&quot;pymdownx.superfences&quot;</span><span class="p">,</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>        <span class="s2">&quot;pymdownx.tabbed&quot;</span><span class="p">,</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>        <span class="s2">&quot;pymdownx.tasklist&quot;</span><span class="p">,</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>        <span class="s2">&quot;pymdownx.tilde&quot;</span><span class="p">,</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="p">]</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="sd">&quot;&quot;&quot;The markdown extensions that are to be used for every markdown file.&quot;&quot;&quot;</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="n">extension_configs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>        <span class="s2">&quot;footnotes&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>            <span class="s2">&quot;BACKLINK_TEXT&quot;</span><span class="p">:</span> <span class="s1">&#39;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 384 512&quot; </span><span class="se">\</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="s1">class=&quot;fn-backlink&quot; style=&quot;width: .75rem; height: .75rem;&quot; fill=&quot;currentColor&quot;&gt;&lt;!--! </span><span class="se">\</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="s1">Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - </span><span class="se">\</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="s1">https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --&gt;</span><span class="se">\</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="s1">&lt;path d=&quot;M32 448c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c53 0 96-43 96-96l0-306.7 73.4 73.4c12.5 </span><span class="se">\</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="s1">12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-12.5 </span><span class="se">\</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="s1">12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 109.3 160 416c0 17.7-14.3 32-32 32l-96 0z&quot;/&gt;&lt;/svg&gt;&#39;</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>        <span class="p">},</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        <span class="s2">&quot;codehilite&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;css_class&quot;</span><span class="p">:</span> <span class="s2">&quot;highlight&quot;</span><span class="p">},</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>    <span class="p">}</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>    <span class="sd">&quot;&quot;&quot;The configurations for each markdown extension.&quot;&quot;&quot;</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="k">class</span> <span class="nc">Site</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.site configuration.&quot;&quot;&quot;</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>    <span class="sd">&quot;&quot;&quot;The name of the site. Defaults to `Mophidian`&quot;&quot;&quot;</span>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>    <span class="sd">&quot;&quot;&quot;The websites description.&quot;&quot;&quot;</span>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>    <span class="sd">&quot;&quot;&quot;Base url for the website. Example: https://{user}.github.io/&quot;&quot;&quot;</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>
-</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1.0&quot;</span>
-</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>    <span class="sd">&quot;&quot;&quot;The version of the site `ex`: 0.1 or 1. Defaults to `1.0`&quot;&quot;&quot;</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="k">class</span> <span class="nc">MarkdownWrapper</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.markdown.wrapper configuration.&quot;&quot;&quot;</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;article&quot;</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>    <span class="sd">&quot;&quot;&quot;Tag of the element that wraps the markdown.&quot;&quot;&quot;</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>    <span class="n">attributes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>    <span class="sd">&quot;&quot;&quot;The attributes to apply to the markdown wrapper element.&quot;&quot;&quot;</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="k">class</span> <span class="nc">Markdown</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.markdown configuration.&quot;&quot;&quot;</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>    <span class="n">wrapper</span><span class="p">:</span> <span class="n">MarkdownWrapper</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>    <span class="n">pygmentize</span><span class="p">:</span> <span class="n">Pygmentize</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>    <span class="n">override_defaults</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>    <span class="sd">&quot;&quot;&quot;Flag for overriding default extensions and extension configs. Default</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">    allows adding to extensions list and overriding existing default extension</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">    configs. If True then only use what is provided in the config.</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>    <span class="n">extensions</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>        <span class="s2">&quot;abbr&quot;</span><span class="p">,</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>        <span class="s2">&quot;admonition&quot;</span><span class="p">,</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>        <span class="s2">&quot;attr_list&quot;</span><span class="p">,</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>        <span class="s2">&quot;def_list&quot;</span><span class="p">,</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>        <span class="s2">&quot;footnotes&quot;</span><span class="p">,</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>        <span class="s2">&quot;md_in_html&quot;</span><span class="p">,</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>        <span class="s2">&quot;tables&quot;</span><span class="p">,</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>        <span class="s2">&quot;toc&quot;</span><span class="p">,</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>        <span class="s2">&quot;wikilinks&quot;</span><span class="p">,</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="s2">&quot;codehilite&quot;</span><span class="p">,</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="s2">&quot;pymdownx.betterem&quot;</span><span class="p">,</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>        <span class="s2">&quot;pymdownx.caret&quot;</span><span class="p">,</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>        <span class="s2">&quot;pymdownx.details&quot;</span><span class="p">,</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>        <span class="s2">&quot;pymdownx.mark&quot;</span><span class="p">,</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>        <span class="s2">&quot;pymdownx.smartsymbols&quot;</span><span class="p">,</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>        <span class="s2">&quot;pymdownx.superfences&quot;</span><span class="p">,</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        <span class="s2">&quot;pymdownx.tabbed&quot;</span><span class="p">,</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>        <span class="s2">&quot;pymdownx.tasklist&quot;</span><span class="p">,</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        <span class="s2">&quot;pymdownx.tilde&quot;</span><span class="p">,</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="p">}</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="sd">&quot;&quot;&quot;The markdown extensions that are to be used for every markdown file.&quot;&quot;&quot;</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>    <span class="n">extension_configs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="s2">&quot;footnotes&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>            <span class="s2">&quot;BACKLINK_TEXT&quot;</span><span class="p">:</span> <span class="s1">&#39;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 384 512&quot; </span><span class="se">\</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="s1">class=&quot;fn-backlink&quot; style=&quot;width: .75rem; height: .75rem;&quot; fill=&quot;currentColor&quot;&gt;&lt;!--! </span><span class="se">\</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="s1">Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - </span><span class="se">\</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="s1">https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --&gt;</span><span class="se">\</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="s1">&lt;path d=&quot;M32 448c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c53 0 96-43 96-96l0-306.7 73.4 73.4c12.5 </span><span class="se">\</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="s1">12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-12.5 </span><span class="se">\</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="s1">12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 109.3 160 416c0 17.7-14.3 32-32 32l-96 0z&quot;/&gt;&lt;/svg&gt;&#39;</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>        <span class="p">},</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>        <span class="s2">&quot;codehilite&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;css_class&quot;</span><span class="p">:</span> <span class="s2">&quot;highlight&quot;</span><span class="p">},</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>    <span class="p">}</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>    <span class="sd">&quot;&quot;&quot;The configurations for each markdown extension.&quot;&quot;&quot;</span>
 </span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>
-</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;src/pages/&quot;</span><span class="p">)</span>
-</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>    <span class="sd">&quot;&quot;&quot;The directory to use for the source files.&quot;&quot;&quot;</span>
-</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>
-</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>    <span class="n">components</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;src/components/&quot;</span><span class="p">)</span>
-</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>    <span class="sd">&quot;&quot;&quot;The directory to use for the component files.&quot;&quot;&quot;</span>
-</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>
-</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>    <span class="n">public</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;public/&quot;</span><span class="p">)</span>
-</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>
-</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>    <span class="n">dest</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;out/&quot;</span><span class="p">)</span>
-</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>    <span class="sd">&quot;&quot;&quot;The directory to put the built files into. Defaults to `site/`&quot;&quot;&quot;</span>
-</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>
-</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>    <span class="n">root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>    <span class="sd">&quot;&quot;&quot;Root directory of the website. Used for links.</span>
-</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a><span class="sd">    Ex: `https://user.github.io/project/` where `project/` is the directory of</span>
-</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a><span class="sd">    the website. Defaults to ``</span>
-</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>    <span class="n">meta_tags</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;charset&quot;</span><span class="p">,</span> <span class="s2">&quot;http_equiv&quot;</span><span class="p">,</span> <span class="s2">&quot;viewport&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>        <span class="s2">&quot;charset&quot;</span><span class="p">,</span>
-</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>        <span class="s2">&quot;http_equiv&quot;</span><span class="p">,</span>
-</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>        <span class="s2">&quot;viewport&quot;</span><span class="p">,</span>
-</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>    <span class="p">]</span>
-</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>    <span class="sd">&quot;&quot;&quot;Which default meta tags should mophidian include</span>
-</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a><span class="sd">    in the base page head tag.</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="k">class</span> <span class="nc">Site</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.site configuration.&quot;&quot;&quot;</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>    <span class="sd">&quot;&quot;&quot;The name of the site. Defaults to `Mophidian`&quot;&quot;&quot;</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>    <span class="sd">&quot;&quot;&quot;The websites description.&quot;&quot;&quot;</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>    <span class="sd">&quot;&quot;&quot;Base url for the website. Example: https://{user}.github.io/&quot;&quot;&quot;</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1.0&quot;</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>    <span class="sd">&quot;&quot;&quot;The version of the site `ex`: 0.1 or 1. Defaults to `1.0`&quot;&quot;&quot;</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>    <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">(</span><span class="s2">&quot;src/pages/&quot;</span><span class="p">)</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>    <span class="sd">&quot;&quot;&quot;The directory to use for the source files.&quot;&quot;&quot;</span>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>    <span class="n">components</span><span class="p">:</span> <span class="n">PathType</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">(</span><span class="s2">&quot;src/components/&quot;</span><span class="p">)</span>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>    <span class="sd">&quot;&quot;&quot;The directory to use for the component files.&quot;&quot;&quot;</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>    <span class="n">public</span><span class="p">:</span> <span class="n">PathType</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">(</span><span class="s2">&quot;public/&quot;</span><span class="p">)</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>    <span class="sd">&quot;&quot;&quot;The directory where all static/public files go. These files are never transformed.&quot;&quot;&quot;</span>
 </span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>
-</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a><span class="sd">    Tags:</span>
-</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a><span class="sd">        &#39;charset&#39;: `&lt;meta charset=&quot;UTF-8&quot;&gt;`</span>
-</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a><span class="sd">        &#39;http_equiv&#39;: `&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;`</span>
-</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a><span class="sd">        &#39;viewport&#39;: `&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,</span>
-</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="sd">            initial-scale=1.0&quot;&gt;`</span>
-</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>    <span class="n">python</span><span class="p">:</span> <span class="n">PathType</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">(</span><span class="s2">&quot;src/python/&quot;</span><span class="p">)</span>
+</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>    <span class="sd">&quot;&quot;&quot;The directory where exposed python modules are located. Each file is exposed as a local</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a><span class="sd">    module i.e. `.&lt;file_name&gt;`. All data inside these modules can be imported and accessed&quot;&quot;&quot;</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>
+</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>    <span class="n">dest</span><span class="p">:</span> <span class="n">PathType</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">(</span><span class="s2">&quot;out/&quot;</span><span class="p">)</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>    <span class="sd">&quot;&quot;&quot;The directory to put the built files into. Defaults to `site/`&quot;&quot;&quot;</span>
 </span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>
-</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>
-</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a><span class="c1"># class RSSImage(cfg):</span>
-</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a><span class="c1">#     &quot;&quot;&quot;Mophidian.build.rss.image configuration.&quot;&quot;&quot;</span>
-</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>
-</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a><span class="c1">#     title: str = &quot;&quot;</span>
-</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a><span class="c1">#     &quot;&quot;&quot;Image title&quot;&quot;&quot;</span>
-</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a><span class="c1">#     url: str = &quot;&quot;</span>
-</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a><span class="c1">#     &quot;&quot;&quot;Image url&quot;&quot;&quot;</span>
-</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a><span class="c1">#     width: int = 31</span>
-</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a><span class="c1">#     &quot;&quot;&quot;Image width. Max of 144&quot;&quot;&quot;</span>
-</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a><span class="c1">#     height: int = 88</span>
-</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a><span class="c1">#     &quot;&quot;&quot;Image height. Max of 400&quot;&quot;&quot;</span>
-</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>
+</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>    <span class="n">root</span><span class="p">:</span> <span class="n">PathType</span>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>    <span class="sd">&quot;&quot;&quot;Root directory of the website. Used for links.</span>
+</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a><span class="sd">    Ex: `https://user.github.io/project/` where `project/` is the directory of</span>
+</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a><span class="sd">    the website. Defaults to ``</span>
+</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>
+</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>    <span class="n">meta_tags</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Option</span><span class="p">[</span><span class="s2">&quot;charset&quot;</span><span class="p">,</span> <span class="s2">&quot;http_equiv&quot;</span><span class="p">,</span> <span class="s2">&quot;viewport&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>        <span class="s2">&quot;charset&quot;</span><span class="p">,</span>
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>        <span class="s2">&quot;http_equiv&quot;</span><span class="p">,</span>
+</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>        <span class="s2">&quot;viewport&quot;</span><span class="p">,</span>
+</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>    <span class="p">}</span>
+</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>    <span class="sd">&quot;&quot;&quot;Which default meta tags should mophidian include</span>
+</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a><span class="sd">    in the base page head tag.</span>
 </span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>
-</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a><span class="c1"># class RSS(cfg):</span>
-</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a><span class="c1">#     &quot;&quot;&quot;Mophidian.build.rss configuration.&quot;&quot;&quot;</span>
-</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a>
-</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a><span class="c1">#     enabled: bool = False</span>
-</span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a><span class="c1">#     &quot;&quot;&quot;Toggle to generate a rss feed on build and expose the link to the pages.</span>
-</span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a><span class="c1">#     &quot;&quot;&quot;</span>
+</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a><span class="sd">    Tags:</span>
+</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a><span class="sd">        &#39;charset&#39;: `&lt;meta charset=&quot;UTF-8&quot;&gt;`</span>
+</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a><span class="sd">        &#39;http_equiv&#39;: `&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;`</span>
+</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a><span class="sd">        &#39;viewport&#39;: `&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,</span>
+</span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a><span class="sd">            initial-scale=1.0&quot;&gt;`</span>
+</span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a>
-</span><span id="L-184"><a href="#L-184"><span class="linenos">184</span></a><span class="c1">#     paths: list[str]</span>
-</span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a><span class="c1">#     &quot;&quot;&quot;Paths of what markdown files to use for the rss feed. If no paths are</span>
-</span><span id="L-186"><a href="#L-186"><span class="linenos">186</span></a><span class="c1">#     specified then all rendered markdown files are added to the rss feed.&quot;&quot;&quot;</span>
-</span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a>
-</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a><span class="c1">#     image: RSSImage</span>
-</span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a><span class="c1">#     &quot;&quot;&quot;Mophidian.build.rss.image configuration&quot;&quot;&quot;</span>
-</span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a>
-</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a><span class="c1">#     language: str = &quot;en-us&quot;</span>
-</span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a><span class="c1">#     &quot;&quot;&quot;(str) The language associated with the rss feed. Example: en-us.&quot;&quot;&quot;</span>
-</span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a>
-</span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a>
-</span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a><span class="c1"># class Sitemap(cfg):</span>
-</span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a><span class="c1">#     &quot;&quot;&quot;Mophidian.build.sitemap configuration.&quot;&quot;&quot;</span>
-</span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a>
-</span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a><span class="c1">#     enabled: bool = False</span>
-</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a><span class="c1">#     &quot;&quot;&quot;Toggle to generate a sitemap on build.&quot;&quot;&quot;</span>
+</span><span id="L-184"><a href="#L-184"><span class="linenos">184</span></a><span class="k">class</span> <span class="nc">Scripts</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.build.scripts configuration&quot;&quot;&quot;</span>
+</span><span id="L-186"><a href="#L-186"><span class="linenos">186</span></a>
+</span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a>    <span class="n">pre</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a>    <span class="sd">&quot;&quot;&quot;List of commands to run, in cwd, before the initial build process.&quot;&quot;&quot;</span>
+</span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a>
+</span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a>    <span class="n">post</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a>    <span class="sd">&quot;&quot;&quot;List of commands to run, in cwd, after the initial build process.&quot;&quot;&quot;</span>
+</span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a>
+</span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a><span class="k">class</span> <span class="nc">Build</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.build configuration.&quot;&quot;&quot;</span>
+</span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a>
+</span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a>    <span class="n">refresh_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span>
+</span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a>    <span class="sd">&quot;&quot;&quot;The delay until the live server reloads the browser after a file change</span>
+</span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a><span class="sd">    is detected. Defaults to `2.0`.</span>
+</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a>
-</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a><span class="c1">#     patterns: list[str]</span>
-</span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a><span class="c1">#     &quot;&quot;&quot;If you have a large site you may specify patters to apply. Each pattern</span>
-</span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a><span class="c1">#     is computed into it&#39;s own sitemap and referenced in a sitemap index. If no</span>
-</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a><span class="c1">#     patterns are specified then a single sitemap is generated for all rendered</span>
-</span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a><span class="c1">#     pages.</span>
-</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a><span class="c1">#     &quot;&quot;&quot;</span>
-</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a>
-</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a><span class="k">class</span> <span class="nc">Scripts</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.build.scripts configuration&quot;&quot;&quot;</span>
-</span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a>
-</span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a>    <span class="n">pre</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-</span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a>    <span class="sd">&quot;&quot;&quot;List of commands to run, in cwd, before the initial build process.&quot;&quot;&quot;</span>
+</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a>    <span class="n">scripts</span><span class="p">:</span> <span class="n">Scripts</span>
+</span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a>    <span class="sd">&quot;&quot;&quot;User defined commands to run before and after a build.&quot;&quot;&quot;</span>
+</span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a>
+</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a>    <span class="n">favicon</span><span class="p">:</span> <span class="n">PathType</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">(</span><span class="s2">&quot;/favicon.ico&quot;</span><span class="p">)</span>
+</span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a>    <span class="sd">&quot;&quot;&quot;Path to the favicon from website root.&quot;&quot;&quot;</span>
+</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a>
+</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a>    <span class="n">body</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>    <span class="sd">&quot;&quot;&quot;The attributes to apply to the body tag.&quot;&quot;&quot;</span>
+</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a>
+</span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a>    <span class="n">html</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+</span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a>    <span class="sd">&quot;&quot;&quot;The attributes to apply to the html tag.&quot;&quot;&quot;</span>
+</span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a>
 </span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a>
-</span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a>    <span class="n">post</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-</span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a>    <span class="sd">&quot;&quot;&quot;List of commands to run, in cwd, after the initial build process.&quot;&quot;&quot;</span>
+</span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a><span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian configuration.&quot;&quot;&quot;</span>
 </span><span id="L-216"><a href="#L-216"><span class="linenos">216</span></a>
-</span><span id="L-217"><a href="#L-217"><span class="linenos">217</span></a><span class="k">class</span> <span class="nc">Build</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="L-218"><a href="#L-218"><span class="linenos">218</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.build configuration.&quot;&quot;&quot;</span>
-</span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a>
-</span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a>    <span class="n">refresh_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span>
-</span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a>    <span class="sd">&quot;&quot;&quot;The delay until the live server reloads the browser after a file change</span>
-</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a><span class="sd">    is detected. Defaults to `2.0`.</span>
-</span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-217"><a href="#L-217"><span class="linenos">217</span></a>    <span class="n">_path_</span> <span class="o">=</span> <span class="s2">&quot;moph.yml&quot;</span>
+</span><span id="L-218"><a href="#L-218"><span class="linenos">218</span></a>
+</span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a>    <span class="n">markdown</span><span class="p">:</span> <span class="n">Markdown</span>
+</span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a>    <span class="sd">&quot;&quot;&quot;Markdown configuration.&quot;&quot;&quot;</span>
+</span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a>
+</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a>    <span class="n">site</span><span class="p">:</span> <span class="n">Site</span>
+</span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a>    <span class="sd">&quot;&quot;&quot;Site configuration.&quot;&quot;&quot;</span>
 </span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a>
-</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>    <span class="n">scripts</span><span class="p">:</span> <span class="n">Scripts</span>
-</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a>    <span class="c1"># sitemap: Sitemap</span>
-</span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>    <span class="c1"># &quot;&quot;&quot;Mophidian.build.sitemap configuration&quot;&quot;&quot;</span>
-</span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a>
-</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a>    <span class="c1"># rss: RSS</span>
-</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a>    <span class="c1"># &quot;&quot;&quot;Mophidian.build.rss configuration&quot;&quot;&quot;</span>
-</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>
-</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a>    <span class="n">favicon</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/favicon.ico&quot;</span><span class="p">)</span>
-</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>    <span class="sd">&quot;&quot;&quot;Path to the favicon from website root.&quot;&quot;&quot;</span>
+</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>    <span class="n">build</span><span class="p">:</span> <span class="n">Build</span>
+</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a>    <span class="sd">&quot;&quot;&quot;Build configuration.&quot;&quot;&quot;</span>
+</span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>
+</span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
+</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a>
+</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a><span class="k">if</span> <span class="n">CONFIG</span><span class="o">.</span><span class="n">markdown</span><span class="o">.</span><span class="n">extensions</span> <span class="o">!=</span> <span class="n">default_extensions</span><span class="p">:</span>
+</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>    <span class="k">for</span> <span class="n">extension</span> <span class="ow">in</span> <span class="n">CONFIG</span><span class="o">.</span><span class="n">markdown</span><span class="o">.</span><span class="n">extensions</span><span class="p">:</span>
+</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a>        <span class="n">default_extensions</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span>
+</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>    <span class="n">CONFIG</span><span class="o">.</span><span class="n">markdown</span><span class="o">.</span><span class="n">extensions</span> <span class="o">=</span> <span class="n">default_extensions</span>
 </span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a>
-</span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a>    <span class="n">body</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
-</span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a>    <span class="sd">&quot;&quot;&quot;The attributes to apply to the body tag.&quot;&quot;&quot;</span>
-</span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a>
-</span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a>    <span class="n">html</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
-</span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a>    <span class="sd">&quot;&quot;&quot;The attributes to apply to the html tag.&quot;&quot;&quot;</span>
-</span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a>
-</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a>
-</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a><span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian configuration.&quot;&quot;&quot;</span>
-</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a>
-</span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a>    <span class="n">_path_</span> <span class="o">=</span> <span class="s2">&quot;moph.yml&quot;</span>
-</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a>
-</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a>    <span class="n">markdown</span><span class="p">:</span> <span class="n">Markdown</span>
-</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a>    <span class="sd">&quot;&quot;&quot;Markdown configuration.&quot;&quot;&quot;</span>
-</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a>
-</span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a>    <span class="n">site</span><span class="p">:</span> <span class="n">Site</span>
-</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a>    <span class="sd">&quot;&quot;&quot;Site configuration.&quot;&quot;&quot;</span>
-</span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a>
-</span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a>    <span class="n">build</span><span class="p">:</span> <span class="n">Build</span>
-</span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a>    <span class="sd">&quot;&quot;&quot;Build configuration.&quot;&quot;&quot;</span>
-</span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a>
-</span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a>    <span class="n">data</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\x1b</span><span class="s2">[33m&quot;</span>
-</span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a>
-</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a>
-</span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
-</span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a>
-</span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a><span class="k">if</span> <span class="n">CONFIG</span><span class="o">.</span><span class="n">markdown</span><span class="o">.</span><span class="n">extensions</span> <span class="o">!=</span> <span class="n">default_extensions</span><span class="p">:</span>
-</span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a>    <span class="k">for</span> <span class="n">extension</span> <span class="ow">in</span> <span class="n">CONFIG</span><span class="o">.</span><span class="n">markdown</span><span class="o">.</span><span class="n">extensions</span><span class="p">:</span>
-</span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a>        <span class="n">default_extensions</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span>
-</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a>    <span class="n">CONFIG</span><span class="o">.</span><span class="n">markdown</span><span class="o">.</span><span class="n">extensions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">default_extensions</span><span class="p">)</span>
-</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a>
-</span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="k">if</span> <span class="n">CONFIG</span><span class="o">.</span><span class="n">markdown</span><span class="o">.</span><span class="n">extension_configs</span> <span class="o">!=</span> <span class="n">default_extension_configs</span><span class="p">:</span>
-</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a>    <span class="n">default_extension_configs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">markdown</span><span class="o">.</span><span class="n">extension_configs</span><span class="p">)</span>
-</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a>    <span class="n">CONFIG</span><span class="o">.</span><span class="n">markdown</span><span class="o">.</span><span class="n">extension_configs</span> <span class="o">=</span> <span class="n">default_extension_configs</span>
+</span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a><span class="k">if</span> <span class="n">CONFIG</span><span class="o">.</span><span class="n">markdown</span><span class="o">.</span><span class="n">extension_configs</span> <span class="o">!=</span> <span class="n">default_extension_configs</span><span class="p">:</span>
+</span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a>    <span class="n">merge</span><span class="p">(</span><span class="n">default_extension_configs</span><span class="p">,</span> <span class="n">CONFIG</span><span class="o">.</span><span class="n">markdown</span><span class="o">.</span><span class="n">extension_configs</span><span class="p">)</span>
+</span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a>    <span class="n">CONFIG</span><span class="o">.</span><span class="n">markdown</span><span class="o">.</span><span class="n">extension_configs</span> <span class="o">=</span> <span class="n">default_extension_configs</span>
 </span></pre></div>
 
 
@@ -439,14 +417,14 @@
 
     </div>
     <a class="headerlink" href="#Pygmentize"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Pygmentize-46"><a href="#Pygmentize-46"><span class="linenos">46</span></a><span class="k">class</span> <span class="nc">Pygmentize</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="Pygmentize-47"><a href="#Pygmentize-47"><span class="linenos">47</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.markdown.pygmentize configuration.&quot;&quot;&quot;</span>
-</span><span id="Pygmentize-48"><a href="#Pygmentize-48"><span class="linenos">48</span></a>
-</span><span id="Pygmentize-49"><a href="#Pygmentize-49"><span class="linenos">49</span></a>    <span class="n">highlight</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="Pygmentize-50"><a href="#Pygmentize-50"><span class="linenos">50</span></a>    <span class="sd">&quot;&quot;&quot;Whether to include the highlight css in the head.&quot;&quot;&quot;</span>
-</span><span id="Pygmentize-51"><a href="#Pygmentize-51"><span class="linenos">51</span></a>
-</span><span id="Pygmentize-52"><a href="#Pygmentize-52"><span class="linenos">52</span></a>    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;highlight.css&quot;</span>
-</span><span id="Pygmentize-53"><a href="#Pygmentize-53"><span class="linenos">53</span></a>    <span class="sd">&quot;&quot;&quot;Path of where to generate the pygmentize css file.&quot;&quot;&quot;</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Pygmentize-62"><a href="#Pygmentize-62"><span class="linenos">62</span></a><span class="k">class</span> <span class="nc">Pygmentize</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="Pygmentize-63"><a href="#Pygmentize-63"><span class="linenos">63</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.markdown.pygmentize configuration.&quot;&quot;&quot;</span>
+</span><span id="Pygmentize-64"><a href="#Pygmentize-64"><span class="linenos">64</span></a>
+</span><span id="Pygmentize-65"><a href="#Pygmentize-65"><span class="linenos">65</span></a>    <span class="n">highlight</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="Pygmentize-66"><a href="#Pygmentize-66"><span class="linenos">66</span></a>    <span class="sd">&quot;&quot;&quot;Whether to include the highlight css in the head.&quot;&quot;&quot;</span>
+</span><span id="Pygmentize-67"><a href="#Pygmentize-67"><span class="linenos">67</span></a>
+</span><span id="Pygmentize-68"><a href="#Pygmentize-68"><span class="linenos">68</span></a>    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;highlight.css&quot;</span>
+</span><span id="Pygmentize-69"><a href="#Pygmentize-69"><span class="linenos">69</span></a>    <span class="sd">&quot;&quot;&quot;Path of where to generate the pygmentize css file.&quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -511,14 +489,14 @@
 
     </div>
     <a class="headerlink" href="#MarkdownWrapper"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="MarkdownWrapper-56"><a href="#MarkdownWrapper-56"><span class="linenos">56</span></a><span class="k">class</span> <span class="nc">MarkdownWrapper</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="MarkdownWrapper-57"><a href="#MarkdownWrapper-57"><span class="linenos">57</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.markdown.wrapper configuration.&quot;&quot;&quot;</span>
-</span><span id="MarkdownWrapper-58"><a href="#MarkdownWrapper-58"><span class="linenos">58</span></a>
-</span><span id="MarkdownWrapper-59"><a href="#MarkdownWrapper-59"><span class="linenos">59</span></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;article&quot;</span>
-</span><span id="MarkdownWrapper-60"><a href="#MarkdownWrapper-60"><span class="linenos">60</span></a>    <span class="sd">&quot;&quot;&quot;Tag of the element that wraps the markdown.&quot;&quot;&quot;</span>
-</span><span id="MarkdownWrapper-61"><a href="#MarkdownWrapper-61"><span class="linenos">61</span></a>
-</span><span id="MarkdownWrapper-62"><a href="#MarkdownWrapper-62"><span class="linenos">62</span></a>    <span class="n">attributes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]</span>
-</span><span id="MarkdownWrapper-63"><a href="#MarkdownWrapper-63"><span class="linenos">63</span></a>    <span class="sd">&quot;&quot;&quot;The attributes to apply to the markdown wrapper element.&quot;&quot;&quot;</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="MarkdownWrapper-72"><a href="#MarkdownWrapper-72"><span class="linenos">72</span></a><span class="k">class</span> <span class="nc">MarkdownWrapper</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="MarkdownWrapper-73"><a href="#MarkdownWrapper-73"><span class="linenos">73</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.markdown.wrapper configuration.&quot;&quot;&quot;</span>
+</span><span id="MarkdownWrapper-74"><a href="#MarkdownWrapper-74"><span class="linenos">74</span></a>
+</span><span id="MarkdownWrapper-75"><a href="#MarkdownWrapper-75"><span class="linenos">75</span></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;article&quot;</span>
+</span><span id="MarkdownWrapper-76"><a href="#MarkdownWrapper-76"><span class="linenos">76</span></a>    <span class="sd">&quot;&quot;&quot;Tag of the element that wraps the markdown.&quot;&quot;&quot;</span>
+</span><span id="MarkdownWrapper-77"><a href="#MarkdownWrapper-77"><span class="linenos">77</span></a>
+</span><span id="MarkdownWrapper-78"><a href="#MarkdownWrapper-78"><span class="linenos">78</span></a>    <span class="n">attributes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]</span>
+</span><span id="MarkdownWrapper-79"><a href="#MarkdownWrapper-79"><span class="linenos">79</span></a>    <span class="sd">&quot;&quot;&quot;The attributes to apply to the markdown wrapper element.&quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -583,55 +561,55 @@
 
     </div>
     <a class="headerlink" href="#Markdown"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Markdown-66"><a href="#Markdown-66"><span class="linenos"> 66</span></a><span class="k">class</span> <span class="nc">Markdown</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="Markdown-67"><a href="#Markdown-67"><span class="linenos"> 67</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.markdown configuration.&quot;&quot;&quot;</span>
-</span><span id="Markdown-68"><a href="#Markdown-68"><span class="linenos"> 68</span></a>
-</span><span id="Markdown-69"><a href="#Markdown-69"><span class="linenos"> 69</span></a>    <span class="n">wrapper</span><span class="p">:</span> <span class="n">MarkdownWrapper</span>
-</span><span id="Markdown-70"><a href="#Markdown-70"><span class="linenos"> 70</span></a>
-</span><span id="Markdown-71"><a href="#Markdown-71"><span class="linenos"> 71</span></a>    <span class="n">pygmentize</span><span class="p">:</span> <span class="n">Pygmentize</span>
-</span><span id="Markdown-72"><a href="#Markdown-72"><span class="linenos"> 72</span></a>
-</span><span id="Markdown-73"><a href="#Markdown-73"><span class="linenos"> 73</span></a>    <span class="n">override_defaults</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="Markdown-74"><a href="#Markdown-74"><span class="linenos"> 74</span></a>    <span class="sd">&quot;&quot;&quot;Flag for overriding default extensions and extension configs. Default</span>
-</span><span id="Markdown-75"><a href="#Markdown-75"><span class="linenos"> 75</span></a><span class="sd">    allows adding to extensions list and overriding existing default extension</span>
-</span><span id="Markdown-76"><a href="#Markdown-76"><span class="linenos"> 76</span></a><span class="sd">    configs. If True then only use what is provided in the config.</span>
-</span><span id="Markdown-77"><a href="#Markdown-77"><span class="linenos"> 77</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="Markdown-78"><a href="#Markdown-78"><span class="linenos"> 78</span></a>
-</span><span id="Markdown-79"><a href="#Markdown-79"><span class="linenos"> 79</span></a>    <span class="n">extensions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="Markdown-80"><a href="#Markdown-80"><span class="linenos"> 80</span></a>        <span class="s2">&quot;abbr&quot;</span><span class="p">,</span>
-</span><span id="Markdown-81"><a href="#Markdown-81"><span class="linenos"> 81</span></a>        <span class="s2">&quot;admonition&quot;</span><span class="p">,</span>
-</span><span id="Markdown-82"><a href="#Markdown-82"><span class="linenos"> 82</span></a>        <span class="s2">&quot;attr_list&quot;</span><span class="p">,</span>
-</span><span id="Markdown-83"><a href="#Markdown-83"><span class="linenos"> 83</span></a>        <span class="s2">&quot;def_list&quot;</span><span class="p">,</span>
-</span><span id="Markdown-84"><a href="#Markdown-84"><span class="linenos"> 84</span></a>        <span class="s2">&quot;footnotes&quot;</span><span class="p">,</span>
-</span><span id="Markdown-85"><a href="#Markdown-85"><span class="linenos"> 85</span></a>        <span class="s2">&quot;md_in_html&quot;</span><span class="p">,</span>
-</span><span id="Markdown-86"><a href="#Markdown-86"><span class="linenos"> 86</span></a>        <span class="s2">&quot;tables&quot;</span><span class="p">,</span>
-</span><span id="Markdown-87"><a href="#Markdown-87"><span class="linenos"> 87</span></a>        <span class="s2">&quot;toc&quot;</span><span class="p">,</span>
-</span><span id="Markdown-88"><a href="#Markdown-88"><span class="linenos"> 88</span></a>        <span class="s2">&quot;wikilinks&quot;</span><span class="p">,</span>
-</span><span id="Markdown-89"><a href="#Markdown-89"><span class="linenos"> 89</span></a>        <span class="s2">&quot;codehilite&quot;</span><span class="p">,</span>
-</span><span id="Markdown-90"><a href="#Markdown-90"><span class="linenos"> 90</span></a>        <span class="s2">&quot;pymdownx.betterem&quot;</span><span class="p">,</span>
-</span><span id="Markdown-91"><a href="#Markdown-91"><span class="linenos"> 91</span></a>        <span class="s2">&quot;pymdownx.caret&quot;</span><span class="p">,</span>
-</span><span id="Markdown-92"><a href="#Markdown-92"><span class="linenos"> 92</span></a>        <span class="s2">&quot;pymdownx.details&quot;</span><span class="p">,</span>
-</span><span id="Markdown-93"><a href="#Markdown-93"><span class="linenos"> 93</span></a>        <span class="s2">&quot;pymdownx.mark&quot;</span><span class="p">,</span>
-</span><span id="Markdown-94"><a href="#Markdown-94"><span class="linenos"> 94</span></a>        <span class="s2">&quot;pymdownx.smartsymbols&quot;</span><span class="p">,</span>
-</span><span id="Markdown-95"><a href="#Markdown-95"><span class="linenos"> 95</span></a>        <span class="s2">&quot;pymdownx.superfences&quot;</span><span class="p">,</span>
-</span><span id="Markdown-96"><a href="#Markdown-96"><span class="linenos"> 96</span></a>        <span class="s2">&quot;pymdownx.tabbed&quot;</span><span class="p">,</span>
-</span><span id="Markdown-97"><a href="#Markdown-97"><span class="linenos"> 97</span></a>        <span class="s2">&quot;pymdownx.tasklist&quot;</span><span class="p">,</span>
-</span><span id="Markdown-98"><a href="#Markdown-98"><span class="linenos"> 98</span></a>        <span class="s2">&quot;pymdownx.tilde&quot;</span><span class="p">,</span>
-</span><span id="Markdown-99"><a href="#Markdown-99"><span class="linenos"> 99</span></a>    <span class="p">]</span>
-</span><span id="Markdown-100"><a href="#Markdown-100"><span class="linenos">100</span></a>    <span class="sd">&quot;&quot;&quot;The markdown extensions that are to be used for every markdown file.&quot;&quot;&quot;</span>
-</span><span id="Markdown-101"><a href="#Markdown-101"><span class="linenos">101</span></a>
-</span><span id="Markdown-102"><a href="#Markdown-102"><span class="linenos">102</span></a>    <span class="n">extension_configs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="Markdown-103"><a href="#Markdown-103"><span class="linenos">103</span></a>        <span class="s2">&quot;footnotes&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="Markdown-104"><a href="#Markdown-104"><span class="linenos">104</span></a>            <span class="s2">&quot;BACKLINK_TEXT&quot;</span><span class="p">:</span> <span class="s1">&#39;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 384 512&quot; </span><span class="se">\</span>
-</span><span id="Markdown-105"><a href="#Markdown-105"><span class="linenos">105</span></a><span class="s1">class=&quot;fn-backlink&quot; style=&quot;width: .75rem; height: .75rem;&quot; fill=&quot;currentColor&quot;&gt;&lt;!--! </span><span class="se">\</span>
-</span><span id="Markdown-106"><a href="#Markdown-106"><span class="linenos">106</span></a><span class="s1">Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - </span><span class="se">\</span>
-</span><span id="Markdown-107"><a href="#Markdown-107"><span class="linenos">107</span></a><span class="s1">https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --&gt;</span><span class="se">\</span>
-</span><span id="Markdown-108"><a href="#Markdown-108"><span class="linenos">108</span></a><span class="s1">&lt;path d=&quot;M32 448c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c53 0 96-43 96-96l0-306.7 73.4 73.4c12.5 </span><span class="se">\</span>
-</span><span id="Markdown-109"><a href="#Markdown-109"><span class="linenos">109</span></a><span class="s1">12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-12.5 </span><span class="se">\</span>
-</span><span id="Markdown-110"><a href="#Markdown-110"><span class="linenos">110</span></a><span class="s1">12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 109.3 160 416c0 17.7-14.3 32-32 32l-96 0z&quot;/&gt;&lt;/svg&gt;&#39;</span>
-</span><span id="Markdown-111"><a href="#Markdown-111"><span class="linenos">111</span></a>        <span class="p">},</span>
-</span><span id="Markdown-112"><a href="#Markdown-112"><span class="linenos">112</span></a>        <span class="s2">&quot;codehilite&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;css_class&quot;</span><span class="p">:</span> <span class="s2">&quot;highlight&quot;</span><span class="p">},</span>
-</span><span id="Markdown-113"><a href="#Markdown-113"><span class="linenos">113</span></a>    <span class="p">}</span>
-</span><span id="Markdown-114"><a href="#Markdown-114"><span class="linenos">114</span></a>    <span class="sd">&quot;&quot;&quot;The configurations for each markdown extension.&quot;&quot;&quot;</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Markdown-82"><a href="#Markdown-82"><span class="linenos"> 82</span></a><span class="k">class</span> <span class="nc">Markdown</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="Markdown-83"><a href="#Markdown-83"><span class="linenos"> 83</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.markdown configuration.&quot;&quot;&quot;</span>
+</span><span id="Markdown-84"><a href="#Markdown-84"><span class="linenos"> 84</span></a>
+</span><span id="Markdown-85"><a href="#Markdown-85"><span class="linenos"> 85</span></a>    <span class="n">wrapper</span><span class="p">:</span> <span class="n">MarkdownWrapper</span>
+</span><span id="Markdown-86"><a href="#Markdown-86"><span class="linenos"> 86</span></a>
+</span><span id="Markdown-87"><a href="#Markdown-87"><span class="linenos"> 87</span></a>    <span class="n">pygmentize</span><span class="p">:</span> <span class="n">Pygmentize</span>
+</span><span id="Markdown-88"><a href="#Markdown-88"><span class="linenos"> 88</span></a>
+</span><span id="Markdown-89"><a href="#Markdown-89"><span class="linenos"> 89</span></a>    <span class="n">override_defaults</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="Markdown-90"><a href="#Markdown-90"><span class="linenos"> 90</span></a>    <span class="sd">&quot;&quot;&quot;Flag for overriding default extensions and extension configs. Default</span>
+</span><span id="Markdown-91"><a href="#Markdown-91"><span class="linenos"> 91</span></a><span class="sd">    allows adding to extensions list and overriding existing default extension</span>
+</span><span id="Markdown-92"><a href="#Markdown-92"><span class="linenos"> 92</span></a><span class="sd">    configs. If True then only use what is provided in the config.</span>
+</span><span id="Markdown-93"><a href="#Markdown-93"><span class="linenos"> 93</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="Markdown-94"><a href="#Markdown-94"><span class="linenos"> 94</span></a>
+</span><span id="Markdown-95"><a href="#Markdown-95"><span class="linenos"> 95</span></a>    <span class="n">extensions</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="Markdown-96"><a href="#Markdown-96"><span class="linenos"> 96</span></a>        <span class="s2">&quot;abbr&quot;</span><span class="p">,</span>
+</span><span id="Markdown-97"><a href="#Markdown-97"><span class="linenos"> 97</span></a>        <span class="s2">&quot;admonition&quot;</span><span class="p">,</span>
+</span><span id="Markdown-98"><a href="#Markdown-98"><span class="linenos"> 98</span></a>        <span class="s2">&quot;attr_list&quot;</span><span class="p">,</span>
+</span><span id="Markdown-99"><a href="#Markdown-99"><span class="linenos"> 99</span></a>        <span class="s2">&quot;def_list&quot;</span><span class="p">,</span>
+</span><span id="Markdown-100"><a href="#Markdown-100"><span class="linenos">100</span></a>        <span class="s2">&quot;footnotes&quot;</span><span class="p">,</span>
+</span><span id="Markdown-101"><a href="#Markdown-101"><span class="linenos">101</span></a>        <span class="s2">&quot;md_in_html&quot;</span><span class="p">,</span>
+</span><span id="Markdown-102"><a href="#Markdown-102"><span class="linenos">102</span></a>        <span class="s2">&quot;tables&quot;</span><span class="p">,</span>
+</span><span id="Markdown-103"><a href="#Markdown-103"><span class="linenos">103</span></a>        <span class="s2">&quot;toc&quot;</span><span class="p">,</span>
+</span><span id="Markdown-104"><a href="#Markdown-104"><span class="linenos">104</span></a>        <span class="s2">&quot;wikilinks&quot;</span><span class="p">,</span>
+</span><span id="Markdown-105"><a href="#Markdown-105"><span class="linenos">105</span></a>        <span class="s2">&quot;codehilite&quot;</span><span class="p">,</span>
+</span><span id="Markdown-106"><a href="#Markdown-106"><span class="linenos">106</span></a>        <span class="s2">&quot;pymdownx.betterem&quot;</span><span class="p">,</span>
+</span><span id="Markdown-107"><a href="#Markdown-107"><span class="linenos">107</span></a>        <span class="s2">&quot;pymdownx.caret&quot;</span><span class="p">,</span>
+</span><span id="Markdown-108"><a href="#Markdown-108"><span class="linenos">108</span></a>        <span class="s2">&quot;pymdownx.details&quot;</span><span class="p">,</span>
+</span><span id="Markdown-109"><a href="#Markdown-109"><span class="linenos">109</span></a>        <span class="s2">&quot;pymdownx.mark&quot;</span><span class="p">,</span>
+</span><span id="Markdown-110"><a href="#Markdown-110"><span class="linenos">110</span></a>        <span class="s2">&quot;pymdownx.smartsymbols&quot;</span><span class="p">,</span>
+</span><span id="Markdown-111"><a href="#Markdown-111"><span class="linenos">111</span></a>        <span class="s2">&quot;pymdownx.superfences&quot;</span><span class="p">,</span>
+</span><span id="Markdown-112"><a href="#Markdown-112"><span class="linenos">112</span></a>        <span class="s2">&quot;pymdownx.tabbed&quot;</span><span class="p">,</span>
+</span><span id="Markdown-113"><a href="#Markdown-113"><span class="linenos">113</span></a>        <span class="s2">&quot;pymdownx.tasklist&quot;</span><span class="p">,</span>
+</span><span id="Markdown-114"><a href="#Markdown-114"><span class="linenos">114</span></a>        <span class="s2">&quot;pymdownx.tilde&quot;</span><span class="p">,</span>
+</span><span id="Markdown-115"><a href="#Markdown-115"><span class="linenos">115</span></a>    <span class="p">}</span>
+</span><span id="Markdown-116"><a href="#Markdown-116"><span class="linenos">116</span></a>    <span class="sd">&quot;&quot;&quot;The markdown extensions that are to be used for every markdown file.&quot;&quot;&quot;</span>
+</span><span id="Markdown-117"><a href="#Markdown-117"><span class="linenos">117</span></a>
+</span><span id="Markdown-118"><a href="#Markdown-118"><span class="linenos">118</span></a>    <span class="n">extension_configs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="Markdown-119"><a href="#Markdown-119"><span class="linenos">119</span></a>        <span class="s2">&quot;footnotes&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="Markdown-120"><a href="#Markdown-120"><span class="linenos">120</span></a>            <span class="s2">&quot;BACKLINK_TEXT&quot;</span><span class="p">:</span> <span class="s1">&#39;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 384 512&quot; </span><span class="se">\</span>
+</span><span id="Markdown-121"><a href="#Markdown-121"><span class="linenos">121</span></a><span class="s1">class=&quot;fn-backlink&quot; style=&quot;width: .75rem; height: .75rem;&quot; fill=&quot;currentColor&quot;&gt;&lt;!--! </span><span class="se">\</span>
+</span><span id="Markdown-122"><a href="#Markdown-122"><span class="linenos">122</span></a><span class="s1">Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - </span><span class="se">\</span>
+</span><span id="Markdown-123"><a href="#Markdown-123"><span class="linenos">123</span></a><span class="s1">https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --&gt;</span><span class="se">\</span>
+</span><span id="Markdown-124"><a href="#Markdown-124"><span class="linenos">124</span></a><span class="s1">&lt;path d=&quot;M32 448c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c53 0 96-43 96-96l0-306.7 73.4 73.4c12.5 </span><span class="se">\</span>
+</span><span id="Markdown-125"><a href="#Markdown-125"><span class="linenos">125</span></a><span class="s1">12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-12.5 </span><span class="se">\</span>
+</span><span id="Markdown-126"><a href="#Markdown-126"><span class="linenos">126</span></a><span class="s1">12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 109.3 160 416c0 17.7-14.3 32-32 32l-96 0z&quot;/&gt;&lt;/svg&gt;&#39;</span>
+</span><span id="Markdown-127"><a href="#Markdown-127"><span class="linenos">127</span></a>        <span class="p">},</span>
+</span><span id="Markdown-128"><a href="#Markdown-128"><span class="linenos">128</span></a>        <span class="s2">&quot;codehilite&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;css_class&quot;</span><span class="p">:</span> <span class="s2">&quot;highlight&quot;</span><span class="p">},</span>
+</span><span id="Markdown-129"><a href="#Markdown-129"><span class="linenos">129</span></a>    <span class="p">}</span>
+</span><span id="Markdown-130"><a href="#Markdown-130"><span class="linenos">130</span></a>    <span class="sd">&quot;&quot;&quot;The configurations for each markdown extension.&quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -656,7 +634,7 @@ configs. If True then only use what is provided in the config.</p>
                             </div>
                             <div id="Markdown.extensions" class="classattr">
                                 <div class="attr variable">
-            <span class="name">extensions</span><span class="annotation">: list[str]</span><span class="default_value"> = [&#39;abbr&#39;, &#39;admonition&#39;, &#39;attr_list&#39;, &#39;def_list&#39;, &#39;footnotes&#39;, &#39;md_in_html&#39;, &#39;tables&#39;, &#39;toc&#39;, &#39;wikilinks&#39;, &#39;codehilite&#39;, &#39;pymdownx.betterem&#39;, &#39;pymdownx.caret&#39;, &#39;pymdownx.details&#39;, &#39;pymdownx.mark&#39;, &#39;pymdownx.smartsymbols&#39;, &#39;pymdownx.superfences&#39;, &#39;pymdownx.tabbed&#39;, &#39;pymdownx.tasklist&#39;, &#39;pymdownx.tilde&#39;]</span>
+            <span class="name">extensions</span><span class="annotation">: set[str]</span><span class="default_value"> = {&#39;pymdownx.superfences&#39;, &#39;pymdownx.caret&#39;, &#39;codehilite&#39;, &#39;tables&#39;, &#39;pymdownx.details&#39;, &#39;pymdownx.tabbed&#39;, &#39;pymdownx.betterem&#39;, &#39;toc&#39;, &#39;pymdownx.tasklist&#39;, &#39;admonition&#39;, &#39;footnotes&#39;, &#39;pymdownx.smartsymbols&#39;, &#39;wikilinks&#39;, &#39;md_in_html&#39;, &#39;abbr&#39;, &#39;pymdownx.tilde&#39;, &#39;attr_list&#39;, &#39;def_list&#39;, &#39;pymdownx.mark&#39;}</span>
 
         
     </div>
@@ -711,52 +689,57 @@ configs. If True then only use what is provided in the config.</p>
 
     </div>
     <a class="headerlink" href="#Site"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Site-117"><a href="#Site-117"><span class="linenos">117</span></a><span class="k">class</span> <span class="nc">Site</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="Site-118"><a href="#Site-118"><span class="linenos">118</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.site configuration.&quot;&quot;&quot;</span>
-</span><span id="Site-119"><a href="#Site-119"><span class="linenos">119</span></a>
-</span><span id="Site-120"><a href="#Site-120"><span class="linenos">120</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span id="Site-121"><a href="#Site-121"><span class="linenos">121</span></a>    <span class="sd">&quot;&quot;&quot;The name of the site. Defaults to `Mophidian`&quot;&quot;&quot;</span>
-</span><span id="Site-122"><a href="#Site-122"><span class="linenos">122</span></a>
-</span><span id="Site-123"><a href="#Site-123"><span class="linenos">123</span></a>    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span id="Site-124"><a href="#Site-124"><span class="linenos">124</span></a>    <span class="sd">&quot;&quot;&quot;The websites description.&quot;&quot;&quot;</span>
-</span><span id="Site-125"><a href="#Site-125"><span class="linenos">125</span></a>
-</span><span id="Site-126"><a href="#Site-126"><span class="linenos">126</span></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-</span><span id="Site-127"><a href="#Site-127"><span class="linenos">127</span></a>    <span class="sd">&quot;&quot;&quot;Base url for the website. Example: https://{user}.github.io/&quot;&quot;&quot;</span>
-</span><span id="Site-128"><a href="#Site-128"><span class="linenos">128</span></a>
-</span><span id="Site-129"><a href="#Site-129"><span class="linenos">129</span></a>    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1.0&quot;</span>
-</span><span id="Site-130"><a href="#Site-130"><span class="linenos">130</span></a>    <span class="sd">&quot;&quot;&quot;The version of the site `ex`: 0.1 or 1. Defaults to `1.0`&quot;&quot;&quot;</span>
-</span><span id="Site-131"><a href="#Site-131"><span class="linenos">131</span></a>
-</span><span id="Site-132"><a href="#Site-132"><span class="linenos">132</span></a>    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;src/pages/&quot;</span><span class="p">)</span>
-</span><span id="Site-133"><a href="#Site-133"><span class="linenos">133</span></a>    <span class="sd">&quot;&quot;&quot;The directory to use for the source files.&quot;&quot;&quot;</span>
-</span><span id="Site-134"><a href="#Site-134"><span class="linenos">134</span></a>
-</span><span id="Site-135"><a href="#Site-135"><span class="linenos">135</span></a>    <span class="n">components</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;src/components/&quot;</span><span class="p">)</span>
-</span><span id="Site-136"><a href="#Site-136"><span class="linenos">136</span></a>    <span class="sd">&quot;&quot;&quot;The directory to use for the component files.&quot;&quot;&quot;</span>
-</span><span id="Site-137"><a href="#Site-137"><span class="linenos">137</span></a>
-</span><span id="Site-138"><a href="#Site-138"><span class="linenos">138</span></a>    <span class="n">public</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;public/&quot;</span><span class="p">)</span>
-</span><span id="Site-139"><a href="#Site-139"><span class="linenos">139</span></a>
-</span><span id="Site-140"><a href="#Site-140"><span class="linenos">140</span></a>    <span class="n">dest</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;out/&quot;</span><span class="p">)</span>
-</span><span id="Site-141"><a href="#Site-141"><span class="linenos">141</span></a>    <span class="sd">&quot;&quot;&quot;The directory to put the built files into. Defaults to `site/`&quot;&quot;&quot;</span>
-</span><span id="Site-142"><a href="#Site-142"><span class="linenos">142</span></a>
-</span><span id="Site-143"><a href="#Site-143"><span class="linenos">143</span></a>    <span class="n">root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-</span><span id="Site-144"><a href="#Site-144"><span class="linenos">144</span></a>    <span class="sd">&quot;&quot;&quot;Root directory of the website. Used for links.</span>
-</span><span id="Site-145"><a href="#Site-145"><span class="linenos">145</span></a><span class="sd">    Ex: `https://user.github.io/project/` where `project/` is the directory of</span>
-</span><span id="Site-146"><a href="#Site-146"><span class="linenos">146</span></a><span class="sd">    the website. Defaults to ``</span>
-</span><span id="Site-147"><a href="#Site-147"><span class="linenos">147</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="Site-148"><a href="#Site-148"><span class="linenos">148</span></a>
-</span><span id="Site-149"><a href="#Site-149"><span class="linenos">149</span></a>    <span class="n">meta_tags</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;charset&quot;</span><span class="p">,</span> <span class="s2">&quot;http_equiv&quot;</span><span class="p">,</span> <span class="s2">&quot;viewport&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="Site-150"><a href="#Site-150"><span class="linenos">150</span></a>        <span class="s2">&quot;charset&quot;</span><span class="p">,</span>
-</span><span id="Site-151"><a href="#Site-151"><span class="linenos">151</span></a>        <span class="s2">&quot;http_equiv&quot;</span><span class="p">,</span>
-</span><span id="Site-152"><a href="#Site-152"><span class="linenos">152</span></a>        <span class="s2">&quot;viewport&quot;</span><span class="p">,</span>
-</span><span id="Site-153"><a href="#Site-153"><span class="linenos">153</span></a>    <span class="p">]</span>
-</span><span id="Site-154"><a href="#Site-154"><span class="linenos">154</span></a>    <span class="sd">&quot;&quot;&quot;Which default meta tags should mophidian include</span>
-</span><span id="Site-155"><a href="#Site-155"><span class="linenos">155</span></a><span class="sd">    in the base page head tag.</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Site-133"><a href="#Site-133"><span class="linenos">133</span></a><span class="k">class</span> <span class="nc">Site</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="Site-134"><a href="#Site-134"><span class="linenos">134</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.site configuration.&quot;&quot;&quot;</span>
+</span><span id="Site-135"><a href="#Site-135"><span class="linenos">135</span></a>
+</span><span id="Site-136"><a href="#Site-136"><span class="linenos">136</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="Site-137"><a href="#Site-137"><span class="linenos">137</span></a>    <span class="sd">&quot;&quot;&quot;The name of the site. Defaults to `Mophidian`&quot;&quot;&quot;</span>
+</span><span id="Site-138"><a href="#Site-138"><span class="linenos">138</span></a>
+</span><span id="Site-139"><a href="#Site-139"><span class="linenos">139</span></a>    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="Site-140"><a href="#Site-140"><span class="linenos">140</span></a>    <span class="sd">&quot;&quot;&quot;The websites description.&quot;&quot;&quot;</span>
+</span><span id="Site-141"><a href="#Site-141"><span class="linenos">141</span></a>
+</span><span id="Site-142"><a href="#Site-142"><span class="linenos">142</span></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="Site-143"><a href="#Site-143"><span class="linenos">143</span></a>    <span class="sd">&quot;&quot;&quot;Base url for the website. Example: https://{user}.github.io/&quot;&quot;&quot;</span>
+</span><span id="Site-144"><a href="#Site-144"><span class="linenos">144</span></a>
+</span><span id="Site-145"><a href="#Site-145"><span class="linenos">145</span></a>    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;1.0&quot;</span>
+</span><span id="Site-146"><a href="#Site-146"><span class="linenos">146</span></a>    <span class="sd">&quot;&quot;&quot;The version of the site `ex`: 0.1 or 1. Defaults to `1.0`&quot;&quot;&quot;</span>
+</span><span id="Site-147"><a href="#Site-147"><span class="linenos">147</span></a>
+</span><span id="Site-148"><a href="#Site-148"><span class="linenos">148</span></a>    <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">(</span><span class="s2">&quot;src/pages/&quot;</span><span class="p">)</span>
+</span><span id="Site-149"><a href="#Site-149"><span class="linenos">149</span></a>    <span class="sd">&quot;&quot;&quot;The directory to use for the source files.&quot;&quot;&quot;</span>
+</span><span id="Site-150"><a href="#Site-150"><span class="linenos">150</span></a>
+</span><span id="Site-151"><a href="#Site-151"><span class="linenos">151</span></a>    <span class="n">components</span><span class="p">:</span> <span class="n">PathType</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">(</span><span class="s2">&quot;src/components/&quot;</span><span class="p">)</span>
+</span><span id="Site-152"><a href="#Site-152"><span class="linenos">152</span></a>    <span class="sd">&quot;&quot;&quot;The directory to use for the component files.&quot;&quot;&quot;</span>
+</span><span id="Site-153"><a href="#Site-153"><span class="linenos">153</span></a>
+</span><span id="Site-154"><a href="#Site-154"><span class="linenos">154</span></a>    <span class="n">public</span><span class="p">:</span> <span class="n">PathType</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">(</span><span class="s2">&quot;public/&quot;</span><span class="p">)</span>
+</span><span id="Site-155"><a href="#Site-155"><span class="linenos">155</span></a>    <span class="sd">&quot;&quot;&quot;The directory where all static/public files go. These files are never transformed.&quot;&quot;&quot;</span>
 </span><span id="Site-156"><a href="#Site-156"><span class="linenos">156</span></a>
-</span><span id="Site-157"><a href="#Site-157"><span class="linenos">157</span></a><span class="sd">    Tags:</span>
-</span><span id="Site-158"><a href="#Site-158"><span class="linenos">158</span></a><span class="sd">        &#39;charset&#39;: `&lt;meta charset=&quot;UTF-8&quot;&gt;`</span>
-</span><span id="Site-159"><a href="#Site-159"><span class="linenos">159</span></a><span class="sd">        &#39;http_equiv&#39;: `&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;`</span>
-</span><span id="Site-160"><a href="#Site-160"><span class="linenos">160</span></a><span class="sd">        &#39;viewport&#39;: `&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,</span>
-</span><span id="Site-161"><a href="#Site-161"><span class="linenos">161</span></a><span class="sd">            initial-scale=1.0&quot;&gt;`</span>
-</span><span id="Site-162"><a href="#Site-162"><span class="linenos">162</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="Site-157"><a href="#Site-157"><span class="linenos">157</span></a>    <span class="n">python</span><span class="p">:</span> <span class="n">PathType</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">(</span><span class="s2">&quot;src/python/&quot;</span><span class="p">)</span>
+</span><span id="Site-158"><a href="#Site-158"><span class="linenos">158</span></a>    <span class="sd">&quot;&quot;&quot;The directory where exposed python modules are located. Each file is exposed as a local</span>
+</span><span id="Site-159"><a href="#Site-159"><span class="linenos">159</span></a><span class="sd">    module i.e. `.&lt;file_name&gt;`. All data inside these modules can be imported and accessed&quot;&quot;&quot;</span>
+</span><span id="Site-160"><a href="#Site-160"><span class="linenos">160</span></a>
+</span><span id="Site-161"><a href="#Site-161"><span class="linenos">161</span></a>    <span class="n">dest</span><span class="p">:</span> <span class="n">PathType</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">(</span><span class="s2">&quot;out/&quot;</span><span class="p">)</span>
+</span><span id="Site-162"><a href="#Site-162"><span class="linenos">162</span></a>    <span class="sd">&quot;&quot;&quot;The directory to put the built files into. Defaults to `site/`&quot;&quot;&quot;</span>
+</span><span id="Site-163"><a href="#Site-163"><span class="linenos">163</span></a>
+</span><span id="Site-164"><a href="#Site-164"><span class="linenos">164</span></a>    <span class="n">root</span><span class="p">:</span> <span class="n">PathType</span>
+</span><span id="Site-165"><a href="#Site-165"><span class="linenos">165</span></a>    <span class="sd">&quot;&quot;&quot;Root directory of the website. Used for links.</span>
+</span><span id="Site-166"><a href="#Site-166"><span class="linenos">166</span></a><span class="sd">    Ex: `https://user.github.io/project/` where `project/` is the directory of</span>
+</span><span id="Site-167"><a href="#Site-167"><span class="linenos">167</span></a><span class="sd">    the website. Defaults to ``</span>
+</span><span id="Site-168"><a href="#Site-168"><span class="linenos">168</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="Site-169"><a href="#Site-169"><span class="linenos">169</span></a>
+</span><span id="Site-170"><a href="#Site-170"><span class="linenos">170</span></a>    <span class="n">meta_tags</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Option</span><span class="p">[</span><span class="s2">&quot;charset&quot;</span><span class="p">,</span> <span class="s2">&quot;http_equiv&quot;</span><span class="p">,</span> <span class="s2">&quot;viewport&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="Site-171"><a href="#Site-171"><span class="linenos">171</span></a>        <span class="s2">&quot;charset&quot;</span><span class="p">,</span>
+</span><span id="Site-172"><a href="#Site-172"><span class="linenos">172</span></a>        <span class="s2">&quot;http_equiv&quot;</span><span class="p">,</span>
+</span><span id="Site-173"><a href="#Site-173"><span class="linenos">173</span></a>        <span class="s2">&quot;viewport&quot;</span><span class="p">,</span>
+</span><span id="Site-174"><a href="#Site-174"><span class="linenos">174</span></a>    <span class="p">}</span>
+</span><span id="Site-175"><a href="#Site-175"><span class="linenos">175</span></a>    <span class="sd">&quot;&quot;&quot;Which default meta tags should mophidian include</span>
+</span><span id="Site-176"><a href="#Site-176"><span class="linenos">176</span></a><span class="sd">    in the base page head tag.</span>
+</span><span id="Site-177"><a href="#Site-177"><span class="linenos">177</span></a>
+</span><span id="Site-178"><a href="#Site-178"><span class="linenos">178</span></a><span class="sd">    Tags:</span>
+</span><span id="Site-179"><a href="#Site-179"><span class="linenos">179</span></a><span class="sd">        &#39;charset&#39;: `&lt;meta charset=&quot;UTF-8&quot;&gt;`</span>
+</span><span id="Site-180"><a href="#Site-180"><span class="linenos">180</span></a><span class="sd">        &#39;http_equiv&#39;: `&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;`</span>
+</span><span id="Site-181"><a href="#Site-181"><span class="linenos">181</span></a><span class="sd">        &#39;viewport&#39;: `&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,</span>
+</span><span id="Site-182"><a href="#Site-182"><span class="linenos">182</span></a><span class="sd">            initial-scale=1.0&quot;&gt;`</span>
+</span><span id="Site-183"><a href="#Site-183"><span class="linenos">183</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -766,7 +749,7 @@ configs. If True then only use what is provided in the config.</p>
 
                             <div id="Site.name" class="classattr">
                                 <div class="attr variable">
-            <span class="name">name</span><span class="annotation">: str</span><span class="default_value"> = &#39;&#39;</span>
+            <span class="name">name</span><span class="annotation">: str</span>
 
         
     </div>
@@ -779,7 +762,7 @@ configs. If True then only use what is provided in the config.</p>
                             </div>
                             <div id="Site.description" class="classattr">
                                 <div class="attr variable">
-            <span class="name">description</span><span class="annotation">: str</span><span class="default_value"> = &#39;&#39;</span>
+            <span class="name">description</span><span class="annotation">: str</span>
 
         
     </div>
@@ -792,7 +775,7 @@ configs. If True then only use what is provided in the config.</p>
                             </div>
                             <div id="Site.url" class="classattr">
                                 <div class="attr variable">
-            <span class="name">url</span><span class="annotation">: str</span><span class="default_value"> = &#39;&#39;</span>
+            <span class="name">url</span><span class="annotation">: str</span>
 
         
     </div>
@@ -818,7 +801,7 @@ configs. If True then only use what is provided in the config.</p>
                             </div>
                             <div id="Site.source" class="classattr">
                                 <div class="attr variable">
-            <span class="name">source</span><span class="annotation">: str</span><span class="default_value"> = Path(&#39;src/pages&#39;)</span>
+            <span class="name">source</span><span class="annotation">: PathType[True]</span><span class="default_value"> = &#39;src/pages/&#39;</span>
 
         
     </div>
@@ -831,7 +814,7 @@ configs. If True then only use what is provided in the config.</p>
                             </div>
                             <div id="Site.components" class="classattr">
                                 <div class="attr variable">
-            <span class="name">components</span><span class="annotation">: str</span><span class="default_value"> = Path(&#39;src/components&#39;)</span>
+            <span class="name">components</span><span class="annotation">: PathType[True]</span><span class="default_value"> = &#39;src/components/&#39;</span>
 
         
     </div>
@@ -842,9 +825,36 @@ configs. If True then only use what is provided in the config.</p>
 
 
                             </div>
+                            <div id="Site.public" class="classattr">
+                                <div class="attr variable">
+            <span class="name">public</span><span class="annotation">: PathType[True]</span><span class="default_value"> = &#39;public/&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Site.public"></a>
+    
+            <div class="docstring"><p>The directory where all static/public files go. These files are never transformed.</p>
+</div>
+
+
+                            </div>
+                            <div id="Site.python" class="classattr">
+                                <div class="attr variable">
+            <span class="name">python</span><span class="annotation">: PathType[True]</span><span class="default_value"> = &#39;src/python/&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Site.python"></a>
+    
+            <div class="docstring"><p>The directory where exposed python modules are located. Each file is exposed as a local
+module i.e. <code>.&lt;file_name&gt;</code>. All data inside these modules can be imported and accessed</p>
+</div>
+
+
+                            </div>
                             <div id="Site.dest" class="classattr">
                                 <div class="attr variable">
-            <span class="name">dest</span><span class="annotation">: str</span><span class="default_value"> = Path(&#39;out&#39;)</span>
+            <span class="name">dest</span><span class="annotation">: PathType[True]</span><span class="default_value"> = &#39;out/&#39;</span>
 
         
     </div>
@@ -857,7 +867,7 @@ configs. If True then only use what is provided in the config.</p>
                             </div>
                             <div id="Site.root" class="classattr">
                                 <div class="attr variable">
-            <span class="name">root</span><span class="annotation">: str</span><span class="default_value"> = Path(&#39;&#39;)</span>
+            <span class="name">root</span><span class="annotation">: PathType</span>
 
         
     </div>
@@ -872,7 +882,7 @@ the website. Defaults to ``</p>
                             </div>
                             <div id="Site.meta_tags" class="classattr">
                                 <div class="attr variable">
-            <span class="name">meta_tags</span><span class="annotation">: list[typing.Literal[&#39;charset&#39;, &#39;http_equiv&#39;, &#39;viewport&#39;]]</span><span class="default_value"> = [&#39;charset&#39;, &#39;http_equiv&#39;, &#39;viewport&#39;]</span>
+            <span class="name">meta_tags</span><span class="annotation">: set[typing.Literal[&#39;charset&#39;, &#39;http_equiv&#39;, &#39;viewport&#39;]]</span><span class="default_value"> = {&#39;http_equiv&#39;, &#39;charset&#39;, &#39;viewport&#39;}</span>
 
         
     </div>
@@ -924,29 +934,25 @@ in the base page head tag.</p>
 
     </div>
     <a class="headerlink" href="#Build"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Build-218"><a href="#Build-218"><span class="linenos">218</span></a><span class="k">class</span> <span class="nc">Build</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="Build-219"><a href="#Build-219"><span class="linenos">219</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.build configuration.&quot;&quot;&quot;</span>
-</span><span id="Build-220"><a href="#Build-220"><span class="linenos">220</span></a>
-</span><span id="Build-221"><a href="#Build-221"><span class="linenos">221</span></a>    <span class="n">refresh_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span>
-</span><span id="Build-222"><a href="#Build-222"><span class="linenos">222</span></a>    <span class="sd">&quot;&quot;&quot;The delay until the live server reloads the browser after a file change</span>
-</span><span id="Build-223"><a href="#Build-223"><span class="linenos">223</span></a><span class="sd">    is detected. Defaults to `2.0`.</span>
-</span><span id="Build-224"><a href="#Build-224"><span class="linenos">224</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="Build-225"><a href="#Build-225"><span class="linenos">225</span></a>
-</span><span id="Build-226"><a href="#Build-226"><span class="linenos">226</span></a>    <span class="n">scripts</span><span class="p">:</span> <span class="n">Scripts</span>
-</span><span id="Build-227"><a href="#Build-227"><span class="linenos">227</span></a>    <span class="c1"># sitemap: Sitemap</span>
-</span><span id="Build-228"><a href="#Build-228"><span class="linenos">228</span></a>    <span class="c1"># &quot;&quot;&quot;Mophidian.build.sitemap configuration&quot;&quot;&quot;</span>
-</span><span id="Build-229"><a href="#Build-229"><span class="linenos">229</span></a>
-</span><span id="Build-230"><a href="#Build-230"><span class="linenos">230</span></a>    <span class="c1"># rss: RSS</span>
-</span><span id="Build-231"><a href="#Build-231"><span class="linenos">231</span></a>    <span class="c1"># &quot;&quot;&quot;Mophidian.build.rss configuration&quot;&quot;&quot;</span>
-</span><span id="Build-232"><a href="#Build-232"><span class="linenos">232</span></a>
-</span><span id="Build-233"><a href="#Build-233"><span class="linenos">233</span></a>    <span class="n">favicon</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/favicon.ico&quot;</span><span class="p">)</span>
-</span><span id="Build-234"><a href="#Build-234"><span class="linenos">234</span></a>    <span class="sd">&quot;&quot;&quot;Path to the favicon from website root.&quot;&quot;&quot;</span>
-</span><span id="Build-235"><a href="#Build-235"><span class="linenos">235</span></a>
-</span><span id="Build-236"><a href="#Build-236"><span class="linenos">236</span></a>    <span class="n">body</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
-</span><span id="Build-237"><a href="#Build-237"><span class="linenos">237</span></a>    <span class="sd">&quot;&quot;&quot;The attributes to apply to the body tag.&quot;&quot;&quot;</span>
-</span><span id="Build-238"><a href="#Build-238"><span class="linenos">238</span></a>
-</span><span id="Build-239"><a href="#Build-239"><span class="linenos">239</span></a>    <span class="n">html</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
-</span><span id="Build-240"><a href="#Build-240"><span class="linenos">240</span></a>    <span class="sd">&quot;&quot;&quot;The attributes to apply to the html tag.&quot;&quot;&quot;</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Build-194"><a href="#Build-194"><span class="linenos">194</span></a><span class="k">class</span> <span class="nc">Build</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="Build-195"><a href="#Build-195"><span class="linenos">195</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian.build configuration.&quot;&quot;&quot;</span>
+</span><span id="Build-196"><a href="#Build-196"><span class="linenos">196</span></a>
+</span><span id="Build-197"><a href="#Build-197"><span class="linenos">197</span></a>    <span class="n">refresh_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span>
+</span><span id="Build-198"><a href="#Build-198"><span class="linenos">198</span></a>    <span class="sd">&quot;&quot;&quot;The delay until the live server reloads the browser after a file change</span>
+</span><span id="Build-199"><a href="#Build-199"><span class="linenos">199</span></a><span class="sd">    is detected. Defaults to `2.0`.</span>
+</span><span id="Build-200"><a href="#Build-200"><span class="linenos">200</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="Build-201"><a href="#Build-201"><span class="linenos">201</span></a>
+</span><span id="Build-202"><a href="#Build-202"><span class="linenos">202</span></a>    <span class="n">scripts</span><span class="p">:</span> <span class="n">Scripts</span>
+</span><span id="Build-203"><a href="#Build-203"><span class="linenos">203</span></a>    <span class="sd">&quot;&quot;&quot;User defined commands to run before and after a build.&quot;&quot;&quot;</span>
+</span><span id="Build-204"><a href="#Build-204"><span class="linenos">204</span></a>
+</span><span id="Build-205"><a href="#Build-205"><span class="linenos">205</span></a>    <span class="n">favicon</span><span class="p">:</span> <span class="n">PathType</span><span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">(</span><span class="s2">&quot;/favicon.ico&quot;</span><span class="p">)</span>
+</span><span id="Build-206"><a href="#Build-206"><span class="linenos">206</span></a>    <span class="sd">&quot;&quot;&quot;Path to the favicon from website root.&quot;&quot;&quot;</span>
+</span><span id="Build-207"><a href="#Build-207"><span class="linenos">207</span></a>
+</span><span id="Build-208"><a href="#Build-208"><span class="linenos">208</span></a>    <span class="n">body</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+</span><span id="Build-209"><a href="#Build-209"><span class="linenos">209</span></a>    <span class="sd">&quot;&quot;&quot;The attributes to apply to the body tag.&quot;&quot;&quot;</span>
+</span><span id="Build-210"><a href="#Build-210"><span class="linenos">210</span></a>
+</span><span id="Build-211"><a href="#Build-211"><span class="linenos">211</span></a>    <span class="n">html</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+</span><span id="Build-212"><a href="#Build-212"><span class="linenos">212</span></a>    <span class="sd">&quot;&quot;&quot;The attributes to apply to the html tag.&quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -968,9 +974,22 @@ is detected. Defaults to <code>2.0</code>.</p>
 
 
                             </div>
+                            <div id="Build.scripts" class="classattr">
+                                <div class="attr variable">
+            <span class="name">scripts</span><span class="annotation">: mophidian.config.Scripts</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Build.scripts"></a>
+    
+            <div class="docstring"><p>User defined commands to run before and after a build.</p>
+</div>
+
+
+                            </div>
                             <div id="Build.favicon" class="classattr">
                                 <div class="attr variable">
-            <span class="name">favicon</span><span class="annotation">: str</span><span class="default_value"> = Path(&#39;favicon.ico&#39;)</span>
+            <span class="name">favicon</span><span class="annotation">: PathType[True]</span><span class="default_value"> = &#39;/favicon.ico&#39;</span>
 
         
     </div>
@@ -1038,21 +1057,19 @@ is detected. Defaults to <code>2.0</code>.</p>
 
     </div>
     <a class="headerlink" href="#Config"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Config-243"><a href="#Config-243"><span class="linenos">243</span></a><span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="Config-244"><a href="#Config-244"><span class="linenos">244</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian configuration.&quot;&quot;&quot;</span>
-</span><span id="Config-245"><a href="#Config-245"><span class="linenos">245</span></a>
-</span><span id="Config-246"><a href="#Config-246"><span class="linenos">246</span></a>    <span class="n">_path_</span> <span class="o">=</span> <span class="s2">&quot;moph.yml&quot;</span>
-</span><span id="Config-247"><a href="#Config-247"><span class="linenos">247</span></a>
-</span><span id="Config-248"><a href="#Config-248"><span class="linenos">248</span></a>    <span class="n">markdown</span><span class="p">:</span> <span class="n">Markdown</span>
-</span><span id="Config-249"><a href="#Config-249"><span class="linenos">249</span></a>    <span class="sd">&quot;&quot;&quot;Markdown configuration.&quot;&quot;&quot;</span>
-</span><span id="Config-250"><a href="#Config-250"><span class="linenos">250</span></a>
-</span><span id="Config-251"><a href="#Config-251"><span class="linenos">251</span></a>    <span class="n">site</span><span class="p">:</span> <span class="n">Site</span>
-</span><span id="Config-252"><a href="#Config-252"><span class="linenos">252</span></a>    <span class="sd">&quot;&quot;&quot;Site configuration.&quot;&quot;&quot;</span>
-</span><span id="Config-253"><a href="#Config-253"><span class="linenos">253</span></a>
-</span><span id="Config-254"><a href="#Config-254"><span class="linenos">254</span></a>    <span class="n">build</span><span class="p">:</span> <span class="n">Build</span>
-</span><span id="Config-255"><a href="#Config-255"><span class="linenos">255</span></a>    <span class="sd">&quot;&quot;&quot;Build configuration.&quot;&quot;&quot;</span>
-</span><span id="Config-256"><a href="#Config-256"><span class="linenos">256</span></a>
-</span><span id="Config-257"><a href="#Config-257"><span class="linenos">257</span></a>    <span class="n">data</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\x1b</span><span class="s2">[33m&quot;</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Config-215"><a href="#Config-215"><span class="linenos">215</span></a><span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="Config-216"><a href="#Config-216"><span class="linenos">216</span></a>    <span class="sd">&quot;&quot;&quot;Mophidian configuration.&quot;&quot;&quot;</span>
+</span><span id="Config-217"><a href="#Config-217"><span class="linenos">217</span></a>
+</span><span id="Config-218"><a href="#Config-218"><span class="linenos">218</span></a>    <span class="n">_path_</span> <span class="o">=</span> <span class="s2">&quot;moph.yml&quot;</span>
+</span><span id="Config-219"><a href="#Config-219"><span class="linenos">219</span></a>
+</span><span id="Config-220"><a href="#Config-220"><span class="linenos">220</span></a>    <span class="n">markdown</span><span class="p">:</span> <span class="n">Markdown</span>
+</span><span id="Config-221"><a href="#Config-221"><span class="linenos">221</span></a>    <span class="sd">&quot;&quot;&quot;Markdown configuration.&quot;&quot;&quot;</span>
+</span><span id="Config-222"><a href="#Config-222"><span class="linenos">222</span></a>
+</span><span id="Config-223"><a href="#Config-223"><span class="linenos">223</span></a>    <span class="n">site</span><span class="p">:</span> <span class="n">Site</span>
+</span><span id="Config-224"><a href="#Config-224"><span class="linenos">224</span></a>    <span class="sd">&quot;&quot;&quot;Site configuration.&quot;&quot;&quot;</span>
+</span><span id="Config-225"><a href="#Config-225"><span class="linenos">225</span></a>
+</span><span id="Config-226"><a href="#Config-226"><span class="linenos">226</span></a>    <span class="n">build</span><span class="p">:</span> <span class="n">Build</span>
+</span><span id="Config-227"><a href="#Config-227"><span class="linenos">227</span></a>    <span class="sd">&quot;&quot;&quot;Build configuration.&quot;&quot;&quot;</span>
 </span></pre></div>
 
 

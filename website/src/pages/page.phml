@@ -1,4 +1,9 @@
 <>
+  <python>
+    from .sample import print_hello as hello
+
+    hello()
+  </python>
   <nav>
     <a href="@/docs/"><h5>Docs</h5></a>
     <h3>Mophidian</h3>

@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8"/>
     <meta
-      http-equiv="X-UA-Compatible"
-      content="IE=edge"
-    />
-    <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0"
+    />
+    <meta
+      http-equiv="X-UA-Compatible"
+      content="IE=edge"
     />
     <link
       rel="shortcut icon"
@@ -17,7 +17,7 @@
     />
     <title>Reporting Issues</title>
     <style>
-      [data-phml-cmpt-scope='Footer~-5190266117458259105'] footer {
+      [data-phml-cmpt-scope='Footer~4250211772467131579'] footer {
           text-align: center;
           margin-top: 4rem;
           margin-bottom: .5rem;
@@ -64,22 +64,9 @@
     <script>
 
     </script>
-    <link
-      rel="stylesheet"
-      href="/Mophidian/global.css"
-    />
-    <link
-      rel="stylesheet"
-      href="/Mophidian/tailwind.css"
-    />
-    <link
-      rel="stylesheet"
-      href="/Mophidian/blog/blog.css"
-    />
-    <link type="rss"/>
   </head>
   <body>
-    <div data-phml-cmpt-scope="Header~2426376081520869947">
+    <div data-phml-cmpt-scope="Header~-153196739913242186">
       <nav id="header">
         <a href="/Mophidian/">
           <h3>Mophidian</h3>
@@ -100,43 +87,35 @@
     <div class="article-tag-list">
 
     </div>
-    <article>
-      <h1 id="reporting-issues">Reporting Issues</h1>
-      <p>
-        This project is in constant development by a single developer. There are also four total first party repositories
-        being used. So if there are issues found by users it would be a huge help if they were reported in github issues.
-      </p>
-      <h2 id="first-party-repositories">First party repositories</h2>
-      <p>
-        This project uses three other first party repositories to handle things like: typed configuration objects,
-        colored ansi terminal output, and a live reloading server.
-      </p>
-      <h3 id="tcfg">TCFG</h3>
-      <p>
-        To handle typed configuration objects Mophidian utilizes a python library called
-        <a href="https://github.com/Tired-Fox/tcfg/">tcfg</a>
-        , which stands for typed configuration. It supports
-        <code>yaml</code>
-        ,
-        <code>json</code>
-        , and
-        <code>toml</code>
-        out of the box and is customizable.
-        The point of using this is to load a configuration and automatically fill in defaults. It will also automatically
-        give detailed exceptions when a configuration type is an invalid type. There is an added bonus of being able to access
-        config values as attributes on an object. If the configuration gets large or requires multiple files and/or multiple
-        configuration types the library allows this without any additional setup. I encourage python developers to check out
-        the library if they are interested.
-      </p>
-      <p>
-        To report an issue or error involving tcfg please create a github issue to the
-        <a href="https://github.com/Tired-Fox/tcfg/issues">tcfg repo</a>
-      </p>
-    </article>
+    <main class="mt-2">
+      <h1>
+        Blog
+        <sup>
+          <small>WIP</small>
+        </sup>
+      </h1>
+      <h5>Here is where you can get the latest updates for the project</h5>
+      <h3 class="mt-2">Posts</h3>
+      <ul id="posts">
+        <li>
+          <a href="/Mophidian/blog/reporting_issues/">Reporting Issues</a>
+          <div>
+
+          </div>
+        </li>
+        <li>
+          <a href="/Mophidian/blog/v0.2.0/">v0.2.0 of Mophidian</a>
+          <div>
+            <small>version</small>
+            <small>release</small>
+          </div>
+        </li>
+      </ul>
+    </main>
     <div class="spacer">
 
     </div>
-    <div data-phml-cmpt-scope="Footer~-5190266117458259105">
+    <div data-phml-cmpt-scope="Footer~4250211772467131579">
       <footer>
         <small>&copy; 2023 Zachary Boehm; All rights reserved</small>
       </footer>

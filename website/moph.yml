@@ -9,9 +9,3 @@ build:
   scripts:
     pre:
       - pdoc mophidian -d google -o public/api/
-  # sitemap:
-  #   enabled: false
-  # rss:
-  #   enabled: false
-  #   paths:
-  #     - blog/

@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "mophidian"
 version = "0.2.4"
-description = "Static websites with python"
+description = "Static websites generated with python"
 readme = "README.md"
 license = "MIT"
 authors = [
@@ -20,7 +20,7 @@ requires-python = ">=3.7"
 dependencies = [
     # First Party - by Tired-Fox
     "phml>=0.3.1",
-    "tcfg>=0.4.4",
+    "tcfg[yaml]>=0.4.6",
     "watchserver>=0.1.9",
     "saimll>=0.5.0",
 

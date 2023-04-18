@@ -77,7 +77,7 @@
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="kn">from</span> <span class="nn">phml.utilities</span> <span class="kn">import</span> <span class="n">query</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="kn">from</span> <span class="nn">mophidian.config</span> <span class="kn">import</span> <span class="n">CONFIG</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="kn">from</span> <span class="nn">mophidian.core.util</span> <span class="kn">import</span> <span class="n">REGEX</span><span class="p">,</span> <span class="n">filter_sort</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="kn">from</span> <span class="nn">mophidian.core.util</span> <span class="kn">import</span> <span class="n">REGEX</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="s2">&quot;Node&quot;</span>
@@ -148,9 +148,6 @@
 </span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a>            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">):</span>
 </span><span id="L-78"><a href="#L-78"><span class="linenos">78</span></a>                <span class="n">out</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">child</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
 </span><span id="L-79"><a href="#L-79"><span class="linenos">79</span></a>        <span class="k">return</span> <span class="n">out</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a>
-</span><span id="L-81"><a href="#L-81"><span class="linenos">81</span></a><span class="n">phml</span> <span class="o">=</span> <span class="n">HypertextManager</span><span class="p">()</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos">82</span></a><span class="n">phml</span><span class="o">.</span><span class="n">expose</span><span class="p">(</span><span class="n">filter_sort</span><span class="o">=</span><span class="n">filter_sort</span><span class="p">)</span>
 </span></pre></div>
 
 
