@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from functools import cached_property
+from functools import cached_property, cache
 
 from pathlib import Path
 from shutil import copyfile, SameFileError  # For copying static files
@@ -37,7 +37,7 @@ from mophidian.core.util import (
     MARKDOWN,
 )
 from .markdown_extensions import _RelativePathExtension
-from .base import apply_attribute_configs, build_attributes, Node, phml
+from .base import apply_attribute_configs, build_attributes, Node
 
 if TYPE_CHECKING:
     from .containers import Directory
@@ -197,6 +197,7 @@ class File(Node):
         super().__init__(path, ignore)
         self.unique = unique
         self.epoch = 0.0
+        self._hash_ = hash(path) + hash(ignore) + hash(unique)
 
         # file name
         file_info = REGEX["file"]["name"].search(path)
@@ -225,6 +226,9 @@ class File(Node):
         else:
             self.relative_url = "/"
 
+    def __hash__(self) -> int:
+        return self._hash_
+
     @cached_property
     def url(self) -> str:
         """Url of the page with the website root."""
@@ -251,7 +255,6 @@ class File(Node):
             self._dest = Path(self._dest).with_name(self.file_name + ".html").as_posix()
             self.unique = True
 
-    @property
     def ast(self) -> AST:
         """Parsed phml ast of the file."""
         raise Exception("Do not use base File class's ast property")
@@ -335,7 +338,7 @@ class Page(Renderable):
 
     @property
     def ast(self) -> AST:
-        page_ast = phml.load(Path(self.full_path)).ast
+        page_ast = mophidian.phml.load(Path(self.full_path)).ast
 
         if query(page_ast, "html") or query(page_ast, "body"):
             Logger.warning(
@@ -402,31 +405,6 @@ class Page(Renderable):
 
         ast = apply_attribute_configs(ast)
         ast = phml.compile(**kwargs)
-
-        # TODO: Create new rss system
-
-        # if CONFIG.build.rss:
-        #     rss_link = query(ast, "link[type*=rss]")
-        #     if rss_link is not None:
-        #         rss_link.properties.update(
-        #             {
-        #                 "type": "application/rss+xml",
-        #                 "rel": "alternate",
-        #                 "href": Path(CONFIG.site.base_url).joinpath(
-        #                     CONFIG.site.root, "feed.xml"
-        #                 ),
-        #             }
-        #         )
-
-        # Append root to href and src links
-        # root = "/" + CONFIG.site.root.strip("/")
-        # for link_type in ["href", "src", "xlink:href"]:
-        #     for node in query_all(ast, f"[{link_type}^=@]"):
-        #         if not node[link_type].startswith(root):
-        #             new_link = (
-        #                 node[link_type].lstrip("@").replace("\\", "/").lstrip("/")
-        #             )
-        #             node[link_type] = f"{root}/{new_link}"
 
         return phml.render(_ast=ast, **kwargs)
 
@@ -525,7 +503,7 @@ class Markdown(Renderable):
             p(
                 CONFIG.markdown.wrapper.tag,
                 props,
-                *phml.parse(content).ast.children
+                *mophidian.phml.parse(content).ast.children
             )
         ) 
 
@@ -584,12 +562,12 @@ class Markdown(Renderable):
                     page_files.find(CONFIG.markdown.pygmentize.path) is None
                     and static_files.find(CONFIG.markdown.pygmentize.path) is None
                 ):
-                    if not mophidian.states["markdown_code_highlight_warned"]:
+                    if not mophidian.STATE.markdown_code_highlight_warned:
                         Logger.warning(
                             "Markdown code highlighting requires a pygmentize css file. \
 Use `moph highlight` to create that file."
                         )
-                        mophidian.states["markdown_code_highlight_warned"] = True
+                        mophidian.STATE.markdown_code_highlight_warned = True
                 else:
                     head.insert(
                         -1,
@@ -638,33 +616,6 @@ Use `moph highlight` to create that file."
 
         ast = apply_attribute_configs(ast)
         ast = phml.compile(**kwargs)
-
-        # TODO: Rewrite rss system
-
-        # if CONFIG.build.rss:
-        #     rss_link = query(ast, "link[type*=rss]")
-        #     if rss_link is not None:
-        #         rss_link.properties.update(
-        #             {
-        #                 "type": "application/rss+xml",
-        #                 "rel": "alternate",
-        #                 "href": Path(CONFIG.site.base_url).joinpath(
-        #                     CONFIG.site.root, "feed.xml"
-        #                 ),
-        #             }
-        #         )
-
-        # # Fix href and src links
-        # root = "/" + CONFIG.site.root.strip("/")
-        # for link_type in ["href", "src", "xlink:href"]:
-        #     for node in query_all(ast, f"[{link_type}^=@]"):
-        #         if not node[link_type].startswith(root):
-        #             new_link = (
-        #                 node[link_type].lstrip("@").replace("\\", "/").lstrip("/")
-        #             )
-        #             node[link_type] = f"{root}/{new_link}"
-
-        # phml.ast = ast
 
         return phml.render(_ast=ast, **kwargs)
 
@@ -725,6 +676,7 @@ class Layout(File, Linker):
         Linker.__init__(self)
         self.parent: Layout | None = None
         self.linked_files = []
+        self._hash_ = hash(path) + hash(ignore)
 
     def __fetch_layouts(self) -> list[Layout]:
         lyts = [self]
@@ -734,13 +686,17 @@ class Layout(File, Linker):
             parent = parent.parent
         return list(reversed(lyts))
 
+    def __hash__(self) -> int:
+        return self._hash_ + len(self.linked_files)
+
+    @cache
     def ast(self) -> AST:
         layouts = self.__fetch_layouts()
-        ast = phml.parse("<Slot/>").ast
+        ast = mophidian.phml.parse("<Slot/>").ast
 
         # Start with <Slot /> element and replace the <Slot /> element with each inherited layout
         for layout in layouts:
-            layout_ast = phml.load(Path(self.root).joinpath(layout.path.strip("/"))).ast
+            layout_ast = mophidian.phml.load(Path(self.root).joinpath(layout.path.strip("/"))).ast
 
             # If it quacks like a full page, then it's a full page
             if query(layout_ast, "html") or query(layout_ast, "body"):

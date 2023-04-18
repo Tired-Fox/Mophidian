@@ -6,7 +6,7 @@ from phml import HypertextManager
 from phml.utilities import query
 
 from mophidian.config import CONFIG
-from mophidian.core.util import REGEX, filter_sort
+from mophidian.core.util import REGEX
 
 __all__ = [
     "Node"
@@ -77,6 +77,3 @@ class Node:
             for child in list(self.children):
                 out += "\n" + child.print(4)
         return out
-
-phml = HypertextManager()
-phml.expose(filter_sort=filter_sort)
