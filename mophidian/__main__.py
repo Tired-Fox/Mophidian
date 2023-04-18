@@ -9,7 +9,7 @@ import click
 from watchserver import LiveServer
 from saimll import SAIML, Logger, LogLevel, style
 
-from mophidian import states, DestState, __version__
+from mophidian import STATE, DestState, __version__
 from mophidian.cli.styles import generate_highlight
 from mophidian.config import CONFIG
 from mophidian.core import (
@@ -112,14 +112,9 @@ def build_command(debug: bool, dirty: bool, no_scripts: bool = False):
     if dirty:
         rmtree("out/")
 
-    states["dest"] = DestState.FINAL
-    file_system, _, _, _ = full_build(dirty=dirty, scripts=not no_scripts)
-
-    # if CONFIG.build.sitemap.enabled:
-    #     generate_sitemaps(file_system)
-
-    # if CONFIG.build.rss.enabled:
-    #     generate_rss(file_system)
+    STATE.dest = DestState.FINAL
+    Logger.Custom("Building website...", label="▮", clr="cyan")
+    full_build(dirty=dirty, scripts=not no_scripts)
 
     Logger.flush()
 

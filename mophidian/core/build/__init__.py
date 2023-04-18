@@ -2,7 +2,7 @@ import os
 from saimll import SAIML, Logger
 from phml import HypertextManager
 
-from mophidian import CONFIG, states
+from mophidian import CONFIG, STATE, init_phml
 from mophidian.compile_steps import init_steps
 from mophidian.core.util import filter_sort
 from .context import Mophidian
@@ -20,6 +20,8 @@ init_steps()
 def build(dirty: bool = False, scripts: bool = False):
     """Take the components and files and render and write them to the given output directory."""
 
+    phml = init_phml()
+
     if scripts:
         Logger.Debug("Running pre build commands")
         for command in CONFIG.build.scripts.pre:
@@ -29,8 +31,6 @@ def build(dirty: bool = False, scripts: bool = False):
     Logger.Debug("Building pages")
 
     # ? Init phml parser/compiler with globally exposed variables
-    phml = HypertextManager()
-    phml.expose(mophidian=Mophidian(), filter_sort=filter_sort)
 
     Logger.Debug("Discovering files and components")
 
@@ -44,7 +44,7 @@ def build(dirty: bool = False, scripts: bool = False):
         phml.add(cmpt.full_path, ignore=CONFIG.site.components)
 
     # ? Render all the pages
-    dest = states["dest"]
+    dest = STATE.dest
     Logger.Debug(f"Rendering pages to {SAIML.parse(f'[@F yellow $]{dest}')}")
     Logger.Debug(f"\n{file_system}")
 
@@ -60,3 +60,4 @@ def build(dirty: bool = False, scripts: bool = False):
             os.system(command)
 
     return file_system, public, components, phml
+

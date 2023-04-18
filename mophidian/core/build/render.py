@@ -5,7 +5,7 @@ import time
 
 from phml import HypertextManager
 
-from mophidian import states, CONFIG
+from mophidian import STATE, CONFIG
 from mophidian.core.util import title, url
 from mophidian.file_system import Directory, Nav, FileState, File
 
@@ -15,7 +15,7 @@ __all__ = ["render_pages", "write_static_files"]
 
 def is_file_different(file: File, source_data: str) -> bool:
     try:
-        with open(file.dest(states["dest"]), "r", encoding="utf-8") as dest:
+        with open(file.dest(STATE.dest), "r", encoding="utf-8") as dest:
             dest_data = dest.read()
 
         return source_data != dest_data
@@ -27,7 +27,7 @@ def is_static_different(file: File) -> bool:
     try:
         with open(file.full_path, "r", encoding="utf-8") as source:
             source_data = source.read()
-        with open(file.dest(states["dest"]), "r", encoding="utf-8") as dest:
+        with open(file.dest(STATE.dest), "r", encoding="utf-8") as dest:
             dest_data = dest.read()
 
         return source_data != dest_data

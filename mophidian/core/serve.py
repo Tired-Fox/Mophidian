@@ -3,7 +3,7 @@ from pathlib import Path
 from watchserver import LiveCallback, ServerPath
 from saimll import SAIML, Log, LogLevel, style
 
-from mophidian import CONFIG, states
+from mophidian import CONFIG, STATE
 from mophidian.core import render_pages, write_static_files
 from mophidian.file_system import (
     Component,
@@ -166,14 +166,14 @@ class Callbacks(LiveCallback):
             self.file_system,
             self.static_files,
             self.component_files,
-            states["dest"],
+            STATE.dest,
             self.phml,
             self.file_system.build_nav(),
         )
 
     def write_static(self):
         """Re-write all site static files."""
-        write_static_files(self.file_system, self.static_files, states["dest"])
+        write_static_files(self.file_system, self.static_files, STATE.dest)
 
     def update_layout(self, path: str):
         """Update a given layout and all linked pages."""
