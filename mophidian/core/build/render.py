@@ -4,6 +4,7 @@ from os import remove
 import time
 
 from phml import HypertextManager
+from phml.utilities import classnames
 
 from mophidian import STATE, CONFIG
 from mophidian.core.util import title, url
@@ -47,7 +48,7 @@ def render_pages(
 ):
     """Render all the pages with their layouts to their destination file."""
 
-    global_vars = {"url": url, "title_case": title, "nav": nav}
+    global_vars = {"url": url, "title_case": title, "nav": nav, "classnames": classnames}
 
     epoch = time.time()
     # Render pages

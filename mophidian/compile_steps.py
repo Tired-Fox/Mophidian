@@ -4,7 +4,7 @@ from phml.nodes import Element
 
 from mophidian import CONFIG
 
-ROOT = "/" + CONFIG.site.root.strip("/")
+ROOT = "/" + CONFIG.site.root.strip("/") if CONFIG.site.root.strip("/") != "" else ""
 
 @scoped_step
 def replace_at_symbol(node, *_):

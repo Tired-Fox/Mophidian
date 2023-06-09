@@ -1,6 +1,6 @@
 <>
     <article>
-        <slot />
+        <Slot />
     </article>
 </>
 <style>

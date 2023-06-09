@@ -12,7 +12,7 @@ import frontmatter
 
 from phml import HypertextManager
 from phml.components import tokenize_name, ComponentManager
-from phml.nodes import AST
+from phml.nodes import AST, inspect
 
 from phml.utilities import (  # Used to parse the phml content and manipulate it's ast
     check,
@@ -365,10 +365,13 @@ class Page(Renderable):
         for head in headers:
             head_children.extend(head.children or [])
 
+        # PERF: Extract rendering into shared method
         head = query(ast, "head")
+        to_head = [*head_children, *query_all(page_ast, "link"), *query_all(page_ast, "meta")]
+        remove_nodes(page_ast, ["link", "meta"], strict=False)
 
         if head is not None:
-            for node in head_children:
+            for node in to_head:
                 node.parent = head
                 exist = "[{}]"
                 exist_equal = "[{}={}]"
@@ -555,6 +558,9 @@ class Markdown(Renderable):
             head_children.extend(head.children or [])
 
         head = query(ast, "head")
+        to_head = [*head_children, *query_all(page_ast, "link"), *query_all(page_ast, "meta")]
+        remove_nodes(page_ast, ["link", "meta"], strict=False)
+
         if head is not None:
             # !PERF: Extract this
             if CONFIG.markdown.pygmentize.highlight:
@@ -574,7 +580,7 @@ class Markdown(Renderable):
                             },
                         ),
                     )
-            for node in head_children:
+            for node in to_head:
                 node.parent = head
                 exist = "[{}]"
                 exist_equal = '[{}="{}"]'

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import annotations
 from pathlib import Path
-from shutil import rmtree
+from shutil import rmtree, copytree
 import socket
 from time import sleep
 import click
@@ -139,9 +139,8 @@ def code_highlight(style: str):
 @click.option(
     "-p",
     "--preset",
-    flag_value=True,
     help="generate the project with a preset",
-    default=False,
+    default="default",
 )
 @cli.command(name="new", help="Create a new mophidian project")
 def new(force: bool, preset: bool, name: str):
@@ -152,7 +151,7 @@ def new(force: bool, preset: bool, name: str):
     while name == "":
         name = input("Enter the name of your project: ")
 
-    Logger.Info("Generating file strucutre")
+    Logger.Info("Generating file structure")
 
     path = Path(name.lower())
 
@@ -167,19 +166,12 @@ def new(force: bool, preset: bool, name: str):
             )
             exit()
 
-    if preset:
-        from shutil import copytree
-
-        copytree(
-            Path(__file__).parent.joinpath("preset/default"), path, dirs_exist_ok=True
-        )
-    else:
-        path.joinpath("src/pages").mkdir(parents=True, exist_ok=True)
-        path.joinpath("src/components").mkdir(parents=True, exist_ok=True)
-        path.joinpath("public").mkdir(parents=True, exist_ok=True)
+    copytree(
+        Path(__file__).parent.joinpath(f"preset/{preset}"), path, dirs_exist_ok=True
+    )
 
     CONFIG.site.name = name
-    CONFIG.save()
+    CONFIG.save((path / "moph.yml").as_posix())
 
     Logger.info(
         SAIML.parse(
@@ -220,19 +212,27 @@ def new(force: bool, preset: bool, name: str):
     default=False,
     help="don't run pre build and post build scripts",
 )
+@click.option(
+    "-p",
+    "--port",
+    default=3031,
+    help="run server on specified port"
+)
 @cli.command(name="dev")
-def dev(open: bool, host: bool, debug: bool = False, no_scripts: bool = False):
+def dev(open: bool, host: bool, debug: bool = False, no_scripts: bool = False, port: int = 3031):
     """Serve the site; when files change, rebuild the site and reload the server."""
 
     if debug:
         Logger.level(LogLevel.DEBUG)
 
+    STATE.dest = DestState.DEV
     server = LiveServer(
         watch=[CONFIG.site.source, CONFIG.site.public, CONFIG.site.components],
-        root="dist",
+        root="_dev",
         errors=CONFIG.site.root,
         auto_open=CONFIG.site.root if open else None,
         suppress=True,
+        port=port,
         live_callback=Callbacks(not no_scripts),
     )
 
@@ -241,7 +241,7 @@ def dev(open: bool, host: bool, debug: bool = False, no_scripts: bool = False):
     except Exception as exc:
         raise exc
     finally:
-        rmtree("dist", ignore_errors=True)
+        rmtree("_dev", ignore_errors=True)
 
 
 @cli.command(name="preview")
@@ -264,16 +264,23 @@ def dev(open: bool, host: bool, debug: bool = False, no_scripts: bool = False):
     default=False,
     help="don't run pre build and post build scripts",
 )
-def preview(open: bool, host: bool, no_scripts: bool = False):
+@click.option(
+    "-p",
+    "--port",
+    default=3031,
+    help="run server on specified port"
+)
+def preview(open: bool, host: bool, no_scripts: bool = False, port: int = 3031):
     """Preview the project. This includes building to the websites root and launching a server.
     There are no live updates, to get that use `moph serve`.
     """
 
+    STATE.dest = DestState.PREVIEW
     server = LiveServer(
-        watch=["dist/"],
-        root="dist",
+        watch=["_preview/"],
+        root="_preview",
         errors=CONFIG.site.root,
-        port=8081,
+        port=port,
         auto_open=CONFIG.site.root if open else None,
         suppress=True,
     )
@@ -285,7 +292,7 @@ def preview(open: bool, host: bool, no_scripts: bool = False):
     except Exception as exc:
         raise exc
     finally:
-        rmtree("dist", ignore_errors=True)
+        rmtree("_preview", ignore_errors=True)
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@ from functools import cache
 from dataclasses import dataclass
 from phml import HypertextManager
 from pathlib import Path
+import tempfile
 
 from .config import CONFIG
 
@@ -12,8 +13,9 @@ from .config import CONFIG
 class DestState:
     FINAL = "out"
     """Compile files to `out` folder."""
-    DEV = (Path("dist") / CONFIG.site.root).as_posix()
+    DEV = (Path("_dev") / CONFIG.site.root).as_posix()
     """Compile files to `dist/{root}` folder."""
+    PREVIEW = (Path("_preview") / CONFIG.site.root).as_posix()
 
 
 class State:
@@ -41,8 +43,7 @@ def init_phml() -> HypertextManager:
     phml.expose(mophidian=Mophidian(), filter_sort=filter_sort)
 
     for path in Path(CONFIG.site.python).glob("**/*.py"):
-        phml.add_module(path.as_posix(), ignore=CONFIG.site.python)
-
+        phml.add_module(path.as_posix(), base=CONFIG.site.name, ignore=CONFIG.site.python)
     return phml
 
 
