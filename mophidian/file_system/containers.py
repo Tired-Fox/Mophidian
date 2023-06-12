@@ -144,7 +144,7 @@ class Container(Node):
         result = first(lambda l: isinstance(l, Layout), current.children)
         for node in path:
             for child in current.children:
-                if isinstance(child, Container) and child.name == node:
+                if isinstance(child, Container) and child.name == node.lstrip("(").rstrip(")"):
                     current = child
                     result = (
                         first(lambda l: isinstance(l, Layout), current.children)
@@ -223,9 +223,11 @@ class Container(Node):
         Args:
             item (File | Container): The item to add to the directory
         """
-
         current = self
-        path = [item.root, *[i for i in item.path.split("/") if i.strip() != ""]]
+        path = [
+            item.root,
+            *[i for i in item.path.split("/") if i.strip() != ""]
+        ]
         for i, segment in enumerate(path):
             if Path("/".join(path[: i + 1])).is_file():
                 if (
@@ -233,16 +235,18 @@ class Container(Node):
                         [
                             c
                             for c in current.children
-                            if isinstance(c, File) and c.full_path == item.full_path
+                            if isinstance(c, File)
+                            and c.full_path == item.full_path
                         ]
                     )
                     > 0
                 ):
-                    raise Exception(f"Duplicate file at path {item.full_path!r}")
-
+                    raise Exception(
+                        f"Duplicate file at path {item.full_path!r}"
+                    )
                 current.children.append(item)
             elif "/".join(path[: i + 1]) != item.root:
-                new_path = Path(item.root).joinpath(*path[1 : i + 1])
+                new_path = Path(item.root).joinpath(*path[1: i + 1])
                 if REGEX["group"]["name"].match(segment) is not None:
                     found = False
                     if current.path.strip("/") == new_path.as_posix():
@@ -253,7 +257,7 @@ class Container(Node):
                             for child in current.children
                             if isinstance(child, Group)
                         ]:
-                            if group.path == "/".join(path[1 : i + 1]) + "/":
+                            if group.path == "/".join(path[1: i + 1]):
                                 current = group
                                 found = True
                                 break
@@ -318,76 +322,76 @@ class Container(Node):
         unwrap_indecies(nav, nav_indexes)
         return nav
 
+    def iterate_layouts(self, parent: Layout | None = None):
+        # Layouts without named inheritance
+        _layouts = [
+            layout
+            for layout in self.children
+            if isinstance(layout, Layout) and not layout.inherits
+        ]
+
+        # Layouts with named inheritance
+        _ilayouts = [
+            layout
+            for layout in self.children
+            if isinstance(layout, Layout) and layout.inherits
+        ]
+
+        # Directories and Groups
+        _containers = [
+            cont for cont in self.children
+            if isinstance(cont, Container)
+        ]
+
+        if len(_layouts) > 1:
+            raise Exception(
+                f"More than one layout for directory or group: {self.path}"
+            )
+
+        # If layout is in current directory assign as current parent layout
+        _layout = parent
+        if len(_layouts) == 1:
+            _layout = _layouts[0]
+            _layout.parent = parent
+
+        # Recursively process containers
+        for container in _containers:
+            container.iterate_layouts(_layout)
+
+        # For all named layouts find it's associated layout
+        for lyt in _ilayouts:
+            if lyt.inherits:
+                lyt.parent = self.find_layout_by_name(lyt.inherit_from)
+
+    def iterate_pages(self):
+        # Renderable files in the current directory
+        _pages = [page for page in self.children if isinstance(page, Renderable)]
+
+        # Directories and Groups
+        _containers = [
+            cont for cont in self.children if isinstance(cont, Container)
+        ]
+
+        for page in _pages:
+            if page.inherits:
+                page.layout = self.find_layout_by_name(page.inherit_from)
+            else:
+                page.layout = self.find_layout_by_path(page.parents)
+
+            # Link the page to all layouts that it uses
+            layout = page.layout
+            while layout is not None:
+                layout.link_file(page)
+                layout = layout.parent
+
+        # Recursively process containers
+        for container in _containers:
+            container.iterate_pages()
+
     def build_hierarchy(self):
         """Build the relationships between layouts and pages."""
-
-        def iterate_layouts(current: Container, parent: Layout | None = None):
-            # Layouts without named inheritance
-            _layouts = [
-                layout
-                for layout in current.children
-                if isinstance(layout, Layout) and not layout.inherits
-            ]
-
-            # Layouts with named inheritance
-            _ilayouts = [
-                layout
-                for layout in current.children
-                if isinstance(layout, Layout) and layout.inherits
-            ]
-
-            # Directories and Groups
-            _containers = [
-                cont for cont in current.children if isinstance(cont, Container)
-            ]
-
-            if len(_layouts) > 1:
-                raise Exception(
-                    f"More than one layout for directory or group: {current.path}"
-                )
-
-            # If layout is in current directory assign as current parent layout
-            _layout = parent
-            if len(_layouts) == 1:
-                _layout = _layouts[0]
-                _layout.parent = parent
-
-            # Recursively process containers
-            for container in _containers:
-                iterate_layouts(container, _layout)
-
-            # For all named layouts find it's associated layout
-            for lyt in _ilayouts:
-                if lyt.inherits:
-                    lyt.parent = self.find_layout_by_name(lyt.inherit_from)
-
-        def iterate_pages(current: Container):
-            # Renderable files in the current directory
-            _pages = [page for page in current.children if isinstance(page, Renderable)]
-
-            # Directories and Groups
-            _containers = [
-                cont for cont in current.children if isinstance(cont, Container)
-            ]
-
-            for page in _pages:
-                if page.inherits:
-                    page.layout = self.find_layout_by_name(page.inherit_from)
-                else:
-                    page.layout = self.find_layout_by_path(page.parents)
-
-                # Link the page to all layouts that it uses
-                layout = page.layout
-                while layout is not None:
-                    layout.link_file(page)
-                    layout = layout.parent
-
-            # Recursively process containers
-            for container in _containers:
-                iterate_pages(container)
-
-        iterate_layouts(self)
-        iterate_pages(self)
+        self.iterate_layouts()
+        self.iterate_pages()
 
     def files(self, ext: str | list[str] | None = None) -> list[File]:
         """List of all files in file system.
