@@ -2,18 +2,23 @@
 
 [Review](https://hynek.me/articles/testing-packaging/)
 
-- [x] Separate config annotation to it's own library/package/module `tcfg`
-- [x] Rename and rebrand TEDDecor `simll` (Simple Inline Markup Language and Logging)
-  - [x] Only markup, logging, and pprint
+- [ ] Live server
+  - [ ] Host mapping
+  - [ ] Watch paths
+  - [ ] Callbacks for updating files
+- [ ] Pygments highlighting
+- [ ] Automatically pull links and meta tags into head
+- [ ] If no Head components allow Head tag in layout and page to place elements into the head
 
 - [ ] General
   - [ ] Add custom errors
 
 - [ ] Tooling
   - [ ] presets
+    - [ ] Default
+    - [ ] Blank
+    - [ ] Blog
   - [ ] integrations
-    - [ ] Tailwind
-    - [ ] Sass
     - [ ] Fontawesome
       - [ ] Javascript & Webfont variants
     - [ ] Math
