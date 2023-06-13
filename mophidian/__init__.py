@@ -1,3 +1,5 @@
 from .config import Config
-from .compile import Compiler
+from .compiler import Compiler
 from .fs import fsprint
+
+__version__="0.2.5"

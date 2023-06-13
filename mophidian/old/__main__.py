@@ -9,10 +9,10 @@ import click
 from watchserver import LiveServer
 from saimll import SAIML, Logger, LogLevel, style
 
-from mophidian import STATE, DestState, __version__
-from mophidian.cli.styles import generate_highlight
-from mophidian.config import CONFIG
-from mophidian.core import (
+from mophidian.old import STATE, DestState, __version__
+from mophidian.old.cli.styles import generate_highlight
+from mophidian.old.config import CONFIG
+from mophidian.old.core import (
     build as full_build,
     Callbacks,
 )

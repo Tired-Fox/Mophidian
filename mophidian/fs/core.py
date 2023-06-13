@@ -35,3 +35,4 @@ class FileState(Enum):
     Deleted = 1
     New = 2
     Modified = 3
+    Force = 4

@@ -1,0 +1,5 @@
+<>
+  {{ files }}
+  <p>Blog</p>
+  <Callout />
+</>

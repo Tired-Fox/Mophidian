@@ -5,8 +5,11 @@ from operator import itemgetter
 import os
 from re import match, sub
 from pathlib import Path
-from shutil import rmtree
-from typing import Any, TypeVar
+from typing import Any, TypeVar, Union
+
+from tcfg.type_check.base import Type
+
+from mophidian.config import CONFIG
 
 from .core import FileState, FileType
 from .exceptions import PathError
@@ -96,14 +99,31 @@ def _compare_fs(fs: FileType, obj: File | Directory) -> bool:
         case _:
             raise Exception("Unkown FileSystem Type")
 
-class Search(str):
-    def __class_getitem__(self, value: str) -> type:
-        return File
-
 
 class FileSystem:
     def __init__(self, path: str) -> None:
         self.root = Directory(path, path)
+        self.linked = set()
+
+    def link(self, file: File):
+        self.linked.add(file)
+
+    def unlink(self, file: File) -> bool:
+        try:
+            self.linked.remove(file)
+            return True
+        except IndexError:
+            return False
+
+    def update(self):
+        for link in self.linked:
+            link.event()
+
+    def by_context(self, key: str, value: Any) -> File | None:
+        for file in self.walk(FileType.File):
+            if key in file.context and file.context[key] == value:
+                return file
+        return None
 
     def clean(self):
         for child in self.walk(FileType.File):
@@ -124,9 +144,7 @@ class FileSystem:
                 return file
         if len(parts) > 0:
             for i, part in enumerate(parts):
-                dirs: dict = {
-                    dir.name: dir for dir in current.iter(FileType.Directory)
-                }
+                dirs: dict = {dir.name: dir for dir in current.iter(FileType.Directory)}
                 if part not in dirs:
                     raise Exception(
                         f"Url not found; missing path {'/'.join(parts[:i+1])}"
@@ -201,6 +219,169 @@ class FileSystem:
         return f"FileSystem(root='{self.root._path_}', children=[{len(self.root.children)}])"
 
 
+class File:
+    __slots__ = (
+        "ignore",
+        "_path_",
+        "_segments_",
+        "_ext_",
+        "_epoc_",
+        "name",
+        "label",
+        "linked",
+        "parent",
+        "state",
+        "context",
+        "title",
+    )
+
+    def __init__(
+        self, path: str, ignore: str = "", *, parent: Directory | None = None
+    ) -> None:
+        self._path_: Path = Path(path)
+        if not self._path_.is_file():
+            raise PathError("Files must exist")
+
+        self.ignore = ignore
+        self._segments_: list[str] = self._path_.as_posix().split("/")[:-1]
+        self._ext_: str = self._path_.suffix.lstrip(".")
+
+        self.name, self.label = itemgetter("name", "label")(
+            match(
+                r"(?P<name>[^@]*)(?:@(?P<label>.*))?(?:.phml)?", self._path_.stem
+            ).groupdict()
+        )
+
+        self.title = self.name
+        match self.file_type():
+            case FileType.Markdown:
+                if self.name == "readme":
+                    self.title = Path(self.url()).parent.stem
+            case FileType.Page:
+                self.title = self._path_.parent.stem.lstrip("(").rstrip(")")
+
+        if self.title.strip() == "":
+            self.title = "home"
+
+        self._epoc_: float = 0
+        self.parent: Directory | None = parent
+        self.state = FileState.New
+        self.linked: set[File] = set()
+        self.context: dict[str, Any] = {}
+
+    @property
+    def path(self) -> str:
+        return self._path_.as_posix()
+
+    @cache
+    def url(self, base: str | None = None) -> str:
+        start = (
+            (
+                Path(base or CONFIG.site.base)
+                .joinpath(sub(f"^/?{self.ignore}/?", "", self._path_.as_posix()))
+                .as_posix()
+            )
+            .lstrip("/")
+            .split("/")
+        )
+        start = "/".join(
+            [
+                part
+                for part in start
+                if not part.startswith("(") and not part.endswith(")")
+            ]
+        )
+        match self.file_type():
+            case FileType.Markdown:
+                if self.name.lower() == "readme":
+                    return (
+                        "/"
+                        + start.rsplit("/", 1)[0].lstrip("/").lstrip("(").rstrip(")")
+                        + "/"
+                    ).replace("//", "/")
+                else:
+                    return (
+                        "/" + start.rsplit("/", 1)[0].lstrip("/") + f"/{self.name}/"
+                    ).replace("//", "/")
+            case FileType.Page:
+                return (
+                    "/"
+                    + start.rsplit("/", 1)[0].lstrip("/").lstrip("(").rstrip(")")
+                    + "/"
+                ).replace("//", "/")
+            case _:
+                return ("/" + start.lstrip("/")).replace("//", "/")
+
+    def link(self, file: File) -> Callable[[], None]:
+        self.linked.add(file)
+        return lambda: self.linked.remove(file)
+
+    def event(self):
+        self.state = FileState.Force
+
+    def update(self):
+        # Remove all linked items that are deleted
+        self.linked = set(filter(lambda x: x.state != FileState.Deleted, self.linked))
+        for link in self.linked:
+            link.event()
+
+    def unlink(self, file: File) -> bool:
+        try:
+            self.linked.remove(file)
+            return True
+        except IndexError:
+            return False
+
+    @cache
+    def file_type(self) -> FileType:
+        match self._ext_:
+            case "md" | "mdx":
+                return FileType.Markdown
+            case "phml":
+                if self._path_.stem.startswith("page"):
+                    return FileType.Page
+                elif self._path_.stem.startswith("layout"):
+                    return FileType.Layout
+        return FileType.Static
+
+    def is_modified(self) -> bool:
+        """Check for file modification and update the last modified date."""
+        if (nmt := os.path.getmtime(self._path_.as_posix())) > self._epoc_:
+            self._epoc_ = nmt
+            return True
+        return False
+
+    def get_content(self) -> str:
+        """Get the files content."""
+        return self._path_.read_text("utf-8")
+
+    def modify(self):
+        if self.state != FileState.Deleted:
+            self.state = FileState.Modified
+            self.update()
+
+    def delete(self):
+        self.state = FileState.Deleted
+
+    def updated(self):
+        self.state = FileState.NC
+
+    def __fstr__(self, _: int = 0) -> str:
+        match self.state:
+            case FileState.Modified:
+                state = "[\x1b[33m*\x1b[39m] "
+            case FileState.New:
+                state = "[\x1b[32m+\x1b[39m] "
+            case FileState.Deleted:
+                state = "[\x1b[31m-\x1b[39m] "
+            case _:
+                state = ""
+        return f"{state}{self._path_.name}"
+
+    def __repr__(self) -> str:
+        return f"File(name={self.name!r}, label={self.label!r}, ext={self._ext_!r}, url={self.url()!r})"
+
+
 class Directory:
     __slots__ = (
         "ignore",
@@ -236,9 +417,7 @@ class Directory:
 
     def url(self, base: str = "") -> str:
         return (
-            Path(base)
-            .joinpath(self._path_.as_posix().lstrip(self.ignore))
-            .as_posix()
+            Path(base).joinpath(self._path_.as_posix().lstrip(self.ignore)).as_posix()
         )
 
     def push(self, path: Path | str, ignore: str = "") -> bool:
@@ -335,132 +514,3 @@ class Directory:
 
     def __repr__(self) -> str:
         return f"Directory(group={self.is_group}, name={self.name!r}, children=[{len(self.children)}])"
-
-
-class File:
-    __slots__ = (
-        "ignore",
-        "_path_",
-        "_segments_",
-        "_ext_",
-        "_epoc_",
-        "name",
-        "label",
-        "linked",
-        "parent",
-        "state",
-        "context",
-    )
-
-    def __init__(
-        self, path: str, ignore: str = "", *, parent: Directory | None = None
-    ) -> None:
-        self._path_: Path = Path(path)
-        if not self._path_.is_file():
-            raise PathError("Files must exist")
-
-        self.ignore = ignore
-        self._segments_: list[str] = self._path_.as_posix().split("/")[:-1]
-        self._ext_: str = self._path_.suffix.lstrip(".")
-
-        self.label = itemgetter("label")(
-            match(r"[^@]*(?:@(?P<label>.*))?(?:.phml)?", self._path_.stem).groupdict()
-        )
-        self.name = "page"
-
-        self._epoc_: float = 0
-        self.parent: Directory | None = parent
-        self.state = FileState.New
-        self.linked: set[File] = set()
-        self.context: dict[str, Any] = {}
-
-    @property
-    def path(self) -> str:
-        return self._path_.as_posix()
-
-    @cache
-    def url(self, base: str = "") -> str:
-        start = (
-            Path(base)
-            .joinpath(self._path_.as_posix().lstrip(self.ignore))
-            .as_posix()
-        )
-        match self.file_type():
-            case FileType.Markdown:
-                if self.name.lower() == "readme":
-                    return ("/" + start.rsplit("/", 1)[0].lstrip("/") + "/").replace("//", "/")
-                else:
-                    return ("/" + start.rsplit("/", 1)[0].lstrip("/") + "/").replace("//", "/")
-            case FileType.Page:
-                return ("/" + start.rsplit("/", 1)[0].lstrip("/") + "/").replace("//", "/")
-            case _:
-                return ("/" + start.lstrip("/")).replace("//", "/")
-
-    def link(self, file: File) -> Callable[[], None]:
-        self.linked.add(file)
-        return lambda: self.linked.remove(file)
-
-    def event(self):
-        self.state = FileState.Modified
-
-    def update(self):
-        # Remove all linked items that are deleted
-        self.linked = set(filter(lambda x: x.state != FileState.Deleted, self.linked))
-        for link in self.linked:
-            link.event()
-
-    def unlink(self, file: File) -> bool:
-        try:
-            self.linked.remove(file)
-            return True
-        except IndexError: 
-            return False
-
-    @cache
-    def file_type(self) -> FileType:
-        match self._ext_:
-            case "md" | "mdx":
-                return FileType.Markdown
-            case "phml":
-                if self._path_.stem.startswith("page"):
-                    return FileType.Page
-                elif self._path_.stem.startswith("layout"):
-                    return FileType.Layout
-        return FileType.Static
-
-    def is_modified(self) -> bool:
-        """Check for file modification and update the last modified date."""
-        if (nmt := os.path.getmtime(self._path_.as_posix())) > self._epoc_:
-            self._epoc_ = nmt
-            return True
-        return False
-
-    def get_content(self) -> str:
-        """Get the files content."""
-        return self._path_.read_text("utf-8")
-
-    def modify(self):
-        if self.state != FileState.Deleted:
-            self.state = FileState.Modified
-            self.update()
-
-    def delete(self):
-        self.state = FileState.Deleted
-
-    def updated(self):
-        self.state = FileState.NC
-
-    def __fstr__(self, _: int = 0) -> str:
-        match self.state:
-            case FileState.Modified:
-                state = "[\x1b[33m*\x1b[39m] "
-            case FileState.New:
-                state = "[\x1b[32m+\x1b[39m] "
-            case FileState.Deleted:
-                state = "[\x1b[31m-\x1b[39m] "
-            case _:
-                state = ""
-        return f"{state}{self._path_.name}"
-
-    def __repr__(self) -> str:
-        return f"File(name={self.name!r}, label={self.label!r}, ext={self._ext_!r}, url={self.url()!r})"

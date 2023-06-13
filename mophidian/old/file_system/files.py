@@ -26,9 +26,9 @@ from phml.utilities import (  # Used to parse the phml content and manipulate it
 from phml.builder import p  # To create injected elements
 from saimll import SAIML, Logger  # Custom logging
 
-import mophidian
-from mophidian.config import CONFIG
-from mophidian.core.util import (
+import mophidian.old as mophidian
+from mophidian.old.config import CONFIG
+from mophidian.old.core.util import (
     REGEX,
     PAGE_IGNORE,
     html,

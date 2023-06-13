@@ -2,9 +2,9 @@ import os
 from saimll import SAIML, Logger
 from phml import HypertextManager
 
-from mophidian import CONFIG, STATE, init_phml
-from mophidian.compile_steps import init_steps
-from mophidian.core.util import filter_sort
+from mophidian.old import CONFIG, STATE, init_phml
+from mophidian.old.compile_steps import init_steps
+from mophidian.old.core.util import filter_sort
 from .context import Mophidian
 from .construct import *
 from .render import *

@@ -1,0 +1,7 @@
+<Slot />
+<style>
+  body {
+      maring-block: 0;
+      margin-inline: 10rem;
+  }
+</style>
