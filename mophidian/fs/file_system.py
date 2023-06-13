@@ -1,12 +1,12 @@
 from __future__ import annotations
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from functools import cache, cached_property
 from operator import itemgetter
 import os
-from re import match
+from re import match, sub
 from pathlib import Path
 from shutil import rmtree
-from typing import TypeVar
+from typing import Any, TypeVar
 
 from .core import FileState, FileType
 from .exceptions import PathError
@@ -108,6 +108,7 @@ class FileSystem:
     def clean(self):
         for child in self.walk(FileType.File):
             if child.state == FileState.Deleted:
+                os.remove(child._path_)
                 child.parent.children.remove(child)
 
     def search(self, url: str) -> File | Directory:
@@ -242,12 +243,14 @@ class Directory:
 
     def push(self, path: Path | str, ignore: str = "") -> bool:
         ignore = ignore if ignore != "" else self.ignore
-        path = Path(str(path).lstrip(ignore))
-        segments = path.as_posix().lstrip("/").split("/")
+        path = Path(sub(f"^/?{ignore}/?", "", str(path)))
+        segments = path.as_posix().split("/")
         current: Directory = self
 
         layout = self.layout
         for i, part in enumerate(segments):
+            if layout is not None and current.layout is not None:
+                layout.link(current.layout)
             layout = current.layout or layout
             if part not in current:
                 new_item = Path().joinpath(ignore, *segments[: i + 1])
@@ -258,11 +261,11 @@ class Directory:
                             raise ValueError(
                                 "Can not have multiple layouts in the same directory"
                             )
-                        new.linked = list(current.walk(FileType.Page))
+                        new.linked = set(current.walk(FileType.Page))
                         current.layout = new
                     else:
                         for lyt in layouts(new):
-                            lyt.linked.append(new)
+                            lyt.linked.add(new)
                     _push_fs(current, new)
                 elif new_item.is_dir():
                     i = _push_fs(
@@ -346,6 +349,7 @@ class File:
         "linked",
         "parent",
         "state",
+        "context",
     )
 
     def __init__(
@@ -366,8 +370,9 @@ class File:
 
         self._epoc_: float = 0
         self.parent: Directory | None = parent
-        self.state = FileState.Created
-        self.linked = []
+        self.state = FileState.New
+        self.linked: set[File] = set()
+        self.context: dict[str, Any] = {}
 
     @property
     def path(self) -> str:
@@ -383,13 +388,33 @@ class File:
         match self.file_type():
             case FileType.Markdown:
                 if self.name.lower() == "readme":
-                    return "/" + start.rsplit("/", 1)[0].lstrip("/") + "/"
+                    return ("/" + start.rsplit("/", 1)[0].lstrip("/") + "/").replace("//", "/")
                 else:
-                    return "/" + start.rsplit("/", 1)[0].lstrip("/") + "/"
+                    return ("/" + start.rsplit("/", 1)[0].lstrip("/") + "/").replace("//", "/")
             case FileType.Page:
-                return "/" + start.rsplit("/", 1)[0].lstrip("/") + "/"
+                return ("/" + start.rsplit("/", 1)[0].lstrip("/") + "/").replace("//", "/")
             case _:
-                return "/" + start.lstrip("/")
+                return ("/" + start.lstrip("/")).replace("//", "/")
+
+    def link(self, file: File) -> Callable[[], None]:
+        self.linked.add(file)
+        return lambda: self.linked.remove(file)
+
+    def event(self):
+        self.state = FileState.Modified
+
+    def update(self):
+        # Remove all linked items that are deleted
+        self.linked = set(filter(lambda x: x.state != FileState.Deleted, self.linked))
+        for link in self.linked:
+            link.event()
+
+    def unlink(self, file: File) -> bool:
+        try:
+            self.linked.remove(file)
+            return True
+        except IndexError: 
+            return False
 
     @cache
     def file_type(self) -> FileType:
@@ -415,11 +440,11 @@ class File:
         return self._path_.read_text("utf-8")
 
     def modify(self):
-        if self.is_modified:
+        if self.state != FileState.Deleted:
             self.state = FileState.Modified
+            self.update()
 
     def delete(self):
-        os.remove(self._path_)
         self.state = FileState.Deleted
 
     def updated(self):
@@ -429,7 +454,7 @@ class File:
         match self.state:
             case FileState.Modified:
                 state = "[\x1b[33m*\x1b[39m] "
-            case FileState.Created:
+            case FileState.New:
                 state = "[\x1b[32m+\x1b[39m] "
             case FileState.Deleted:
                 state = "[\x1b[31m-\x1b[39m] "

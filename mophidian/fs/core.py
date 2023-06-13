@@ -33,5 +33,5 @@ class FileType(Enum):
 class FileState(Enum):
     NC = 0
     Deleted = 1
-    Created = 2
+    New = 2
     Modified = 3
