@@ -32,10 +32,12 @@ def _build_attributes(attributes: dict) -> dict:
     for attribute in attributes:
         if isinstance(attributes[attribute], list):
             props[attribute] = " ".join(attributes[attribute])
-        elif isinstance(attributes[attribute], (str, int, float)):
+        elif isinstance(attributes[attribute], (str, int, float)) and not isinstance(
+            attributes[attribute], bool
+        ):
             props[attribute] = str(attributes[attribute])
-        elif isinstance(attributes[attribute], bool):
-            props[attribute] = "yes" if attributes[attribute] else "no"
+        else:
+            props[attribute] = attributes[attribute]
     return props
 
 

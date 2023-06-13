@@ -1,2 +1,7 @@
 paths:
   scripts: 'src/scripts'
+markdown:
+  wrapper:
+    tag: div
+    attributes:
+      class: prose
