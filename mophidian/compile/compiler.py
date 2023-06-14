@@ -1,14 +1,14 @@
-from functools import cache
-import os
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Literal
+from typing import Any
 import frontmatter
 from markdown import Markdown
 from phml import HypertextManager, p
+from phml.compiler import scoped_step
 from phml.helpers import normalize_indent
-from phml.nodes import AST, Node
+from phml.nodes import AST, Element
 from phml.utilities import query, query_all, remove_nodes, replace_node
+from saimll import Logger
 from mophidian.core import html
 
 from mophidian.fs import FileSystem, FileType, File, TOC, Anchor
@@ -19,10 +19,46 @@ from mophidian.fs.core import FileState
 
 from mophidian.fs.file_system import layouts
 
+def flatten_children(result: TOC, children: list):
+    for child in children:
+        result.append(Anchor(child["name"], child["id"], child["level"]))
+        if "children" in child and len(child["children"]) > 0:
+            flatten_children(result, child["children"])
+
+def head_sort(node) -> int:
+    match node.tag:
+        case "meta":
+            return len(node.attributes)
+        case "link":
+            return 100 + len(node.attributes)
+        case "title":
+            return 200 + len(node.attributes)
+        case _:
+            return 400 + len(node.attributes)
+
+
 MARKDOWN = Markdown(
     extensions=list(CONFIG.markdown.extensions),
     extension_configs=CONFIG.markdown.configs,
 )
+
+ROOT = "/" + CONFIG.site.base.strip("/") if CONFIG.site.base.strip("/") != "" else ""
+
+
+@scoped_step
+def replace_link_root(node, *_):
+    for child in node:
+        if isinstance(child, Element):
+            attrs = [
+                attr
+                for attr in ["href", "src", "xlink:href"]
+                if attr in child
+                and str(child[attr]).startswith("/")
+                and not str(child[attr]).startswith(ROOT)
+            ]
+            for attr in attrs:
+                new_link = Path(str(child[attr])).as_posix().lstrip("/")
+                child[attr] = f"{ROOT}/{new_link}"
 
 
 def _build_attributes(attributes: dict) -> dict:
@@ -64,7 +100,7 @@ class Compiler:
         )
         self.scripts: FileSystem = FileSystem(CONFIG.paths.scripts).glob("**/*.py")
 
-        for component in self.components.walk(FileType.File):
+        for component in self.components.walk_files():
             self.phml.add(component.path, ignore=component.ignore)
             component.context["cname"] = self.phml.components.generate_name(
                 component._path_.as_posix(), component.ignore
@@ -75,6 +111,8 @@ class Compiler:
                 script.path, base="moph", ignore=self.scripts.root.ignore
             )
 
+        self.phml.compiler.add_step(replace_link_root, "scoped")
+
         self.gcontext = {"files": self.file_system, "public": self.public}
         self.root = html()
 
@@ -82,7 +120,7 @@ class Compiler:
         if out.is_dir():
             rmtree(CONFIG.paths.out)
 
-    def _update_results_(self, file: File, results: dict[str, Any]):
+    def _update_links_(self, file: File, results: dict[str, Any]):
         if "components" in results:
             new = results["components"]
             if "components" in file.context:
@@ -119,8 +157,8 @@ class Compiler:
                 ):
                     self.file_system.unlink(file)
 
-    def _file_system_(self, dirty: bool):
-        for file in self.file_system.walk(FileType.File):
+    def _compile_pages_(self, dirty: bool):
+        for file in self.file_system.walk_files():
             if (
                 file.state in [FileState.Force, FileState.New]
                 or (dirty or file.is_modified())
@@ -133,18 +171,39 @@ class Compiler:
                         self._markdown_(file)
                     case FileType.Static:
                         self._static_(file)
-                self._update_results_(file, self.phml.compiler.results)
+                self._update_links_(file, self.phml.compiler.results)
             file.state = FileState.NC
 
-    def build(self, dirty: bool = False):
-        self._file_system_(dirty)
+    def _run_pre_build_scripts_(self, run: bool):
+        if run and len(CONFIG.build.commands.pre) > 0:
+            Logger.Custom("Pre build commands...", label="▮", clr="magenta")
+            for command in CONFIG.build.commands.pre:
+                key = list(command.keys())[0]
+                Logger.Message(f"[{key}] \x1b[33m{command[key]}\x1b[39m")
+
+    def _run_post_build_scripts_(self, run: bool):
+        if run and len(CONFIG.build.commands.post) > 0:
+            Logger.Custom("Post build commands...", label="▮", clr="magenta")
+            for command in CONFIG.build.commands.post:
+                key = list(command.keys())[0]
+                Logger.Message(f"[{key}] \x1b[33m{command[key]}\x1b[39m")
+
+    def refresh(self, dirty: bool = False):
+        self._compile_pages_(dirty)
+
+    def build(self, dirty: bool = False, scripts: bool = False):
+        Logger.Custom("Building website...", label="▮", clr="cyan")
+        self._run_pre_build_scripts_(scripts)
+        self.refresh(dirty)
+        self._run_post_build_scripts_(scripts)
+        Logger.Custom("Build Complete", label="▮", clr="green")
 
     def _page_(self, file: File):
         lcontext = {"title": file.title}
         self.phml.load(file._path_)
         self.phml.load(file._path_)
         path = (Path(file.url(CONFIG.paths.out)) / "index.html").as_posix().lstrip("/")
-        self.phml._ast = self._build_page_(file, self.phml.ast.children)
+        self.phml._ast = self._compile_layout_(file, self.phml.ast)
         self.phml.write(path, **self.gcontext, **lcontext)
 
     def _static_(self, file: File):
@@ -161,17 +220,19 @@ class Compiler:
         props: dict[str, str] = _build_attributes(CONFIG.markdown.wrapper.attributes)
 
         lcontext = {
-            "toc": self._parse_toc_(getattr(MARKDOWN, "toc_tokens", [])),
-            "title": self._markdown_title(content) or file.title,
+            "toc": self._parse_markdown_toc_(getattr(MARKDOWN, "toc_tokens", [])),
+            "title": self._get_markdown_title_(content) or file.title,
             **metadata,
         }
 
-        page = self._build_page_(
+        page = self._compile_layout_(
             file,
             p(
-                CONFIG.markdown.wrapper.tag,
-                props,
-                *self.phml.parse(content).ast.children,
+                p(
+                    CONFIG.markdown.wrapper.tag,
+                    props,
+                    *self.phml.parse(content).ast.children,
+                )
             ),
         )
 
@@ -182,10 +243,38 @@ class Compiler:
             )
             self.phml.write(path, **self.gcontext, **lcontext)
 
-    def _build_page_(self, file: File, ast: Node | list[Node]) -> AST:
+    def _compile_head_(self, head: Element | None, ast: AST):
+        if head is not None and "Head" not in self.phml.components:
+            # Reset head tags children as they will be re ordered later
+            to_head: list[Element] = [*head.children]
+            head.children = []
+            
+
+            # Find every 'Head' tag and pull out the nested tags
+            for child in query_all(ast, "Head"):
+                to_head.extend(child.children)
+
+            # Remove 'Head' tags from ast
+            remove_nodes(ast, "Head")
+
+            # Sort and put same tags together
+            to_head.sort(key=head_sort)
+
+            # Add all tags to head tag
+            head.extend(to_head)
+
+    def _compile_layout_(self, file: File, ast: AST) -> AST:
+        # Base html template
         root = self.phml.parse(self.root).ast
+
+        # Style a script tags so the contents can be combined
         styles = []
         scripts = []
+
+        # head tag so all tags that go in the head can be combined and sorted
+        head = query(root, "head")
+
+        # For every layout for the current file, apply the layout in order
         for layout in layouts(file):
             lyt_ast = self.phml.parse(layout.get_content()).ast
 
@@ -195,11 +284,16 @@ class Compiler:
             remove_nodes(lyt_ast, "style", False)
             remove_nodes(lyt_ast, "script", False)
 
+            # Combine Head tags into head tag
+            self._compile_head_(head, lyt_ast)
+
+            # Replace layout into the current ast's Slot tag
             if query(lyt_ast, "Slot") is not None:
                 replace_node(root, "Slot", lyt_ast.children)
             else:
                 print(f"{layout._path_.as_posix()!r} must contain a <Slot /> element")
 
+        # Combine style and script tags
         if len(styles) > 0:
             out = ""
             for style in styles:
@@ -212,10 +306,14 @@ class Compiler:
                 out += f"\n{normalize_indent(script[0].content, 0)}"
             query(root, "head").append(p("script", out))
 
-        replace_node(root, "Slot", ast)
+        # Combine Head tag into head tag for File ast
+        self._compile_head_(head, ast)
+        # Add file ast to current layout
+        replace_node(root, "Slot", ast.children)
         return root
 
-    def _markdown_title(self, content: str) -> str | None:
+    def _get_markdown_title_(self, content: str) -> str | None:
+        """Iterate lines and look for line starting with `#` or a line containing multiple `-`"""
         lines = content.split("\n")
         for i, line in enumerate(lines):
             if line.strip() != "":
@@ -232,19 +330,13 @@ class Compiler:
                         return lines[i - 1].strip()
         return None
 
-    def _parse_toc_(self, toc: list):
+    def _parse_markdown_toc_(self, toc: list):
         """Parse the toc structure from the markdown parser and construct a toc object."""
         result = TOC()
-
-        def flat_chilren(children: list):
-            for child in children:
-                result.append(Anchor(child["name"], child["id"], child["level"]))
-                if "children" in child and len(child["children"]) > 0:
-                    flat_chilren(child["children"])
 
         for link in toc:
             result.append(Anchor(link["name"], link["id"], link["level"]))
             if "children" in link and len(link["children"]) > 0:
-                flat_chilren(link["children"])
+                flatten_children(result, link["children"])
 
         result

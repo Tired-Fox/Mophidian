@@ -1,5 +1,12 @@
+build:
+  commands:
+    pre:
+      - hello-world: echo hello world
+      - write-no: echo no
 paths:
   scripts: 'src/scripts'
+site:
+  base: Mophidian
 markdown:
   wrapper:
     tag: div

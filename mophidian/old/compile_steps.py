@@ -7,7 +7,7 @@ from mophidian import CONFIG
 ROOT = "/" + CONFIG.site.root.strip("/") if CONFIG.site.root.strip("/") != "" else ""
 
 @scoped_step
-def replace_at_symbol(node, *_):
+def replace_link_root(node, *_):
     for child in node:
         if isinstance(child, Element):
             attrs = [
@@ -20,4 +20,4 @@ def replace_at_symbol(node, *_):
                 child[attr] = f"{ROOT}/{new_link}"
 
 def init_steps():
-    add_step(replace_at_symbol, "scoped")
+    add_step(replace_link_root, "scoped")

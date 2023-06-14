@@ -1,5 +1,9 @@
 <>
+  <Head>
+    <meta content="Test">
+  </Head>
   {{ files }}
   <p>Blog</p>
+  <a href="/somewhere">Somewhere</a>
   <Callout />
 </>

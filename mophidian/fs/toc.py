@@ -12,7 +12,7 @@ class Anchor:
     @cached_property
     def link(self) -> str:
         """Link/href of the anchor."""
-        return "#" + self._id
+        return f"#l{self._level}-{self._id}"
 
     @property
     def name(self) -> str:

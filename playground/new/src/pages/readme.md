@@ -1,3 +1,5 @@
-# REAMDE
+# README
 
 Hello World
+
+[Link](./blog/)

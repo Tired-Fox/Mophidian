@@ -16,7 +16,7 @@ if __name__ == "__main__":
     print()
     fsprint(compiler.scripts)
 
-    compiler.build()
+    compiler.build(False, True)
 
     callout = compiler.components.by_context("cname", "Callout")
     if callout is not None:

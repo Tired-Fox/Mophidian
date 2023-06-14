@@ -7,8 +7,8 @@
   - [ ] Watch paths
   - [ ] Callbacks for updating files
 - [ ] Pygments highlighting
-- [ ] Automatically pull links and meta tags into head
-- [ ] If no Head components allow Head tag in layout and page to place elements into the head
+- [x] Automatically pull links and meta tags into head
+- [x] If no Head components allow Head tag in layout and page to place elements into the head
 
 - [ ] General
   - [ ] Add custom errors

@@ -1,5 +1,6 @@
 from tcfg import Option, cfg, new, PathType
 
+
 def merge(dest: dict, source: dict):
     """Merge a dictionary into another dictionary. Only adding keys that don't already exist. It
     will only replace the deepest keys.
@@ -17,6 +18,7 @@ def merge(dest: dict, source: dict):
                 merge(dest[key], value)
         else:
             dest[key] = value
+
 
 default_extensions = {
     "abbr",
@@ -53,18 +55,20 @@ https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, I
     "codehilite": {"css_class": "highlight"},
 }
 
+
 class Paths(cfg):
     files: PathType = new("src/pages")
     """Where the main pages for the website are located."""
-    public: PathType = new("src/public")
+    public: PathType = new("public")
     """Where public/static files are located."""
     components: PathType = new("src/components")
     """Where component files are located."""
-    scripts: PathType = new("src/scripts")
+    scripts: PathType = new("scripts")
     """Where python script files are located."""
     favicon: PathType = new("src/favicon.ico")
     out: PathType = new("out")
     """Where the built files will be written."""
+
 
 class Pygmentize(cfg):
     """Mophidian.markdown.pygmentize configuration."""
@@ -73,7 +77,8 @@ class Pygmentize(cfg):
     """Whether to include the highlight css in the head."""
 
     path: str = "highlight.css"
-    """Path of where to generate the pygmentize css file."""
+    """Path of where to generate the pygmentize css file. This should be the url path to the css file."""
+
 
 class Site(cfg):
     site_name: str
@@ -86,12 +91,14 @@ class Site(cfg):
     urls inside the website.
     """
 
+
 class MarkdownWrapper(cfg):
     tag: str = "article"
     """The html tag to use to wrap the compiled markdown."""
 
-    attributes: dict[str, bool|list|str]
+    attributes: dict[str, bool | list | str]
     """Attributes to add to the markdown wrapper."""
+
 
 class Markdown(cfg):
     wrapper: MarkdownWrapper
@@ -138,18 +145,20 @@ https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, I
 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0l-128 128c-12.5 \
 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 109.3 160 416c0 17.7-14.3 32-32 32l-96 0z"/></svg>'
         },
-        "codehilite": {"css_class": "highlight"},
+        "codehilite": {"css_class": "code-highlight"},
     }
     """The configurations for each markdown extension."""
 
+
 class Commands(cfg):
-    pre: list[str]
-    post: list[str]
+    pre: list[dict[str, str]]
+    post: list[dict[str, str]]
+
 
 class Build(cfg):
-    meta_tags: set[Option["charset", "http_equiv", "viewport"]] = {
+    meta_tags: set[Option["charset", "http-equiv", "viewport"]] = {
         "charset",
-        "http_equiv",
+        "http-equiv",
         "viewport",
     }
     """Which default meta tags should mophidian include
@@ -157,17 +166,18 @@ class Build(cfg):
 
     Tags:
         'charset': `<meta charset="UTF-8">`
-        'http_equiv': `<meta http-equiv="X-UA-Compatible" content="IE=edge">`
+        'http-equiv': `<meta http-equiv="X-UA-Compatible" content="IE=edge">`
         'viewport': `<meta name="viewport" content="width=device-width,
             initial-scale=1.0">`
     """
 
     commands: Commands
     """Extra commands to run pre build and post build."""
- 
+
 
 class Config(cfg):
     """Mophidian configuration."""
+
     _path_ = "src/moph.yml"
 
     paths: Paths
@@ -177,6 +187,7 @@ class Config(cfg):
     markdown: Markdown
     """Markdown plugin configuration."""
     build: Build
+
 
 CONFIG = Config()
 

@@ -5,7 +5,7 @@ from operator import itemgetter
 import os
 from re import match, sub
 from pathlib import Path
-from typing import Any, TypeVar, Union
+from typing import Any, Literal, TypeVar, Union
 
 from tcfg.type_check.base import Type
 
@@ -198,6 +198,20 @@ class FileSystem:
         yield from self.root.iter(ft)
 
     def walk(self, ft: FileType | None = None) -> Iterator[File | Directory]:
+        yield from self.root.walk(ft)
+
+    def walk_files(
+        self,
+        ft: Literal[
+            FileType.File, FileType.Markdown, FileType.Page, FileType.Layout
+        ] = FileType.File,
+    ) -> Iterator[File]:
+        yield from self.root.walk(ft)
+
+    def walk_dirs(
+        self,
+        ft: Literal[FileType.Directory, FileType.Group] = FileType.Directory,
+    ) -> Iterator[Directory]:
         yield from self.root.walk(ft)
 
     def __iter__(self):
