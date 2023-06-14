@@ -6,7 +6,9 @@
   - [ ] Host mapping
   - [ ] Watch paths
   - [ ] Callbacks for updating files
-- [ ] Pygments highlighting
+- [x] Pygments highlighting
+  - Create css file if missing and warn user
+  - Remind user how to generate highlight file
 - [x] Automatically pull links and meta tags into head
 - [x] If no Head components allow Head tag in layout and page to place elements into the head
 
