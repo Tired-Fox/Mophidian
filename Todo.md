@@ -2,15 +2,22 @@
 
 [Review](https://hynek.me/articles/testing-packaging/)
 
-- [ ] Live server
-  - [ ] Host mapping
-  - [ ] Watch paths
-  - [ ] Callbacks for updating files
+- [x] Live server
+  - [x] Host mapping
+  - [x] Watch paths
+  - [x] Callbacks for updating files
 - [x] Pygments highlighting
   - Create css file if missing and warn user
   - Remind user how to generate highlight file
 - [x] Automatically pull links and meta tags into head
 - [x] If no Head components allow Head tag in layout and page to place elements into the head
+- [ ] CLI
+  - [x] build
+  - [x] dev
+  - [x] preview
+  - [ ] new
+    - Interactive preset selection
+  - [x] highlight
 
 - [ ] General
   - [ ] Add custom errors

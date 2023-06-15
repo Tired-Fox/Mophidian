@@ -5,7 +5,7 @@ import sys
 
 from saimll import Logger, SAIML
 
-from mophidian import CONFIG
+from mophidian.config import CONFIG
 
 pygmentize_examples = SAIML.parse(
     "*See examples of each style at \

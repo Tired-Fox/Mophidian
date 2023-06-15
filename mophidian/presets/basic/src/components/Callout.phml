@@ -1,0 +1,86 @@
+<python>
+    # For variables to be exposed the methods defined in this block they must be global
+    # If you just want them to be exposed to the html below and not the methods they can remain local
+    # Locals and globals defined in python blocks are exposed to the html below either way
+
+    global danger_style
+    global warning_style
+    
+    danger_style = ["danger", "error", "important"]
+    warning_style = ["warn", "warning"]
+
+    def border_color(style: str):
+        if style in danger_style:
+            return "callout-danger"
+        elif style in warning_style:
+            return "callout-warning"
+        else:
+            return "callout-info"
+
+    def style_name(style: str):
+        if style in danger_style:
+            return "shape-hexagon"
+        elif style in warning_style:
+            return "shape-triangle"
+        else:
+            return "shape-circle"
+</python>
+
+<div :class="classnames('callout', border_color(style))">
+    <GGIcon :name="style_name(style)" />
+    <div class="callout-body">
+        <slot />
+    </div>
+</div>
+
+<style>
+    .callout {
+        width: 90%;
+        padding: 1rem;
+        border-radius: 1rem;
+        margin-inline: auto;
+
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+
+        font-size: 14px;
+
+        --callout-red: #D60620;
+        --callout-blue: skyblue;
+        --callout-orange: #EB9605;
+    }
+
+    .callout svg {
+        aspect-ratio: 1;
+        width: 2rem;
+    }
+
+    .callout-info {
+        border: 2px solid var(--callout-blue);
+    }
+
+    .callout-danger {
+        border: 2px solid var(--callout-red);
+    }
+
+    .callout-warning {
+        border: 2px solid var(--callout-orange);;
+    }
+
+    .callout-info :is(svg, a) {
+        color: var(--callout-blue);
+    }
+
+    .callout-danger :is(svg, a) {
+        color: var(--callout-red);
+    }
+
+    .callout-warning :is(svg, a) {
+        color: var(--callout-orange);
+    }
+
+    .callout-body {
+        width: 100%;
+    }
+</style>
