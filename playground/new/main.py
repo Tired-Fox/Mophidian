@@ -5,7 +5,6 @@ from mophidian import Compiler, fsprint
 from mophidian.config import CONFIG
 
 if __name__ == "__main__":
-    rmtree(CONFIG.paths.out)
     compiler = Compiler()
     
     fsprint(compiler.file_system)

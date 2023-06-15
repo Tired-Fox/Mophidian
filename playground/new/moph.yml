@@ -1,0 +1,16 @@
+build:
+  commands:
+    pre:
+      - hello-world: echo hello world
+  plugins:
+    pdoc:
+      source: ./mophidian
+paths:
+  scripts: 'src/scripts'
+site:
+  base: Mophidian
+markdown:
+  wrapper:
+    tag: div
+    attributes:
+      class: prose

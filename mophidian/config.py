@@ -1,4 +1,5 @@
-from tcfg import Option, cfg, new, PathType
+from typing import Any
+from tcfg import Option, cfg, PathType
 
 
 def merge(dest: dict, source: dict):
@@ -57,16 +58,17 @@ https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, I
 
 
 class Paths(cfg):
-    files: PathType = new("src/pages")
+    files: PathType = "src/pages"
     """Where the main pages for the website are located."""
-    public: PathType = new("public")
+    public: PathType = "public"
     """Where public/static files are located."""
-    components: PathType = new("src/components")
+    components: PathType = "src/components"
     """Where component files are located."""
-    scripts: PathType = new("scripts")
+    scripts: PathType = "src/scripts"
     """Where python script files are located."""
-    favicon: PathType = new("src/favicon.ico")
-    out: PathType = new("out")
+    favicon: PathType = "favicon.ico"
+    """Path to websites favicon."""
+    out: PathType = "out"
     """Where the built files will be written."""
 
 
@@ -81,7 +83,7 @@ class Pygmentize(cfg):
 
 
 class Site(cfg):
-    site_name: str
+    name: str
     """Website name. This is exposed to the compiler."""
 
     base: PathType
@@ -154,7 +156,6 @@ class Commands(cfg):
     pre: list[dict[str, str]]
     post: list[dict[str, str]]
 
-
 class Build(cfg):
     meta_tags: set[Option["charset", "http-equiv", "viewport"]] = {
         "charset",
@@ -174,11 +175,14 @@ class Build(cfg):
     commands: Commands
     """Extra commands to run pre build and post build."""
 
+    plugins: dict[str, Any]
+    """Mophidian plugins and integrations."""
 
-class Config(cfg):
+
+class MophConfig(cfg):
     """Mophidian configuration."""
 
-    _path_ = "src/moph.yml"
+    _path_ = "moph.yml"
 
     paths: Paths
     """Paths for different file system operations."""
@@ -189,7 +193,7 @@ class Config(cfg):
     build: Build
 
 
-CONFIG = Config()
+CONFIG = MophConfig()
 
 if CONFIG.markdown.override_defaults:
     for extension in CONFIG.markdown.extensions:

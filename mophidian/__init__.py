@@ -1,4 +1,5 @@
-from .config import CONFIG
+from .config import MophConfig
+from .plugins import Plugin
 from .compile import Compiler
 from .fs import fsprint
 

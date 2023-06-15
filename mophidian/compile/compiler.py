@@ -2,13 +2,14 @@ from pathlib import Path
 from shutil import rmtree
 from typing import Any
 import frontmatter
+from subprocess import run
 from markdown import Markdown
 from phml import HypertextManager, p
-from phml.compiler import scoped_step
+from phml.compiler import post_step, scoped_step
 from phml.helpers import normalize_indent
 from phml.nodes import AST, Element
-from phml.utilities import query, query_all, remove_nodes, replace_node
-from saimll import Logger
+from phml.utilities import query, query_all, remove_nodes, replace_node, walk
+from saimll import SAIML, Logger
 from mophidian.core import html
 
 from mophidian.fs import FileSystem, FileType, File, TOC, Anchor
@@ -18,12 +19,16 @@ from re import match, sub
 from mophidian.fs.core import FileState
 
 from mophidian.fs.file_system import layouts
+from mophidian.plugins import Plugin
+from mophidian.plugins.pdoc import Pdoc
+
 
 def flatten_children(result: TOC, children: list):
     for child in children:
         result.append(Anchor(child["name"], child["id"], child["level"]))
         if "children" in child and len(child["children"]) > 0:
             flatten_children(result, child["children"])
+
 
 def head_sort(node) -> int:
     match node.tag:
@@ -42,11 +47,11 @@ MARKDOWN = Markdown(
     extension_configs=CONFIG.markdown.configs,
 )
 
-ROOT = "/" + CONFIG.site.base.strip("/") if CONFIG.site.base.strip("/") != "" else ""
 
 
 @scoped_step
 def replace_link_root(node, *_):
+    root = "/" + CONFIG.site.base.strip("/") if CONFIG.site.base.strip("/") != "" else ""
     for child in node:
         if isinstance(child, Element):
             attrs = [
@@ -54,11 +59,25 @@ def replace_link_root(node, *_):
                 for attr in ["href", "src", "xlink:href"]
                 if attr in child
                 and str(child[attr]).startswith("/")
-                and not str(child[attr]).startswith(ROOT)
+                and not str(child[attr]).startswith(root)
             ]
             for attr in attrs:
                 new_link = Path(str(child[attr])).as_posix().lstrip("/")
-                child[attr] = f"{ROOT}/{new_link}"
+                child[attr] = f"{root}/{new_link}"
+
+
+@post_step
+def save_links_used(ast, _components, _context, results):
+    if "links" not in results:
+        results["links"] = []
+
+    head = query(ast, "head")
+    if head is not None:
+        for node in walk(head):
+            if isinstance(node, Element):
+                for attr in ["href", "src", "xlink:href"]:
+                    if attr in node.attributes:
+                        results["links"].append(node.attributes[attr])
 
 
 def _build_attributes(attributes: dict) -> dict:
@@ -88,6 +107,7 @@ class Compiler:
         "scripts",
         "nav",
         "root",
+        "plugins"
     )
 
     def __init__(self):
@@ -112,13 +132,18 @@ class Compiler:
             )
 
         self.phml.compiler.add_step(replace_link_root, "scoped")
+        self.phml.compiler.add_step(save_links_used, "post")
 
         self.gcontext = {"files": self.file_system, "public": self.public}
         self.root = html()
 
-        out = Path(CONFIG.paths.out)
-        if out.is_dir():
-            rmtree(CONFIG.paths.out)
+        self.plugins = []
+        for plugin, config in CONFIG.build.plugins.items():
+            match plugin:
+                case "pdoc":
+                    if isinstance(config, bool):
+                        config = {}
+                    self.plugins.append(Pdoc(config))
 
     def _update_links_(self, file: File, results: dict[str, Any]):
         if "components" in results:
@@ -157,12 +182,33 @@ class Compiler:
                 ):
                     self.file_system.unlink(file)
 
+        if "links" in results:
+            for link in results["links"]:
+                link = link.lstrip(".").strip("/")
+                if (l := self.public.search(link)) is not None and isinstance(l, File):
+                    l.link(file)
+                elif (l := self.file_system.search(link)) is not None and isinstance(
+                    l, File
+                ):
+                    l.link(file)
+
+    def _write_static_(self, dirty: bool):
+        for file in self.public.walk_files():
+            if file.state == FileState.Force or (
+                file.state
+                in [
+                    FileState.New,
+                    FileState.Modified,
+                ]
+                and (dirty or file.is_modified())
+            ):
+                file.dest().write_text(file.get_content())
+
     def _compile_pages_(self, dirty: bool):
         for file in self.file_system.walk_files():
-            if (
-                file.state in [FileState.Force, FileState.New]
+            if file.state == FileState.Force or (
+                file.state in [FileState.New, FileState.Modified]
                 or (dirty or file.is_modified())
-                and file.state == FileState.Modified
             ):
                 match file.file_type():
                     case FileType.Page:
@@ -176,40 +222,65 @@ class Compiler:
 
     def _run_pre_build_scripts_(self, run: bool):
         if run and len(CONFIG.build.commands.pre) > 0:
-            Logger.Custom("Pre build commands...", label="▮", clr="magenta")
             for command in CONFIG.build.commands.pre:
                 key = list(command.keys())[0]
-                Logger.Message(f"[{key}] \x1b[33m{command[key]}\x1b[39m")
+                Logger.Message(SAIML.parse(f"  \[[@Fmagenta]{key}[@F]\] {command[key]}"))
 
     def _run_post_build_scripts_(self, run: bool):
         if run and len(CONFIG.build.commands.post) > 0:
-            Logger.Custom("Post build commands...", label="▮", clr="magenta")
+            Logger.custom("Post build commands...", label="▮", clr="magenta").Message
             for command in CONFIG.build.commands.post:
                 key = list(command.keys())[0]
                 Logger.Message(f"[{key}] \x1b[33m{command[key]}\x1b[39m")
 
+    def _pre_plugins_(self):
+        if len(self.plugins) > 0:
+            for plugin in self.plugins:
+                if "pre" in plugin:
+                    Logger.Message(SAIML.parse(f"  \[[@Fmagenta]PLUGIN[@F]\] {plugin.__class__.__name__.lower()}"))
+                    plugin.pre(CONFIG)
+
+    def _post_plugins_(self):
+        for plugin in self.plugins:
+            if "post" in plugin:
+                Logger.Message(SAIML.parse(f"  \[[@Fmagenta]PLUGIN[@F]\] {plugin.__class__.__name__.lower()}"))
+                plugin.post(CONFIG)
+
     def refresh(self, dirty: bool = False):
         self._compile_pages_(dirty)
+        self._write_static_(dirty)
 
     def build(self, dirty: bool = False, scripts: bool = False):
-        Logger.Custom("Building website...", label="▮", clr="cyan")
+        if dirty:
+            try:
+                rmtree(CONFIG.paths.out.strip("/"))
+            except:
+                pass
+
+        Logger.custom("Pre Build", label="▮", clr="magenta").Message
+        self._pre_plugins_()
         self._run_pre_build_scripts_(scripts)
+
+        Logger.Custom("Building website...", label="▮", clr="cyan")
+        Path(CONFIG.paths.out).mkdir(parents=True, exist_ok=True)
         self.refresh(dirty)
+
+        Logger.custom("Post Build", label="▮", clr="magenta").Message
         self._run_post_build_scripts_(scripts)
+        self._post_plugins_()
         Logger.Custom("Build Complete", label="▮", clr="green")
 
     def _page_(self, file: File):
         lcontext = {"title": file.title}
         self.phml.load(file._path_)
         self.phml.load(file._path_)
-        path = (Path(file.url(CONFIG.paths.out)) / "index.html").as_posix().lstrip("/")
+        path = file.dest().as_posix()
         self.phml._ast = self._compile_layout_(file, self.phml.ast)
         self.phml.write(path, **self.gcontext, **lcontext)
 
     def _static_(self, file: File):
-        path = Path(file.url(CONFIG.paths.out).lstrip("/"))
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(file.get_content())
+        file.dest().parent.mkdir(parents=True, exist_ok=True)
+        file.dest().write_text(file.get_content())
 
     def _markdown_(self, file: File):
         post = frontmatter.load(file._path_)
@@ -238,9 +309,7 @@ class Compiler:
 
         if page is not None:
             self.phml._ast = page
-            path = (
-                (Path(file.url(CONFIG.paths.out)) / "index.html").as_posix().lstrip("/")
-            )
+            path = file.dest().as_posix()
             self.phml.write(path, **self.gcontext, **lcontext)
 
     def _compile_head_(self, head: Element | None, ast: AST):
@@ -248,7 +317,6 @@ class Compiler:
             # Reset head tags children as they will be re ordered later
             to_head: list[Element] = [*head.children]
             head.children = []
-            
 
             # Find every 'Head' tag and pull out the nested tags
             for child in query_all(ast, "Head"):

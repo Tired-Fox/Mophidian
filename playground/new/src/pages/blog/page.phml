@@ -4,6 +4,6 @@
   </Head>
   {{ files }}
   <p>Blog</p>
-  <a href="/somewhere">Somewhere</a>
+  <a href="/something">Something</a>
   <Callout />
 </>

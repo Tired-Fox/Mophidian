@@ -1,13 +1,13 @@
 from __future__ import annotations
 from collections.abc import Callable, Iterator
-from functools import cache, cached_property
+from functools import cache
 from operator import itemgetter
 import os
 from re import match, sub
 from pathlib import Path
-from typing import Any, Literal, TypeVar, Union
+from typing import Any, Literal
 
-from tcfg.type_check.base import Type
+from watchserver.util import cached_property
 
 from mophidian.config import CONFIG
 
@@ -131,7 +131,7 @@ class FileSystem:
                 os.remove(child._path_)
                 child.parent.children.remove(child)
 
-    def search(self, url: str) -> File | Directory:
+    def search(self, url: str) -> File | Directory | None:
         is_dir = url.endswith("/")
 
         parts = [part for part in normalize_path(url).split("/") if part != ""]
@@ -143,12 +143,10 @@ class FileSystem:
             ):
                 return file
         if len(parts) > 0:
-            for i, part in enumerate(parts):
+            for part in parts:
                 dirs: dict = {dir.name: dir for dir in current.iter(FileType.Directory)}
                 if part not in dirs:
-                    raise Exception(
-                        f"Url not found; missing path {'/'.join(parts[:i+1])}"
-                    )
+                    return None
                 current = dirs[part]
                 for file in current.iter(FileType.File):
                     if file.url().lstrip("/") == url:
@@ -182,7 +180,7 @@ class FileSystem:
                 self.push(path.as_posix(), self.root._path_.as_posix())
         return self
 
-    def push(self, path: Path | str, ignore: str = "") -> bool:
+    def push(self, path: Path | str, ignore: str = "") -> File | None:
         return self.root.push(path, ignore)
 
     def get(self, ft: FileType | None = None) -> File | Directory | None:
@@ -200,12 +198,13 @@ class FileSystem:
     def walk(self, ft: FileType | None = None) -> Iterator[File | Directory]:
         yield from self.root.walk(ft)
 
-    def walk_files(
+    def files(
         self,
         ft: Literal[
             FileType.File, FileType.Markdown, FileType.Page, FileType.Layout
         ] = FileType.File,
     ) -> Iterator[File]:
+        """Iterate the file systems files. Can optionally add additional filters."""
         yield from self.root.walk(ft)
 
     def walk_dirs(
@@ -277,15 +276,30 @@ class File:
         if self.title.strip() == "":
             self.title = "home"
 
-        self._epoc_: float = 0
+        self._epoc_: float = self.dest().stat()[8] if self.dest().is_file() else 0
         self.parent: Directory | None = parent
         self.state = FileState.New
         self.linked: set[File] = set()
         self.context: dict[str, Any] = {}
 
     @property
+    def mtime(self) -> float:
+        return self._path_.stat()[8] 
+
+    @property
     def path(self) -> str:
         return self._path_.as_posix()
+
+    @cache
+    def dest(self) -> Path:
+        dest: Path = Path(self.url(CONFIG.paths.out.strip("/")).lstrip("/"))
+        match self.file_type():
+            case FileType.Markdown:
+                dest /= "index.html"
+            case FileType.Page:
+                dest /= "index.html"
+            case _: pass
+        return dest
 
     @cache
     def url(self, base: str | None = None) -> str:
@@ -310,7 +324,7 @@ class File:
                 if self.name.lower() == "readme":
                     return (
                         "/"
-                        + start.rsplit("/", 1)[0].lstrip("/").lstrip("(").rstrip(")")
+                        + start.rsplit("/", 1)[0].lstrip("/")
                         + "/"
                     ).replace("//", "/")
                 else:
@@ -318,11 +332,18 @@ class File:
                         "/" + start.rsplit("/", 1)[0].lstrip("/") + f"/{self.name}/"
                     ).replace("//", "/")
             case FileType.Page:
-                return (
-                    "/"
-                    + start.rsplit("/", 1)[0].lstrip("/").lstrip("(").rstrip(")")
-                    + "/"
-                ).replace("//", "/")
+                if self._path_.stem.startswith("page"):
+                    return (
+                        "/"
+                        + start.rsplit("/", 1)[0].lstrip("/")
+                        + "/"
+                    ).replace("//", "/")
+                else:
+                    return (
+                        "/"
+                        + start.rsplit("/", 1)[0].lstrip("/")
+                        + f"/{self.name}/"
+                    ).replace('//', '/')
             case _:
                 return ("/" + start.lstrip("/")).replace("//", "/")
 
@@ -352,18 +373,19 @@ class File:
             case "md" | "mdx":
                 return FileType.Markdown
             case "phml":
-                if self._path_.stem.startswith("page"):
-                    return FileType.Page
-                elif self._path_.stem.startswith("layout"):
+                if self._path_.stem.startswith("layout"):
                     return FileType.Layout
+                else:
+                    return FileType.Page
         return FileType.Static
 
     def is_modified(self) -> bool:
-        """Check for file modification and update the last modified date."""
-        if (nmt := os.path.getmtime(self._path_.as_posix())) > self._epoc_:
-            self._epoc_ = nmt
-            return True
-        return False
+        """Check for file modification and update the last modified date.
+        The modification is checked between destination file and source file.
+        """
+        result = self.mtime > self._epoc_ 
+        self._epoc_ = self.mtime
+        return result
 
     def get_content(self) -> str:
         """Get the files content."""
@@ -434,7 +456,7 @@ class Directory:
             Path(base).joinpath(self._path_.as_posix().lstrip(self.ignore)).as_posix()
         )
 
-    def push(self, path: Path | str, ignore: str = "") -> bool:
+    def push(self, path: Path | str, ignore: str = "") -> File | None:
         ignore = ignore if ignore != "" else self.ignore
         path = Path(sub(f"^/?{ignore}/?", "", str(path)))
         segments = path.as_posix().split("/")
@@ -460,6 +482,7 @@ class Directory:
                         for lyt in layouts(new):
                             lyt.linked.add(new)
                     _push_fs(current, new)
+                    return new
                 elif new_item.is_dir():
                     i = _push_fs(
                         current, Directory(new_item.as_posix(), ignore, parent=current)
@@ -471,7 +494,7 @@ class Directory:
                 dirs = [dir.name for dir in current.iter(FileType.Directory)]
                 current = current.children[dirs.index(part)]
 
-        return True
+        return None
 
     def get(self, ft: FileType | None = None) -> File | Directory | None:
         """Get the first child. Can optionally filter for a certain file type."""
