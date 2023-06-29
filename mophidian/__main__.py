@@ -1,16 +1,21 @@
 from pathlib import Path
 from shutil import copytree, rmtree
 from sys import stdout
+import sys
 import click
-from saimll import SAIML, LogLevel, Logger
 from watchserver import LiveServer
+
+# TODO: Replace beaupy with conterm equivelant cli
+from conterm.cli import multi_select, select, prompt
+
+from conterm.pretty import Markup
+from conterm.logging import LogLevel
+
 import mophidian
 from mophidian.compile import Compiler
 from mophidian.compile.serve import Callbacks, run_server
 from mophidian.config import CONFIG
-from mophidian.pygmentize import generate_highlight, print_styles
-
-from beaupy import select, prompt
+from mophidian.pygmentize import generate_highlight, get_styles, print_styles
 
 DEV = ".dev"
 PREVIEW = "preview"
@@ -32,23 +37,20 @@ def cli(version: bool = False):
 
     if version:
         click.echo(f"Mophidian v{mophidian.__version__}")
-        exit()
-
+        sys.exit()
 
 @click.argument("style", default="")
-@click.option(
-    "-l", "--list", flag_value=True, help="List Pygmentize styles", default=False
-)
 @cli.command(name="highlight", help=f"Generate a pygmentize CSS file")
-def code_highlight(style: str, list: bool = False):
+def code_highlight(style: str = ""):
     """Stylize markdown code blocks with pygmentize. This command allows you to generate the
     CSS file with a given styles highlight colors.
     """
-    # PERF: Update cli too to be interactive and searchable
-    if list:
-        print_styles()
-    else:
-        generate_highlight(style)
+
+    if style == "":
+        styles = [s.name for s in get_styles()]
+        style = select(styles, prompt="Select a pygmentize theme:", title="theme")
+
+    generate_highlight(style)
 
 
 @click.option("--debug", flag_value=True, help="Enable debug logs", default=False)
@@ -74,12 +76,9 @@ def build(debug: bool, dirty: bool, no_scripts: bool = False):
     compiler = Compiler()
 
     if debug:
-        Logger.level(LogLevel.DEBUG)
+        mophidian.logger.min_level = -1
 
     compiler.build(dirty=dirty, scripts=not no_scripts)
-
-    Logger.flush()
-
 
 @click.option(
     "-o",
@@ -119,7 +118,7 @@ def dev(
     """Serve the site; when files change, rebuild the site and reload the server."""
 
     if debug:
-        Logger.level(LogLevel.DEBUG)
+        mophidian.logger.min_level = -1
 
     CONFIG.paths.out = DEV
     CONFIG.site.base = ""
@@ -214,37 +213,66 @@ def new(force: bool, preset: str, name: str):
     """
 
     while name == "":
-        name = prompt("Enter the name of your project: ", initial_value="app")
-        print(SAIML.parse(f"[@Fyellow]name[@F]: *{name}"))
+        name = prompt("Enter the name of your project: ", default="app", title="name")
 
-    path = Path(name.lower())
-
-    if path.is_dir():
-        if force:
-            rmtree(path)
-        else:
-            Logger.Error(
-                SAIML.parse(
-                    f"Failed to create project [@Fyellow]/{name}[@F] since it already exists"
-                )
-            )
-            exit()
-
-    if preset == "":
-        preset = select_preset()
-
-    Logger.Info("Generating file structure")
-    copytree(
-        Path(__file__).parent.joinpath(f"presets/{preset}"), path, dirs_exist_ok=True
-    )
-
-    CONFIG.site.name = name
-    CONFIG.save((path / "moph.yml").as_posix())
-
-    Logger.Info(
-        SAIML.parse(
-            f"Finished! Next cd into [@Fyellow]{name!r}[@F] and start building"
+    if preset == "" and prompt("use preset?", keep=False):
+        presets = [
+            preset.stem for preset in Path(__file__).parent.joinpath("presets/").glob("*")
+            if preset.is_dir()
+        ]
+        preset = select(
+            presets,
+            prompt="Select a preset:",
+            title="Preset",
+            preprocess=lambda o: f"{o}: {PRESETS[o]}"
         )
+
+    additional = []
+    if prompt("Run additional setup?", keep=False):
+        additional = multi_select(
+            ["highlight", "markup"],
+            prompt="Additional setup:",
+            allow_empty=True,
+            title="Setup"
+        )
+
+    if "highlight" in additional:
+        pub = CONFIG.paths.public
+        CONFIG.paths.public = f"{name}/{pub}"
+        styles = [s.name for s in get_styles()]
+        style = select(styles, prompt="Select a pygmentize theme:", title="theme", default="one-dark")
+        generate_highlight(style)
+        CONFIG.paths.public = pub
+
+    if "markdown" in additional:
+        pass
+
+    # path = Path(name.lower())
+    # if path.is_dir():
+    #     if force:
+    #         rmtree(path)
+    #     else:
+    #         mophidian.logger.log(
+    #             Markup.parse(
+    #                 f"Failed to create project [yellow]/{name}[/] since it already exists"
+    #             ),
+    #             level=LogLevel.Error
+    #         )
+    #         sys.exit()
+
+    # if preset == "":
+    #     preset = select_preset()
+
+    # mophidian.logger.log("Generating file structure")
+    # copytree(
+    #     Path(__file__).parent.joinpath(f"presets/{preset}"), path, dirs_exist_ok=True
+    # )
+
+    # CONFIG.site.name = name
+    # CONFIG.save((path / "moph.yml").as_posix())
+
+    mophidian.logger.log(
+        Markup.parse(f"Finished! Next cd into [yellow]{name!r}[/] and start building")
     )
 
 PRESETS = {

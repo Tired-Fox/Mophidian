@@ -22,7 +22,7 @@ dependencies = [
     "phml>=0.3.1",
     "tcfg[yaml]>=0.4.6",
     "watchserver>=0.1.9",
-    "saimll>=0.5.0",
+    "conterm>=0.0.1",
 
     # Third party
     "click",

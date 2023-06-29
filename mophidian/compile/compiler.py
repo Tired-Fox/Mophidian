@@ -2,7 +2,6 @@ from pathlib import Path
 from shutil import rmtree
 from typing import Any
 import frontmatter
-from subprocess import run
 from markdown import Markdown
 from phml import HypertextManager, p
 from phml.compiler import post_step, scoped_step
@@ -19,7 +18,6 @@ from re import match, sub
 from mophidian.fs.core import FileState
 
 from mophidian.fs.file_system import layouts
-from mophidian.plugins import Plugin
 from mophidian.plugins.pdoc import Pdoc
 
 
@@ -120,7 +118,7 @@ class Compiler:
         )
         self.scripts: FileSystem = FileSystem(CONFIG.paths.scripts).glob("**/*.py")
 
-        for component in self.components.walk_files():
+        for component in self.components.files():
             self.phml.add(component.path, ignore=component.ignore)
             component.context["cname"] = self.phml.components.generate_name(
                 component._path_.as_posix(), component.ignore
@@ -193,7 +191,7 @@ class Compiler:
                     l.link(file)
 
     def _write_static_(self, dirty: bool):
-        for file in self.public.walk_files():
+        for file in self.public.files():
             if file.state == FileState.Force or (
                 file.state
                 in [
@@ -205,7 +203,7 @@ class Compiler:
                 file.dest().write_text(file.get_content())
 
     def _compile_pages_(self, dirty: bool):
-        for file in self.file_system.walk_files():
+        for file in self.file_system.files():
             if file.state == FileState.Force or (
                 file.state in [FileState.New, FileState.Modified]
                 or (dirty or file.is_modified())

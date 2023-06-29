@@ -73,20 +73,6 @@ def print_styles():
         print("\n" + pygmentize_examples + "\n")
 
 
-def input_style() -> str:
-    """List the pygmentize styles."""
-    styles = get_styles()
-    if len(styles) > 0:
-        print_styles()
-        try:
-            style = input(choose_style_prompt)
-        finally:
-            sys.stdout.write("\x1b[0m")
-
-        return style
-    return ""
-
-
 def _stylesheet_header(style: str, klass: str) -> str:
     return f"""\
 /* Pygmentize: https://pygments.org/ */
@@ -113,20 +99,18 @@ def generate_style(style: str):
         dest = Path(CONFIG.paths.public).joinpath(CONFIG.markdown.pygmentize.path)
         output = output.decode("unicode_escape").replace("\r\n", "\n")
         output = _stylesheet_header(style, klass) + output
-        with open(dest, "+w", encoding="utf-8") as highlight_file:
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        with dest.open("+w") as highlight_file:
             highlight_file.write(output)
         Logger.info(f"Generated code style at {dest.as_posix()!r}").flush()
     else:
         Logger.error(f"Failed to generate css for style {style!r}")
 
 
-def generate_highlight(style: str = ""):
+def generate_highlight(style: str):
     """Generate the pygmentize highlight css file."""
 
     style = style.strip()
-
-    if style == "":
-        style = input_style()
 
     if style == "":
         Logger.Error("A style name must be provided")

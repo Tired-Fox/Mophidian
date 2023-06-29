@@ -43,11 +43,11 @@ class Callbacks(LiveCallback):
 
         # Map for fast indexing and logic checking of existing files
         self.files = {
-            file.path: file for file in self.compiler.file_system.walk_files()
+            file.path: file for file in self.compiler.file_system.files()
         }
-        self.public = {file.path: file for file in self.compiler.public.walk_files()}
+        self.public = {file.path: file for file in self.compiler.public.files()}
         self.components = {
-            file.path: file for file in self.compiler.components.walk_files()
+            file.path: file for file in self.compiler.components.files()
         }
 
     def render_log_content(self, cmpt: str | None, path: str | None) -> str:

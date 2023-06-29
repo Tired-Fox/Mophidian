@@ -39,6 +39,21 @@
                                     <li>
                                             <a class="variable" href="#Pdoc.Config.format">format</a>
                                     </li>
+                                    <li>
+                                            <a class="variable" href="#Pdoc.Config.source">source</a>
+                                    </li>
+                                    <li>
+                                            <a class="variable" href="#Pdoc.Config.out">out</a>
+                                    </li>
+                                    <li>
+                                            <a class="variable" href="#Pdoc.Config.templates">templates</a>
+                                    </li>
+                                    <li>
+                                            <a class="variable" href="#Pdoc.Config.mermaid">mermaid</a>
+                                    </li>
+                                    <li>
+                                            <a class="variable" href="#Pdoc.Config.math">math</a>
+                                    </li>
                             </ul>
 
                         </li>
@@ -73,38 +88,32 @@
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">from</span> <span class="nn">tcfg</span> <span class="kn">import</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">Option</span><span class="p">,</span> <span class="n">PathType</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">mophidian</span> <span class="kn">import</span> <span class="n">Plugin</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="c1"># from mophidian.fs import File</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="k">class</span> <span class="nc">Pdoc</span><span class="p">(</span><span class="n">Plugin</span><span class="p">):</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>        <span class="nb">format</span><span class="p">:</span> <span class="n">Option</span><span class="p">[</span><span class="s2">&quot;google&quot;</span><span class="p">,</span> <span class="s2">&quot;markdown&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">,</span> <span class="s2">&quot;restructuredtext&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;google&quot;</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>        <span class="sd">&quot;&quot;&quot;Docstring format. Options: markdown, google, numpy, restructuredtext Default `google`.&quot;&quot;&quot;</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>        <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>        <span class="n">out</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">=</span> <span class="s2">&quot;api/&quot;</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>        <span class="n">templates</span><span class="p">:</span> <span class="n">PathType</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="k">class</span> <span class="nc">Pdoc</span><span class="p">(</span><span class="n">Plugin</span><span class="p">):</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>    <span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>        <span class="nb">format</span><span class="p">:</span> <span class="n">Option</span><span class="p">[</span><span class="s2">&quot;google&quot;</span><span class="p">,</span> <span class="s2">&quot;markdown&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">,</span> <span class="s2">&quot;restructuredtext&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;google&quot;</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>        <span class="sd">&quot;&quot;&quot;Docstring format. Options: markdown, google, numpy, restructuredtext Default `google`.&quot;&quot;&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>        <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>        <span class="sd">&quot;&quot;&quot;Source module by path.&quot;&quot;&quot;</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>        <span class="n">out</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">=</span> <span class="s2">&quot;api/&quot;</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>        <span class="sd">&quot;&quot;&quot;Output directory relative to website root.&quot;&quot;&quot;</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>        <span class="n">templates</span><span class="p">:</span> <span class="n">PathType</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>        <span class="sd">&quot;&quot;&quot;Directory to pdoc override templates.&quot;&quot;&quot;</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>        <span class="n">mermaid</span><span class="p">:</span> <span class="nb">bool</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>        <span class="n">math</span><span class="p">:</span> <span class="nb">bool</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="k">def</span> <span class="nf">pre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>        <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;-d </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">out</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-o </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">templates</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-t </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">templates</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mermaid</span><span class="p">:</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--mermaid&quot;</span><span class="p">)</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">math</span><span class="p">:</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--math&quot;</span><span class="p">)</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>        <span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;pdoc </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="c1"># TODO: Get data to pass to file during compilation</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="c1"># def data(self, file: File, config: MophConfig):</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="c1">#     pass</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>    <span class="c1"># TODO: Call to run commands in post build</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>    <span class="c1"># def post(self, config: MophConfig):</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="c1">#     pass</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>        <span class="sd">&quot;&quot;&quot;Flag for rendering mermaid diagrams.&quot;&quot;&quot;</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>        <span class="n">math</span><span class="p">:</span> <span class="nb">bool</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>        <span class="sd">&quot;&quot;&quot;Flag for rendering Latex math.&quot;&quot;&quot;</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="k">def</span> <span class="nf">pre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>        <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;-d </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">out</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-o </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">templates</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-t </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">templates</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mermaid</span><span class="p">:</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--mermaid&quot;</span><span class="p">)</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">math</span><span class="p">:</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--math&quot;</span><span class="p">)</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>        <span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;pdoc </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -120,35 +129,32 @@
 
     </div>
     <a class="headerlink" href="#Pdoc"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Pdoc-9"><a href="#Pdoc-9"><span class="linenos"> 9</span></a><span class="k">class</span> <span class="nc">Pdoc</span><span class="p">(</span><span class="n">Plugin</span><span class="p">):</span>
-</span><span id="Pdoc-10"><a href="#Pdoc-10"><span class="linenos">10</span></a>    <span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="Pdoc-11"><a href="#Pdoc-11"><span class="linenos">11</span></a>        <span class="nb">format</span><span class="p">:</span> <span class="n">Option</span><span class="p">[</span><span class="s2">&quot;google&quot;</span><span class="p">,</span> <span class="s2">&quot;markdown&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">,</span> <span class="s2">&quot;restructuredtext&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;google&quot;</span>
-</span><span id="Pdoc-12"><a href="#Pdoc-12"><span class="linenos">12</span></a>        <span class="sd">&quot;&quot;&quot;Docstring format. Options: markdown, google, numpy, restructuredtext Default `google`.&quot;&quot;&quot;</span>
-</span><span id="Pdoc-13"><a href="#Pdoc-13"><span class="linenos">13</span></a>        <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span>
-</span><span id="Pdoc-14"><a href="#Pdoc-14"><span class="linenos">14</span></a>        <span class="n">out</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">=</span> <span class="s2">&quot;api/&quot;</span>
-</span><span id="Pdoc-15"><a href="#Pdoc-15"><span class="linenos">15</span></a>        <span class="n">templates</span><span class="p">:</span> <span class="n">PathType</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Pdoc-6"><a href="#Pdoc-6"><span class="linenos"> 6</span></a><span class="k">class</span> <span class="nc">Pdoc</span><span class="p">(</span><span class="n">Plugin</span><span class="p">):</span>
+</span><span id="Pdoc-7"><a href="#Pdoc-7"><span class="linenos"> 7</span></a>    <span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="Pdoc-8"><a href="#Pdoc-8"><span class="linenos"> 8</span></a>        <span class="nb">format</span><span class="p">:</span> <span class="n">Option</span><span class="p">[</span><span class="s2">&quot;google&quot;</span><span class="p">,</span> <span class="s2">&quot;markdown&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">,</span> <span class="s2">&quot;restructuredtext&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;google&quot;</span>
+</span><span id="Pdoc-9"><a href="#Pdoc-9"><span class="linenos"> 9</span></a>        <span class="sd">&quot;&quot;&quot;Docstring format. Options: markdown, google, numpy, restructuredtext Default `google`.&quot;&quot;&quot;</span>
+</span><span id="Pdoc-10"><a href="#Pdoc-10"><span class="linenos">10</span></a>        <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span>
+</span><span id="Pdoc-11"><a href="#Pdoc-11"><span class="linenos">11</span></a>        <span class="sd">&quot;&quot;&quot;Source module by path.&quot;&quot;&quot;</span>
+</span><span id="Pdoc-12"><a href="#Pdoc-12"><span class="linenos">12</span></a>        <span class="n">out</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">=</span> <span class="s2">&quot;api/&quot;</span>
+</span><span id="Pdoc-13"><a href="#Pdoc-13"><span class="linenos">13</span></a>        <span class="sd">&quot;&quot;&quot;Output directory relative to website root.&quot;&quot;&quot;</span>
+</span><span id="Pdoc-14"><a href="#Pdoc-14"><span class="linenos">14</span></a>        <span class="n">templates</span><span class="p">:</span> <span class="n">PathType</span>
+</span><span id="Pdoc-15"><a href="#Pdoc-15"><span class="linenos">15</span></a>        <span class="sd">&quot;&quot;&quot;Directory to pdoc override templates.&quot;&quot;&quot;</span>
 </span><span id="Pdoc-16"><a href="#Pdoc-16"><span class="linenos">16</span></a>        <span class="n">mermaid</span><span class="p">:</span> <span class="nb">bool</span>
-</span><span id="Pdoc-17"><a href="#Pdoc-17"><span class="linenos">17</span></a>        <span class="n">math</span><span class="p">:</span> <span class="nb">bool</span>
-</span><span id="Pdoc-18"><a href="#Pdoc-18"><span class="linenos">18</span></a>
-</span><span id="Pdoc-19"><a href="#Pdoc-19"><span class="linenos">19</span></a>    <span class="k">def</span> <span class="nf">pre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
-</span><span id="Pdoc-20"><a href="#Pdoc-20"><span class="linenos">20</span></a>        <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;-d </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
-</span><span id="Pdoc-21"><a href="#Pdoc-21"><span class="linenos">21</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">out</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-</span><span id="Pdoc-22"><a href="#Pdoc-22"><span class="linenos">22</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-o </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="Pdoc-23"><a href="#Pdoc-23"><span class="linenos">23</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">templates</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-</span><span id="Pdoc-24"><a href="#Pdoc-24"><span class="linenos">24</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-t </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">templates</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="Pdoc-25"><a href="#Pdoc-25"><span class="linenos">25</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mermaid</span><span class="p">:</span>
-</span><span id="Pdoc-26"><a href="#Pdoc-26"><span class="linenos">26</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--mermaid&quot;</span><span class="p">)</span>
-</span><span id="Pdoc-27"><a href="#Pdoc-27"><span class="linenos">27</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">math</span><span class="p">:</span>
-</span><span id="Pdoc-28"><a href="#Pdoc-28"><span class="linenos">28</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--math&quot;</span><span class="p">)</span>
-</span><span id="Pdoc-29"><a href="#Pdoc-29"><span class="linenos">29</span></a>        <span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;pdoc </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="Pdoc-30"><a href="#Pdoc-30"><span class="linenos">30</span></a>
-</span><span id="Pdoc-31"><a href="#Pdoc-31"><span class="linenos">31</span></a>    <span class="c1"># TODO: Get data to pass to file during compilation</span>
-</span><span id="Pdoc-32"><a href="#Pdoc-32"><span class="linenos">32</span></a>    <span class="c1"># def data(self, file: File, config: MophConfig):</span>
-</span><span id="Pdoc-33"><a href="#Pdoc-33"><span class="linenos">33</span></a>    <span class="c1">#     pass</span>
-</span><span id="Pdoc-34"><a href="#Pdoc-34"><span class="linenos">34</span></a>
-</span><span id="Pdoc-35"><a href="#Pdoc-35"><span class="linenos">35</span></a>    <span class="c1"># TODO: Call to run commands in post build</span>
-</span><span id="Pdoc-36"><a href="#Pdoc-36"><span class="linenos">36</span></a>    <span class="c1"># def post(self, config: MophConfig):</span>
-</span><span id="Pdoc-37"><a href="#Pdoc-37"><span class="linenos">37</span></a>    <span class="c1">#     pass</span>
+</span><span id="Pdoc-17"><a href="#Pdoc-17"><span class="linenos">17</span></a>        <span class="sd">&quot;&quot;&quot;Flag for rendering mermaid diagrams.&quot;&quot;&quot;</span>
+</span><span id="Pdoc-18"><a href="#Pdoc-18"><span class="linenos">18</span></a>        <span class="n">math</span><span class="p">:</span> <span class="nb">bool</span>
+</span><span id="Pdoc-19"><a href="#Pdoc-19"><span class="linenos">19</span></a>        <span class="sd">&quot;&quot;&quot;Flag for rendering Latex math.&quot;&quot;&quot;</span>
+</span><span id="Pdoc-20"><a href="#Pdoc-20"><span class="linenos">20</span></a>
+</span><span id="Pdoc-21"><a href="#Pdoc-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="nf">pre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+</span><span id="Pdoc-22"><a href="#Pdoc-22"><span class="linenos">22</span></a>        <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;-d </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+</span><span id="Pdoc-23"><a href="#Pdoc-23"><span class="linenos">23</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">out</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+</span><span id="Pdoc-24"><a href="#Pdoc-24"><span class="linenos">24</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-o </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="Pdoc-25"><a href="#Pdoc-25"><span class="linenos">25</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">templates</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+</span><span id="Pdoc-26"><a href="#Pdoc-26"><span class="linenos">26</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-t </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">templates</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="Pdoc-27"><a href="#Pdoc-27"><span class="linenos">27</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mermaid</span><span class="p">:</span>
+</span><span id="Pdoc-28"><a href="#Pdoc-28"><span class="linenos">28</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--mermaid&quot;</span><span class="p">)</span>
+</span><span id="Pdoc-29"><a href="#Pdoc-29"><span class="linenos">29</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">math</span><span class="p">:</span>
+</span><span id="Pdoc-30"><a href="#Pdoc-30"><span class="linenos">30</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--math&quot;</span><span class="p">)</span>
+</span><span id="Pdoc-31"><a href="#Pdoc-31"><span class="linenos">31</span></a>        <span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;pdoc </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -165,17 +171,17 @@
 
     </div>
     <a class="headerlink" href="#Pdoc.pre"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Pdoc.pre-19"><a href="#Pdoc.pre-19"><span class="linenos">19</span></a>    <span class="k">def</span> <span class="nf">pre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
-</span><span id="Pdoc.pre-20"><a href="#Pdoc.pre-20"><span class="linenos">20</span></a>        <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;-d </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
-</span><span id="Pdoc.pre-21"><a href="#Pdoc.pre-21"><span class="linenos">21</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">out</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-</span><span id="Pdoc.pre-22"><a href="#Pdoc.pre-22"><span class="linenos">22</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-o </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="Pdoc.pre-23"><a href="#Pdoc.pre-23"><span class="linenos">23</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">templates</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-</span><span id="Pdoc.pre-24"><a href="#Pdoc.pre-24"><span class="linenos">24</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-t </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">templates</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="Pdoc.pre-25"><a href="#Pdoc.pre-25"><span class="linenos">25</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mermaid</span><span class="p">:</span>
-</span><span id="Pdoc.pre-26"><a href="#Pdoc.pre-26"><span class="linenos">26</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--mermaid&quot;</span><span class="p">)</span>
-</span><span id="Pdoc.pre-27"><a href="#Pdoc.pre-27"><span class="linenos">27</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">math</span><span class="p">:</span>
-</span><span id="Pdoc.pre-28"><a href="#Pdoc.pre-28"><span class="linenos">28</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--math&quot;</span><span class="p">)</span>
-</span><span id="Pdoc.pre-29"><a href="#Pdoc.pre-29"><span class="linenos">29</span></a>        <span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;pdoc </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Pdoc.pre-21"><a href="#Pdoc.pre-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="nf">pre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+</span><span id="Pdoc.pre-22"><a href="#Pdoc.pre-22"><span class="linenos">22</span></a>        <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;-d </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">format</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+</span><span id="Pdoc.pre-23"><a href="#Pdoc.pre-23"><span class="linenos">23</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">out</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+</span><span id="Pdoc.pre-24"><a href="#Pdoc.pre-24"><span class="linenos">24</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-o </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">out</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="Pdoc.pre-25"><a href="#Pdoc.pre-25"><span class="linenos">25</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">templates</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+</span><span id="Pdoc.pre-26"><a href="#Pdoc.pre-26"><span class="linenos">26</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-t </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">templates</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="Pdoc.pre-27"><a href="#Pdoc.pre-27"><span class="linenos">27</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">mermaid</span><span class="p">:</span>
+</span><span id="Pdoc.pre-28"><a href="#Pdoc.pre-28"><span class="linenos">28</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--mermaid&quot;</span><span class="p">)</span>
+</span><span id="Pdoc.pre-29"><a href="#Pdoc.pre-29"><span class="linenos">29</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">math</span><span class="p">:</span>
+</span><span id="Pdoc.pre-30"><a href="#Pdoc.pre-30"><span class="linenos">30</span></a>            <span class="n">flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--math&quot;</span><span class="p">)</span>
+</span><span id="Pdoc.pre-31"><a href="#Pdoc.pre-31"><span class="linenos">31</span></a>        <span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;pdoc </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -203,14 +209,19 @@
 
     </div>
     <a class="headerlink" href="#Pdoc.Config"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Pdoc.Config-10"><a href="#Pdoc.Config-10"><span class="linenos">10</span></a>    <span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
-</span><span id="Pdoc.Config-11"><a href="#Pdoc.Config-11"><span class="linenos">11</span></a>        <span class="nb">format</span><span class="p">:</span> <span class="n">Option</span><span class="p">[</span><span class="s2">&quot;google&quot;</span><span class="p">,</span> <span class="s2">&quot;markdown&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">,</span> <span class="s2">&quot;restructuredtext&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;google&quot;</span>
-</span><span id="Pdoc.Config-12"><a href="#Pdoc.Config-12"><span class="linenos">12</span></a>        <span class="sd">&quot;&quot;&quot;Docstring format. Options: markdown, google, numpy, restructuredtext Default `google`.&quot;&quot;&quot;</span>
-</span><span id="Pdoc.Config-13"><a href="#Pdoc.Config-13"><span class="linenos">13</span></a>        <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span>
-</span><span id="Pdoc.Config-14"><a href="#Pdoc.Config-14"><span class="linenos">14</span></a>        <span class="n">out</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">=</span> <span class="s2">&quot;api/&quot;</span>
-</span><span id="Pdoc.Config-15"><a href="#Pdoc.Config-15"><span class="linenos">15</span></a>        <span class="n">templates</span><span class="p">:</span> <span class="n">PathType</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Pdoc.Config-7"><a href="#Pdoc.Config-7"><span class="linenos"> 7</span></a>    <span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+</span><span id="Pdoc.Config-8"><a href="#Pdoc.Config-8"><span class="linenos"> 8</span></a>        <span class="nb">format</span><span class="p">:</span> <span class="n">Option</span><span class="p">[</span><span class="s2">&quot;google&quot;</span><span class="p">,</span> <span class="s2">&quot;markdown&quot;</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">,</span> <span class="s2">&quot;restructuredtext&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;google&quot;</span>
+</span><span id="Pdoc.Config-9"><a href="#Pdoc.Config-9"><span class="linenos"> 9</span></a>        <span class="sd">&quot;&quot;&quot;Docstring format. Options: markdown, google, numpy, restructuredtext Default `google`.&quot;&quot;&quot;</span>
+</span><span id="Pdoc.Config-10"><a href="#Pdoc.Config-10"><span class="linenos">10</span></a>        <span class="n">source</span><span class="p">:</span> <span class="n">PathType</span>
+</span><span id="Pdoc.Config-11"><a href="#Pdoc.Config-11"><span class="linenos">11</span></a>        <span class="sd">&quot;&quot;&quot;Source module by path.&quot;&quot;&quot;</span>
+</span><span id="Pdoc.Config-12"><a href="#Pdoc.Config-12"><span class="linenos">12</span></a>        <span class="n">out</span><span class="p">:</span> <span class="n">PathType</span> <span class="o">=</span> <span class="s2">&quot;api/&quot;</span>
+</span><span id="Pdoc.Config-13"><a href="#Pdoc.Config-13"><span class="linenos">13</span></a>        <span class="sd">&quot;&quot;&quot;Output directory relative to website root.&quot;&quot;&quot;</span>
+</span><span id="Pdoc.Config-14"><a href="#Pdoc.Config-14"><span class="linenos">14</span></a>        <span class="n">templates</span><span class="p">:</span> <span class="n">PathType</span>
+</span><span id="Pdoc.Config-15"><a href="#Pdoc.Config-15"><span class="linenos">15</span></a>        <span class="sd">&quot;&quot;&quot;Directory to pdoc override templates.&quot;&quot;&quot;</span>
 </span><span id="Pdoc.Config-16"><a href="#Pdoc.Config-16"><span class="linenos">16</span></a>        <span class="n">mermaid</span><span class="p">:</span> <span class="nb">bool</span>
-</span><span id="Pdoc.Config-17"><a href="#Pdoc.Config-17"><span class="linenos">17</span></a>        <span class="n">math</span><span class="p">:</span> <span class="nb">bool</span>
+</span><span id="Pdoc.Config-17"><a href="#Pdoc.Config-17"><span class="linenos">17</span></a>        <span class="sd">&quot;&quot;&quot;Flag for rendering mermaid diagrams.&quot;&quot;&quot;</span>
+</span><span id="Pdoc.Config-18"><a href="#Pdoc.Config-18"><span class="linenos">18</span></a>        <span class="n">math</span><span class="p">:</span> <span class="nb">bool</span>
+</span><span id="Pdoc.Config-19"><a href="#Pdoc.Config-19"><span class="linenos">19</span></a>        <span class="sd">&quot;&quot;&quot;Flag for rendering Latex math.&quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -227,6 +238,71 @@
     <a class="headerlink" href="#Pdoc.Config.format"></a>
     
             <div class="docstring"><p>Docstring format. Options: markdown, google, numpy, restructuredtext Default <code>google</code>.</p>
+</div>
+
+
+                            </div>
+                            <div id="Pdoc.Config.source" class="classattr">
+                                <div class="attr variable">
+            <span class="name">source</span><span class="annotation">: PathType</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Pdoc.Config.source"></a>
+    
+            <div class="docstring"><p>Source module by path.</p>
+</div>
+
+
+                            </div>
+                            <div id="Pdoc.Config.out" class="classattr">
+                                <div class="attr variable">
+            <span class="name">out</span><span class="annotation">: PathType</span><span class="default_value"> = &#39;api/&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Pdoc.Config.out"></a>
+    
+            <div class="docstring"><p>Output directory relative to website root.</p>
+</div>
+
+
+                            </div>
+                            <div id="Pdoc.Config.templates" class="classattr">
+                                <div class="attr variable">
+            <span class="name">templates</span><span class="annotation">: PathType</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Pdoc.Config.templates"></a>
+    
+            <div class="docstring"><p>Directory to pdoc override templates.</p>
+</div>
+
+
+                            </div>
+                            <div id="Pdoc.Config.mermaid" class="classattr">
+                                <div class="attr variable">
+            <span class="name">mermaid</span><span class="annotation">: bool</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Pdoc.Config.mermaid"></a>
+    
+            <div class="docstring"><p>Flag for rendering mermaid diagrams.</p>
+</div>
+
+
+                            </div>
+                            <div id="Pdoc.Config.math" class="classattr">
+                                <div class="attr variable">
+            <span class="name">math</span><span class="annotation">: bool</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Pdoc.Config.math"></a>
+    
+            <div class="docstring"><p>Flag for rendering Latex math.</p>
 </div>
 
 
